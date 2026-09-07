@@ -34,3 +34,6 @@ Scope: a Cloudflare Workers site serving the attached knowledge base in its own 
 
 - [x] G7: committed on main and pushed to Soma's remote
   EVIDENCE: 2026-09-07 pushed to git@github.com:somachak/agent-tech-desk.git — `git ls-remote --heads origin` returns 6bef3cb6e61da1d556a06d508f508a5f24c69fb2 on refs/heads/main, matching local HEAD; branch main tracks origin/main. SSH authenticated as somachak with a new ed25519 key on this Mac.
+
+- [x] G8: deployed to Cloudflare Workers and the live site serves every route
+  EVIDENCE: 2026-09-07 `npm run deploy` uploaded 51 assets, version 59cfe2cf-cbd0-4c50-9347-3732a9c9ca84, live at https://agent-tech-desk.pixelartinc.workers.dev — /, /bookshelf, /ide, /tutor, /agent-walkthrough, a guide, a cheat sheet and the source zip all return 200; /api/tutor/health reports the mock engine (no key set yet); /private-do-not-upload/* and /books-md/* return 404.
