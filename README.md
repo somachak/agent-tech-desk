@@ -5,7 +5,7 @@ Soma Pym's desk: the fourteen book guides and the agent walkthrough, plus somewh
 ## Run it locally
 
 ```bash
-npm install
+npm install       # wrangler + pyodide (dev dependencies)
 npm run dev          # builds public/, then starts wrangler on http://localhost:8787
 ```
 
