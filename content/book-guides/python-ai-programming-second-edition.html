@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+</head>
+<body>
+<title>Python AI Programming, Second Edition</title>
+<style>
+:root{color-scheme:light;
+ --surface:#faf9f5;--surface-2:#f2f0e9;--surface-3:#e8e6dc;--surface-ink:#141413;--line:#d9d7cc;--line-soft:#e8e6dc;
+ --ink:#141413;--ink-2:#5c5b57;--ink-3:#6b6a65;--on-ink:#faf9f5;
+ --accent:#d97757;--accent-2:#6a9bcc;--accent-3:#788c5d;
+ --font-head:"Poppins",Arial,sans-serif;--font-body:"Lora",Georgia,serif;--font-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--surface);color:var(--ink-2);font-family:var(--font-body);font-size:17px;line-height:1.7}
+main{max-width:980px;margin:0 auto;padding:36px 22px 90px}
+h1,h2,h3,h4{font-family:var(--font-head);color:var(--ink);line-height:1.2;margin:0 0 10px;text-wrap:balance}
+h1{font-size:38px;letter-spacing:-.02em;font-weight:600}
+h2{font-size:25px;font-weight:600}
+h3{font-size:18px;font-weight:600}
+h4{font-size:15px;font-weight:600;margin-bottom:6px}
+p{margin:0 0 12px;max-width:70ch}
+strong{color:var(--ink)}
+a{color:var(--ink);text-decoration-color:var(--accent);text-underline-offset:3px}
+code,.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+code{font-size:.86em;background:var(--surface-3);padding:1px 5px;border-radius:5px;color:var(--ink)}
+pre{background:var(--surface-3);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-family:var(--font-mono);font-size:12.5px;line-height:1.6;color:var(--ink);overflow-x:auto;margin:8px 0 6px;white-space:pre}
+pre code{background:none;padding:0;font-size:inherit}
+section{margin-top:52px}
+.num{font-family:var(--font-mono);color:var(--ink-3);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px}
+.eyebrow{font-family:var(--font-mono);color:var(--ink-3);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase}
+.byline{font-family:var(--font-head);font-size:14px;color:var(--ink-3);margin:-4px 0 12px}
+.strip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0 10px}
+.strip div{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:13px 15px;font-size:15px}
+.strip b{display:block;font-family:var(--font-head);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
+.callout{border-left:3px solid var(--accent);background:var(--surface-2);border-radius:0 12px 12px 0;padding:12px 16px;margin:14px 0;font-size:15.5px}
+.callout.blue{border-color:var(--accent-2)}.callout.green{border-color:var(--accent-3)}
+.callout ol,.callout ul{margin:6px 0 0 18px;padding:0}.callout li{margin:4px 0}
+.callout p:last-child{margin-bottom:0}
+.chip{display:inline-block;font-family:var(--font-head);font-size:11px;font-weight:600;letter-spacing:.04em;border-radius:6px;padding:2px 8px;color:#141413;vertical-align:middle}
+.chip.foundation{background:var(--accent-3)}.chip.intermediate{background:var(--accent-2)}.chip.advanced{background:var(--accent)}
+.chip.ch{background:var(--surface-3);color:var(--ink-2);font-family:var(--font-mono);font-weight:500}
+.diagram{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:14px;margin:14px 0;overflow-x:auto}
+.diagram pre.mermaid{background:none;border:none;padding:0;margin:0;white-space:pre;overflow:visible;text-align:center}
+.diagram svg{max-width:100%;height:auto}
+/* ladder */
+.ladder{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0}
+.rung{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:16px 18px;cursor:pointer}
+.rung:hover{border-color:var(--accent)}
+.rung.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+.rung .lvl{font-family:var(--font-head);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.rung h3{margin:4px 0 6px}
+.rung p{font-size:14.5px;margin:0}
+.rung .time{font-family:var(--font-mono);font-size:12px;color:var(--ink-3);margin-top:8px}
+.rungbody{display:none;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-top:-2px}
+.rungbody.on{display:block}
+.rungbody ol{margin:6px 0 10px 20px;padding:0}.rungbody li{margin:5px 0}
+.meta{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-3)}
+/* chapter map */
+.chmap{border-top:1px solid var(--line);margin-top:10px}
+.chrow{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:start;padding:10px 6px;border-bottom:1px solid var(--line-soft);cursor:pointer}
+.chrow:hover{background:var(--surface-2)}
+.chrow .n{font-family:var(--font-mono);color:var(--ink-3);font-size:13px;padding-top:4px}
+.chrow b{font-family:var(--font-head);font-size:15px;color:var(--ink);display:block}
+.chrow span.adds{font-size:14.5px;color:var(--ink-2)}
+.chrow .secs{display:none;font-size:13.5px;color:var(--ink-3);margin-top:6px;font-family:var(--font-mono)}
+.chrow.on .secs{display:block}
+/* concepts */
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 6px}
+.tabs button{font-family:var(--font-head);font-weight:600;font-size:13.5px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:10px;padding:9px 14px;cursor:pointer}
+.tabs button:hover{border-color:var(--accent)}
+.tabs button.on{background:var(--accent);border-color:var(--accent);color:#141413}
+.tabs button .cnt{font-family:var(--font-mono);font-weight:500;font-size:12px;margin-left:6px;color:var(--ink-3)}
+.tabs button.on .cnt{color:#141413}
+.prog{display:flex;align-items:center;gap:10px;margin:8px 0 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-3)}
+.prog .bar{flex:1;height:9px;background:var(--surface-3);border-radius:0 4px 4px 0;overflow:hidden}
+.prog .bar i{display:block;height:100%;width:0;background:var(--accent-3);transition:width .25s}
+.panel{display:none}.panel.on{display:block}
+.concept{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;margin:10px 0;overflow:hidden}
+.concept.done{border-color:var(--accent-3)}
+.chead{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px 16px;cursor:pointer}
+.chead:hover{background:var(--surface-3)}
+.chead b{font-family:var(--font-head);font-size:15.5px;color:var(--ink)}
+.chead .idx{font-family:var(--font-mono);color:var(--ink-3);font-size:12px;margin-right:8px}
+.chead label{font-family:var(--font-head);font-size:12.5px;color:var(--ink-2);display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap}
+.chead input{width:16px;height:16px;accent-color:#788c5d}
+.cbody{display:none;padding:4px 16px 16px;border-top:1px solid var(--line-soft)}
+.concept.open .cbody{display:block}
+.cbody p{font-size:15.5px}
+.cbody .callout{margin:10px 0;font-size:14.5px}
+.cbody .note{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-3);margin:0 0 8px}
+.showall{margin:8px 0 0;font-family:var(--font-head);font-size:13px;color:var(--ink-3)}
+/* tables */
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin:8px 0 14px}
+th{font-family:var(--font-head);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:7px 8px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+td.t{font-family:var(--font-mono);font-size:13px;color:var(--ink);white-space:nowrap}
+.tablewrap{overflow-x:auto}
+.check{list-style:none;padding:0;margin:6px 0}
+.check li{display:flex;gap:10px;align-items:flex-start;padding:5px 0;font-size:15px}
+.check input{margin-top:5px;accent-color:#788c5d}
+.btn{font-family:var(--font-head);font-weight:600;font-size:13.5px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:10px;padding:8px 14px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.go{background:var(--accent);border-color:var(--accent);color:#141413}
+.cs-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:800px){.cs-grid,.strip,.ladder{grid-template-columns:1fr}.chrow{grid-template-columns:36px 1fr}.chrow .chip{grid-column:2}}
+details{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:12px 18px;margin-top:14px}
+summary{font-family:var(--font-head);font-weight:600;color:var(--ink);cursor:pointer}
+.quote{border-left:3px solid var(--accent-2);padding:4px 14px;margin:10px 0;font-style:italic;font-size:15.5px}
+.quote .who{display:block;font-style:normal;font-family:var(--font-mono);font-size:12px;color:var(--ink-3);margin-top:2px}
+.small{font-size:14px;color:var(--ink-3)}
+.toplinks{display:flex;flex-wrap:wrap;gap:8px 16px;font-family:var(--font-head);font-size:13.5px;margin:10px 0 0}
+.toplinks a{color:var(--ink-2)}
+@media print{
+ body{font-size:12px} main{padding:0;max-width:none}
+ body.printing main>*:not(#cheat){display:none} .btn,.toplinks{display:none}
+ pre{white-space:pre-wrap;font-size:10.5px} .cs-grid{grid-template-columns:1fr 1fr} section{margin-top:16px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+</style>
+<main>
+<header>
+ <span class="eyebrow">Formulaite bookshelf · book 1 of 14 · Python first</span>
+ <h1>Python AI Programming, Second Edition</h1>
+ <div class="byline">Patrick J · 257 pages · 35 concept cards</div>
+ <p>Builds one Python assistant from a single API call to a traced FastAPI service, using the raw Anthropic SDK, Pydantic, Chroma, DSPy, MCP and OpenTelemetry with no agent framework.</p>
+ 
+ <div class="strip">
+  <div><b>Goal</b>By the end you can build a Formulaite research agent that calls Claude with a validated Ingredient Drawer schema, grounds every section in retrieved supplier passages with citations, loops through tools with a step limit and a gate, and ships it as a traced endpoint behind a 20-case eval gate.</div>
+  <div><b>Output</b>A build ladder (3 rungs), 13 chapters mapped, 35 concept cards you tick off, and a printable cheat sheet.</div>
+  <div><b>Time</b>Foundation ~28 min · Intermediate ~22 min · Advanced ~20 min. Whole guide ~82 min over several sittings.</div>
+ </div>
+ <div class="callout"><strong>How to drive this page.</strong>
+  <ol>
+   <li>Press <button class="btn go" id="openFirst" type="button">Open the first card</button> — it jumps to the Foundation cards and opens card 01.</li>
+   <li>Read one card, tick <strong>Got it</strong>, open the next. The bar shows your progress and remembers it on this browser.</li>
+   <li>When Foundation is done, do <strong>Rung 1</strong> of the build ladder before reading Intermediate. Print the cheat sheet from section 05.</li>
+  </ol>
+  <div class="toplinks"><a href="python-ai-programming-second-edition-cheatsheet.md">Cheat sheet as Markdown</a> · <a href="index.html">All nine guides</a></div>
+ </div>
+</header>
+
+<section id="s01">
+ <span class="num">01 · Where this is going</span>
+ <h2>The model is somebody else&#x27;s problem; the system around it (prompt, schema, retrieval, loop, evals) is entirely yours, and each piece is a few lines of plain Python.</h2>
+ <p><strong>Read this book when:</strong> Open it first, before any agent book: it teaches the plain-Python parts every other book assumes you already have.</p>
+ <p>The one picture that holds the whole book. Every chapter adds a box or an arrow to it; nothing later replaces it.</p>
+ <div class="diagram"><pre class="mermaid">flowchart TD
+  A[Request] --&gt; B[System brief plus history]
+  R[Retrieve numbered passages] --&gt; B
+  B --&gt; C[Model at temperature 0]
+  C --&gt;|tool use| D[Run tool by name]
+  D --&gt;|tool result with id| C
+  C --&gt;|end turn JSON| E[Pydantic validate]
+  E --&gt;|error as new turn| C
+  E --&gt;|typed object| F[Reply with citations]
+  F --&gt; G[Eval set and trace]
+  G --&gt;|history line| H[Release gate]</pre></div>
+</section>
+
+<section id="s02">
+ <span class="num">02 · Build ladder</span>
+ <h2>Three things to build, in order</h2>
+ <p>Each rung is a Formulaite feature. Click a rung for its steps. Do rung 1 after the Foundation cards, rung 2 after Intermediate, rung 3 after Advanced.</p>
+ <div class="ladder"><div class="rung on" data-rung="0" role="button" tabindex="0"><div class="lvl">Rung 1 · Simple</div><h3>One validated Ingredient Drawer</h3><p>A single grounded call that returns one ingredient&#x27;s drawer as a typed object, or a clear refusal.</p><div class="time">~half a day</div></div><div class="rung" data-rung="1" role="button" tabindex="0"><div class="lvl">Rung 2 · Intermediate</div><h3>Ingredient research loop with tools and a gate</h3><p>The 15-line agent loop that looks up the catalogue, reads supplier pages by meaning, and fills a drawer the gate accepts.</p><div class="time">~2 days</div></div><div class="rung" data-rung="2" role="button" tabindex="0"><div class="lvl">Rung 3 · Advanced</div><h3>Evals, tracing and a served research endpoint</h3><p>A FastAPI /research endpoint with spans, cost per run, a 20-ingredient eval gate, and tools shared over MCP.</p><div class="time">~1 week</div></div></div><div class="rungbody on" data-rung="0"><h4>Steps for rung 1: One validated Ingredient Drawer</h4><ol><li>Load ANTHROPIC_API_KEY from .env and make one client.messages.create call with a system brief.</li><li>Paste the catalogue entry for one INCI name into the user message as context, constraints last.</li><li>Ask for JSON at temperature 0 with a &#x27;{&#x27; prefill.</li><li>Validate the reply with a Pydantic IngredientDrawer schema built from drawer.py.</li><li>On ValidationError, append the error as a new turn and retry up to three times.</li></ol><div class="meta">Chapters 1, 2, 3, 4 · Agent Lab files: <code>drawer.py</code> · <code>models.py</code> · <code>memory.py</code> · ~half a day</div></div><div class="rungbody" data-rung="1"><h4>Steps for rung 2: Ingredient research loop with tools and a gate</h4><ol><li>Describe catalogue_lookup and read_supplier_page as tools with a name, a when-to-use description and an input_schema.</li><li>Write the loop: call, check stop_reason, run each tool_use, append tool_result by id, max_steps=5.</li><li>Clean and chunk supplier pages, upsert them into a Chroma collection, and drop hits past a distance threshold.</li><li>Number every passage [n] source and require the drawer&#x27;s sources section to cite them.</li><li>Run run_gates() on every fill_drawer call and send FAIL reasons back as a tool_result.</li></ol><div class="meta">Chapters 6, 7, 8, 11 · Agent Lab files: <code>tools.py</code> · <code>formulaite_tools.py</code> · <code>agent.py</code> · <code>gates.py</code> · <code>glassbox.py</code> · ~2 days</div></div><div class="rungbody" data-rung="2"><h4>Steps for rung 3: Evals, tracing and a served research endpoint</h4><ol><li>Write 20 eval cases (input INCI, must_contain, must_avoid, expected_source, blocking for banned ingredients).</li><li>Score with rules first, then a smaller judge model at temperature 0, calibrated against 20 hand scores.</li><li>Add run_evals that appends one JSONL line per run and blocks release on any blocking failure.</li><li>Wrap Agent.run in a FastAPI endpoint with spans recording steps, tokens and cost, numbers only.</li><li>Serve the tool registry over an MCP server once a second Formulaite client needs it.</li></ol><div class="meta">Chapters 9, 11, 12, 13 · Agent Lab files: <code>glassbox.py</code> · <code>agent.py</code> · <code>tools.py</code> · <code>formulaite_tools.py</code> · ~1 week</div></div>
+</section>
+
+<section id="s03">
+ <span class="num">03 · Chapter map</span>
+ <h2>What each chapter adds to the machine</h2>
+ <p>Colour = the level it belongs to. Click a chapter to see its sections.</p>
+ <div class="chmap"><div class="chrow" role="button" tabindex="0"><div class="n">1</div><div><b>How AI Works Today?</b><span class="adds">Your first model call, the five-layer stack, a safe .env key, and the Daily Grind assistant that grows through every chapter.</span><div class="secs">From Building to using Models · Modern AI Stack · Setting up Working Environment · Making First Model Call · Where Popular Frameworks Fit · Journey through this Book</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">2</div><div><b>Working with Models</b><span class="adds">The message list, tokens and the context window, temperature, streaming, the system brief, a prefilled turn, and retry with backoff.</span><div class="secs">From Completions to Messages · Tokens and Context Window · Settings That Shape Output · Streaming Reply · Separating Instructions from Questions · Handling Errors and Rate Limits</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">3</div><div><b>Prompts that Works</b><span class="adds">The four parts of a prompt, few-shot turns, JSON via prefill, the common failure patterns, and versioned templates in one module.</span><div class="secs">Anatomy of Prompt that Works · Teaching by Example · Asking for Structured Output · Common Failure Patterns and Fixes · Reusable Prompt Templates</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">4</div><div><b>Reliable Outputs and Conversations</b><span class="adds">A Pydantic schema as the one source of truth, validation errors fed back as corrections, and a Conversation class that trims, compacts and saves.</span><div class="secs">Why Valid JSON is Not Enough? · Defining Order Schema with Pydantic · Validating and Retrying Automatically · Keeping Conversation · Managing Filling Context Window · Saving and Restoring Sessions</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">5</div><div><b>Programming Prompts with DSPy</b><span class="adds">Signatures and modules that declare a task, and an optimizer that compiles the prompt against a rule-based metric on held-out examples.</span><div class="secs">Why Hand-Tuned Prompt Breaks? · Signatures and Modules in DSPy · Prompt Tuning using DSPy · Worked Before and After · When DSPy Outperforms?</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">6</div><div><b>Embeddings and Semantic Search</b><span class="adds">Embeddings as position, cosine ranking, a Chroma collection with upsert, and a shortlist of three products instead of the whole menu.</span><div class="secs">What Embedding is? · Generating Embeddings through API · Measuring Similarity between Vectors · Storing Vectors in Database · Searching Shop by Meaning</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">7</div><div><b>Retrieval-Augmented Generation</b><span class="adds">The grounded prompt with a named fallback, numbered citations, a distance threshold that refuses before the model, and a rewrite step for follow-ups.</span><div class="secs">RAG in a Nutshell · Building Retrieval Step · Feeding Context to Model · Complete Question Pipeline · Raising Quality of Replies · Common Rag Mistakes</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">8</div><div><b>Getting Data Ready</b><span class="adds">Loaders for PDF, plain and web files, four-substitution cleaning, paragraph chunking with overlap, and a fingerprint sync that deletes what vanished.</span><div class="secs">Loading Shop&#x27;s Real Files · Cleaning What We Loaded · Chunking Strategies that Matter · Working with Datasets Library · Refreshing and Updating Index</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">9</div><div><b>Model Needs Customization</b><span class="adds">The prompting, retrieval, tuning decision order, what tuning cannot fix, and one honest tuning candidate scored on held-out rows.</span><div class="secs">Choosing Prompting, Retrieval, and Tuning · What Fine-Tuning Actually Does? · Easy Hosted Path · Preparing Training Examples · Measuring Scores</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">10</div><div><b>Working with Images and Sound</b><span class="adds">Images as content blocks, resizing before sending, the unchanged Order schema reading a photographed slip, and one entry point for every input.</span><div class="secs">Sending Images to Model · Reading What Camera Sees · Hearing and Speaking · Combining Modalities · Practical Limits and Costs</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">11</div><div><b>Tools, Agents and MCP</b><span class="adds">Tool descriptions from Pydantic, the 15-line agent loop, three limits, a confirmation ticket for writes, and a FastMCP server.</span><div class="secs">Why Model needs Tools? · Basics of Tool Calling · Agent Loop · Keeping Agent Bounded · Building Minimal Server</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">12</div><div><b>Examining AI with Evals and Safety Tests</b><span class="adds">A 20-case eval set, rules then a calibrated judge, blocking allergen cases, untrusted records, PII redaction, and a one-command release gate.</span><div class="secs">Looking Good is Not Enough · Building Small Eval Set · Scoring with Rules and Judge · Safety, Bias, and Personal Information · Tracking Quality Periodically</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">13</div><div><b>Shipping with FastAPI and OpenTelemetry</b><span class="adds">A typed /ask endpoint and /health check, async batches under a semaphore, spans with numeric attributes, cost from tokens, and four alerts.</span><div class="secs">Wrapping Assistant in FastAPI · One Endpoint for Whole Assistant · Running Many Calls At Once · Tracing with OpenTelemetry · Monitoring Cost, Latency, and Errors · Complete Application Overview</div></div><span class="chip advanced">advanced</span></div></div>
+</section>
+
+<section id="s04">
+ <span class="num">04 · Concept cards</span>
+ <h2>Foundation → Intermediate → Advanced</h2>
+ <p>One idea per card: what it is, a picture for it, the code if there is any, the trap, and where it lives in Formulaite. Tick a card when you could explain it to someone else.</p>
+ <div class="tabs" id="ctabs"><button data-level="foundation" class="on">Foundation<span class="cnt">14 cards · ~28 min</span></button><button data-level="intermediate" class="">Intermediate<span class="cnt">11 cards · ~22 min</span></button><button data-level="advanced" class="">Advanced<span class="cnt">10 cards · ~20 min</span></button></div><div class="panel on" data-level="foundation"><div class="prog"><span class="lbl">Foundation</span><div class="bar"><i></i></div><span class="txt">0 / 14 got it</span></div><div class="concept" data-key="One call to the Messages API"><div class="chead" role="button" tabindex="0"><div><span class="idx">01</span><b>One call to the Messages API</b> <span class="chip ch">ch 1</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Everything in the book starts with one request to a hosted model. You send a list of messages and read back a list of content blocks. The reply text sits in response.content[0].text. The wording varies on every run, and that is normal.</p><div class="callout blue"><strong>Picture it:</strong> Like phoning a knowledgeable supplier rep: you ask one question, they answer in their own words, and you write down what they said.</div><pre><code>import os
+from anthropic import Anthropic
+from dotenv import load_dotenv
+load_dotenv()
+client = Anthropic(api_key=os.environ[&quot;ANTHROPIC_API_KEY&quot;])
+response = client.messages.create(
+    model=&quot;claude-sonnet-5&quot;,
+    max_tokens=300,
+    messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Suggest one cold coffee drink for a hot afternoon.&quot;}],
+)
+print(response.content[0].text)</code></pre><div class="note">content is a list of blocks, so [0].text reads the first one; the key comes from .env, never from the file.</div><div class="callout"><strong>The trap:</strong> Pasting the API key into the script; keep it in .env with chmod 600 and a .gitignore line.</div><div class="callout green"><strong>In Formulaite:</strong> models.py: ClaudeModel.complete() wraps exactly this call so agent.py never touches the SDK directly.</div></div></div><div class="concept" data-key="stop_reason and usage"><div class="chead" role="button" tabindex="0"><div><span class="idx">02</span><b>stop_reason and usage</b> <span class="chip ch">ch 1</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>The response carries more than text. stop_reason says why the model stopped: end_turn, max_tokens, stop_sequence, or later tool_use. usage holds input and output tokens, which drive cost and latency. Record both on every call.</p><div class="callout blue"><strong>Picture it:</strong> A delivery note tells you not just what arrived but whether the order was complete and what it weighed.</div><pre><code>print(response.model)
+print(response.stop_reason)
+print(response.usage.input_tokens, response.usage.output_tokens)
+# claude-sonnet-5
+# end_turn
+# 19 42</code></pre><div class="note">max_tokens in stop_reason means the reply was cut short; check it before trusting the output.</div><div class="callout"><strong>The trap:</strong> Trusting a truncated reply because it parsed; a stop_reason of max_tokens means half a sentence went to the customer.</div><div class="callout green"><strong>In Formulaite:</strong> glassbox.py: every model reply is logged as an Event with its stop reason and token counts so a run can be replayed.</div></div></div><div class="concept" data-key="Standing instructions live in system"><div class="chead" role="button" tabindex="0"><div><span class="idx">03</span><b>Standing instructions live in system</b> <span class="chip ch">ch 2</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>The system parameter carries what is true for every conversation: who the assistant is, its tone, its limits and its fallback. A user message carries only this moment&#x27;s question. The model weighs the two differently, so keep them apart.</p><div class="callout blue"><strong>Picture it:</strong> The lab&#x27;s standard operating procedure is pinned to the wall; the day&#x27;s batch sheet is the message.</div><pre><code>SHOP_BRIEF = (
+    &quot;We are the assistant for Daily Grind, a neighbourhood coffee shop. &quot;
+    &quot;Every reply stays short, warm, and practical, and never exceeds three sentences. &quot;
+    &quot;When a customer asks for something we do not serve, we say so plainly &quot;
+    &quot;and offer the closest match from our own menu. &quot;
+    &quot;We never invent a product, a price, or an ingredient.&quot;
+)
+response = client.messages.create(
+    model=MODEL, max_tokens=300, system=SHOP_BRIEF,
+    messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: question}],
+)</code></pre><div class="note">The brief names what to do when unsure (offer the closest match); a brief with no stated limits invites invention.</div><div class="callout"><strong>The trap:</strong> Stuffing one customer&#x27;s details into system, or leaving out the boundaries so the model improvises confidently.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py: the Agent&#x27;s system brief tells the model it must fill the Ingredient Drawer and must not invent an INCI name or a use level.</div></div></div><div class="concept" data-key="The API remembers nothing"><div class="chead" role="button" tabindex="0"><div><span class="idx">04</span><b>The API remembers nothing</b> <span class="chip ch">ch 2</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Each request is complete in itself. The service keeps no memory between calls. To hold a conversation you resend the whole history every time, as user and assistant turns that alternate. That costs tokens but gives total control over what the model sees.</p><div class="callout blue"><strong>Picture it:</strong> A pen-friend with amnesia: every letter must quote the earlier letters, or they have no idea what you are talking about.</div><pre><code>messages = [
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What do you have that is cold?&quot;},
+    {&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: &quot;Our cold brew and iced americano both work well.&quot;},
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Which of those carries less caffeine?&quot;},
+]</code></pre><div class="note">Roles alternate user, assistant, user; the model reads the whole list and continues it.</div><div class="callout"><strong>The trap:</strong> Sending only the latest question and wondering why &#x27;which of those&#x27; gets a confused answer.</div><div class="callout green"><strong>In Formulaite:</strong> memory.py: Conversation keeps that list well-formed, with tool results always inside a user turn, so agent.py resends it on every step.</div></div></div><div class="concept" data-key="Tokens and the context window"><div class="chead" role="button" tabindex="0"><div><span class="idx">05</span><b>Tokens and the context window</b> <span class="chip ch">ch 2</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A token is a chunk of characters, about four letters of English. Billing is per token, input and output priced separately. The context window is the token ceiling for one request: system, history and reply together. count_tokens measures a prompt for free before you send it.</p><div class="callout blue"><strong>Picture it:</strong> A shipping crate: every item you pack has a weight, you pay by weight, and the crate has a fixed limit.</div><pre><code>estimate = client.messages.count_tokens(
+    model=MODEL,
+    system=SHOP_BRIEF,
+    messages=messages,
+)
+print(estimate.input_tokens)   # 47</code></pre><div class="note">The count includes role markers and the system brief, which is why a short question measures longer than it looks.</div><div class="callout"><strong>The trap:</strong> Never measuring, so a prompt silently doubles and the surprise arrives on the invoice.</div><div class="callout green"><strong>In Formulaite:</strong> memory.py: Conversation.token_estimate() (len(text) // 4) is the cheap budget signal the lab reads before each step.</div></div></div><div class="concept" data-key="Temperature"><div class="chead" role="button" tabindex="0"><div><span class="idx">06</span><b>Temperature</b> <span class="chip ch">ch 2</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Temperature controls how adventurously the model picks the next token. At 0.0 it takes the most likely option every time, so the same input gives the same output. Use 0.0 for anything a program will parse. Use around 0.7 for wording that should feel fresh.</p><div class="callout blue"><strong>Picture it:</strong> A recipe followed by the book versus a chef improvising; you want the book when the batch must be reproducible.</div><pre><code>response = client.messages.create(
+    model=MODEL,
+    max_tokens=300,
+    temperature=0.0,
+    system=SHOP_BRIEF,
+    messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;List our three most popular hot drinks.&quot;}],
+)
+print(response.content[0].text)</code></pre><div class="note">Run it twice and get the same wording; leave top_p at its default and change only one knob.</div><div class="callout"><strong>The trap:</strong> Extracting structured data at a warm temperature and then blaming the parser for random failures.</div><div class="callout green"><strong>In Formulaite:</strong> models.py: ClaudeModel calls at temperature 0 because the drawer is data another program reads, not prose.</div></div></div><div class="concept" data-key="Prefilled assistant turn"><div class="chead" role="button" tabindex="0"><div><span class="idx">07</span><b>Prefilled assistant turn</b> <span class="chip ch">ch 2</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>You may end the message list with an assistant turn you wrote yourself. The model continues from there as if the words were its own. A prefill of &#x27;1.&#x27; forces a list. A prefill of &#x27;{&#x27; forces JSON with no polite preamble.</p><div class="callout blue"><strong>Picture it:</strong> Handing someone a form with the first box already filled in; they carry on in the same format.</div><pre><code>response = client.messages.create(
+    model=MODEL, max_tokens=200, temperature=0.0, system=SHOP_BRIEF,
+    messages=[
+        {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;List three iced drinks from our menu.&quot;},
+        {&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: &quot;1.&quot;},
+    ],
+)
+print(&quot;1.&quot; + response.content[0].text)</code></pre><div class="note">Your code must prepend the prefill again before parsing, because the reply starts after it.</div><div class="callout"><strong>The trap:</strong> Forgetting to add the &#x27;{&#x27; back before json.loads, so every reply fails to parse.</div><div class="callout green"><strong>In Formulaite:</strong> formulaite_tools.py: fill_drawer uses tool use instead of a &#x27;{&#x27; prefill, but the idea is the same: force the shape, do not ask nicely for it.</div></div></div><div class="concept" data-key="Retry with exponential backoff"><div class="chead" role="button" tabindex="0"><div><span class="idx">08</span><b>Retry with exponential backoff</b> <span class="chip ch">ch 2</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Four failures cover almost everything: rate limit 429, overloaded 529, a network fault, and a malformed request 400. The first three clear with a wait. The last never will. Retry only the temporary ones, waiting longer each time plus a little random jitter.</p><div class="callout blue"><strong>Picture it:</strong> A busy supplier phone line: call back after 1, 2, 4 minutes rather than redialling instantly, and do not redial at all if you dialled a wrong number.</div><pre><code>import random, time
+import anthropic
+
+def ask(messages, attempts=4, **options):
+    for attempt in range(attempts):
+        try:
+            return call_model(messages, **options)
+        except (anthropic.RateLimitError, anthropic.APIStatusError):
+            if attempt == attempts - 1:
+                raise
+            time.sleep((2 ** attempt) + random.random())</code></pre><div class="note">**options forwards temperature and max_tokens without repeating them at every layer; the jitter stops many clients retrying in unison.</div><div class="callout"><strong>The trap:</strong> One broad except that retries a 400 four times, wasting quota on a request that will fail forever.</div><div class="callout green"><strong>In Formulaite:</strong> models.py: ClaudeModel.complete() is where the backoff belongs, so a busy API slows the research run instead of killing it.</div></div></div><div class="concept" data-key="Four parts of a prompt"><div class="chead" role="button" tabindex="0"><div><span class="idx">09</span><b>Four parts of a prompt</b> <span class="chip ch">ch 3</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A prompt that behaves carries four parts: role, context, task, constraints. Most bad replies trace to a missing part, not a weak model. Invented prices mean context was missing. Rambling means the constraint was missing. Put constraints last, where they land hardest.</p><div class="callout blue"><strong>Picture it:</strong> A lab work order: who you are, the raw materials on the bench, the one job, and the safety limits written at the bottom.</div><pre><code>RECOMMENDATION = &quot;&quot;&quot;A customer at Daily Grind has asked the following.
+{question}
+Our current menu is below.
+{menu}
+We reply in at most three sentences.
+We name the price of anything we suggest.
+We recommend only products that appear on the menu above.
+&quot;&quot;&quot;</code></pre><div class="note">Question, then context, then the constraints at the very end; a number (three sentences) beats an adjective (brief).</div><div class="callout"><strong>The trap:</strong> Burying the format rule between two long blocks and concluding the model ignores instructions.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py: the system brief plus the catalogue entry plus the drawer schema are exactly role, context, task and constraints.</div></div></div><div class="concept" data-key="Few-shot turns"><div class="chead" role="button" tabindex="0"><div><span class="idx">10</span><b>Few-shot turns</b> <span class="chip ch">ch 3</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A demonstration teaches tone, length and edge cases in two lines where a description takes a paragraph. Examples travel as ordinary user and assistant turns placed before the real question. Two or three are enough. One refusal example teaches more than three happy ones.</p><div class="callout blue"><strong>Picture it:</strong> Showing a new formulator one filled-in ingredient card beats a page of instructions about how cards should look.</div><pre><code>FEW_SHOT = [
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Something warm but not too milky.&quot;},
+    {&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: &quot;A flat white keeps the milk light at 3.40. Our filter coffee at 2.60 is lighter still.&quot;},
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Do you sell bubble tea?&quot;},
+    {&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: &quot;We do not serve bubble tea. Our iced latte at 3.80 is the closest sweet cold option.&quot;},
+]
+
+def recommend(question):
+    messages = FEW_SHOT + [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: question}]
+    return ask(messages, temperature=0.3)</code></pre><div class="note">The second pair carries most of the value: it shows how to refuse briefly and offer an alternative.</div><div class="callout"><strong>The trap:</strong> Adding ten examples; beyond five they rarely help and every one costs tokens on every call.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py: one example drawer for a known ingredient, shown as a prior turn, teaches the model the drawer&#x27;s register.</div></div></div><div class="concept" data-key="Prompt templates with a version"><div class="chead" role="button" tabindex="0"><div><span class="idx">11</span><b>Prompt templates with a version</b> <span class="chip ch">ch 3</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Small wording changes cause real behaviour changes, so prompts are source code. Keep them in one module with named placeholders. Give each template a version constant and keep the old wording. Log the version with every reply so a change in quality points at an edit.</p><div class="callout blue"><strong>Picture it:</strong> Formula revisions: you never overwrite v2 with v3, you keep both so you can see what changed when a batch goes wrong.</div><pre><code>PROMPT_VERSION = &quot;recommendation-v2&quot;
+
+RECOMMENDATION_V1 = &quot;&quot;&quot;A customer at Daily Grind has asked the following.
+{question}
+We reply briefly and helpfully.
+&quot;&quot;&quot;
+
+def render(template, **values):
+    return template.format(**values)</code></pre><div class="note">v1 sits above v2 in the file; the difference (no menu, no limit) explains the invented prices it produced.</div><div class="callout"><strong>The trap:</strong> Editing a prompt in place on Friday and having no idea on Monday which words changed.</div><div class="callout green"><strong>In Formulaite:</strong> glassbox.py: log the prompt version on every run so a Glass Box trace can be compared across prompt edits.</div></div></div><div class="concept" data-key="Pydantic schema as one source of truth"><div class="chead" role="button" tabindex="0"><div><span class="idx">12</span><b>Pydantic schema as one source of truth</b> <span class="chip ch">ch 4</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Valid JSON is not correct JSON. A renamed key, a quantity spelled as a word, or an invented milk all pass json.loads. A Pydantic class states the shape once: names, types, allowed values, defaults. Enums inheriting from str name every permitted option. model_json_schema() turns the class into the prompt text.</p><div class="callout blue"><strong>Picture it:</strong> A batch record template with fixed fields and drop-down options; you cannot write &#x27;venti&#x27; in a box that only accepts small, regular, large.</div><pre><code>from enum import Enum
+from pydantic import BaseModel, Field
+class Milk(str, Enum):
+    whole = &quot;whole&quot;
+    oat = &quot;oat&quot;
+    soy = &quot;soy&quot;
+    none = &quot;none&quot;
+class Order(BaseModel):
+    drink: str = Field(description=&quot;The drink name exactly as written on the menu&quot;)
+    milk: Milk = Milk.whole
+    quantity: int = Field(default=1, ge=1, le=20)
+SCHEMA_BLOCK = json.dumps(Order.model_json_schema(), indent=2)</code></pre><div class="note">Field descriptions double as prompt text; ge/le stop a four-hundred-coffee order; the enum rejects &#x27;almond&#x27;.</div><div class="callout"><strong>The trap:</strong> Checking only that the braces matched and finding the renamed key three functions downstream.</div><div class="callout green"><strong>In Formulaite:</strong> drawer.py: IngredientDrawer is the schema; as_tool_schema() plays the role of model_json_schema() and gates.py validates against it.</div></div></div><div class="concept" data-key="Feed the validation error back"><div class="chead" role="button" tabindex="0"><div><span class="idx">13</span><b>Feed the validation error back</b> <span class="chip ch">ch 4</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A failed validation names the field and the reason. Do not throw that away and retry blindly. Append the bad reply and the error as new turns and ask again. Three attempts, then raise so the caller decides. Most corrections succeed on the second try.</p><div class="callout blue"><strong>Picture it:</strong> Returning a form with the wrong box circled in red, rather than silently handing over a blank one.</div><pre><code>from pydantic import ValidationError
+def extract_order(sentence, attempts=3):
+    messages = [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: sentence}]
+    for attempt in range(attempts):
+        raw = &quot;{&quot; + call_model(messages + [{&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: &quot;{&quot;}],
+                               temperature=0.0, system=ORDER_INSTRUCTIONS)
+        try:
+            return Order.model_validate_json(raw)
+        except (ValidationError, json.JSONDecodeError) as error:
+            messages.append({&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: raw})
+            messages.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: f&quot;That reply failed validation.\n\n{error}\n\nWe return corrected JSON only.&quot;})
+    raise ValueError(&quot;The order could not be validated after three attempts.&quot;)</code></pre><div class="note">The error text becomes the next user turn; a failure surviving three corrections is a prompt problem, not bad luck.</div><div class="callout"><strong>The trap:</strong> Retrying with the same prompt and no error report, then giving up after the same mistake three times.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py: a FAIL verdict from gates.py goes back to the model as a tool_result with the reasons; this is the evaluator-optimizer loop.</div></div></div><div class="concept" data-key="A Conversation object owns the history"><div class="chead" role="button" tabindex="0"><div><span class="idx">14</span><b>A Conversation object owns the history</b> <span class="chip ch">ch 4</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Memory is bookkeeping, not intelligence. One small class holds the customer id, the system brief and the message list. reply() appends the question, calls the model, appends the answer. The rest of the code never touches a raw list again. Trimming and saving attach to the same object.</p><div class="callout blue"><strong>Picture it:</strong> One project folder per client that every colleague adds to, instead of loose notes on five desks.</div><pre><code>class Conversation:
+    def __init__(self, customer_id, system=SHOP_BRIEF):
+        self.customer_id = customer_id
+        self.system = system
+        self.messages = []
+    def add_user(self, content):
+        self.messages.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: content})
+    def reply(self, question, temperature=0.3):
+        self.add_user(question)
+        result = ask(self.messages, temperature=temperature, system=self.system)
+        self.messages.append({&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: result})
+        return result</code></pre><div class="note">trim() drops the oldest pair while over budget; compact() summarises older turns, keeping any stated allergy; save() and load() persist one JSON per customer.</div><div class="callout"><strong>The trap:</strong> Trimming from the front and losing the allergy the customer stated in turn one.</div><div class="callout green"><strong>In Formulaite:</strong> memory.py: Conversation is this class for the agent loop, with add_user, add_assistant, add_tool_results and as_api().</div></div></div></div><div class="panel" data-level="intermediate"><div class="prog"><span class="lbl">Intermediate</span><div class="bar"><i></i></div><span class="txt">0 / 11 got it</span></div><div class="concept" data-key="DSPy: declare the task, compile the prompt"><div class="chead" role="button" tabindex="0"><div><span class="idx">01</span><b>DSPy: declare the task, compile the prompt</b> <span class="chip ch">ch 5</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A hand-tuned prompt hides which word fixed which case. DSPy separates what a task takes in and returns (a Signature) from how it is phrased. A Module wraps the signature with a strategy such as ChainOfThought. An optimizer then searches for wording and examples that score well on a metric you wrote, and saves the compiled prompt to disk.</p><div class="callout blue"><strong>Picture it:</strong> You write the spec for a label; a copywriter tries thirty drafts and keeps the ones your checklist passes.</div><pre><code>import dspy
+class Recommend(dspy.Signature):
+    &quot;&quot;&quot;Recommend one drink from the Daily Grind menu.&quot;&quot;&quot;
+    menu: str = dspy.InputField(desc=&quot;The shop menu with prices&quot;)
+    question: str = dspy.InputField(desc=&quot;What the customer asked for&quot;)
+    suggestion: str = dspy.OutputField(desc=&quot;At most three sentences, naming the price&quot;)
+def grounded(example, prediction, trace=None):
+    reply = prediction.suggestion.lower()
+    return any(item in reply for item in MENU_ITEMS) and reply.count(&quot;.&quot;) &lt;= 3
+optimizer = BootstrapFewShot(metric=grounded, max_bootstrapped_demos=4)
+tuned = optimizer.compile(ShopAssistant(), trainset=trainset)
+tuned.save(&quot;tuned_assistant.json&quot;)</code></pre><div class="note">Held-out score went from 62.5 to 93.8 with no change to the model; only the prompt changed. Compile in the release step, not at start-up.</div><div class="callout"><strong>The trap:</strong> Compiling a task with no mechanical metric (seasonal marketing copy); whatever you cannot score, a machine cannot optimise.</div><div class="callout green"><strong>In Formulaite:</strong> gates.py: the gate checks are already a mechanical metric, so a drawer-filling prompt could be compiled against them later.</div></div></div><div class="concept" data-key="Embedding: meaning as position"><div class="chead" role="button" tabindex="0"><div><span class="idx">02</span><b>Embedding: meaning as position</b> <span class="chip ch">ch 6</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>An embedding is a list of numbers that stands for meaning. Phrases with similar meaning land close together even with no shared words. Cosine similarity compares direction, so a six-word question compares fairly with a forty-word description. Embedding calls are cheap; generation calls are not.</p><div class="callout blue"><strong>Picture it:</strong> Ingredients arranged on a shelf by function: two emollients sit together even if their INCI names look nothing alike.</div><pre><code>import numpy as np
+import voyageai
+vo = voyageai.Client(api_key=os.environ[&quot;VOYAGE_API_KEY&quot;])
+def embed_documents(passages):
+    return vo.embed(passages, model=&quot;voyage-3&quot;, input_type=&quot;document&quot;).embeddings
+def embed_query(question):
+    return vo.embed([question], model=&quot;voyage-3&quot;, input_type=&quot;query&quot;).embeddings[0]
+def cosine(first, second):
+    first, second = np.array(first), np.array(second)
+    return float(np.dot(first, second) / (np.linalg.norm(first) * np.linalg.norm(second)))</code></pre><div class="note">input_type differs for storing versus searching; a ranking always returns something, so treat a top score below about 0.3 as &#x27;nothing relevant&#x27;.</div><div class="callout"><strong>The trap:</strong> Trusting the top hit for &#x27;parking&#x27; because it is the top hit; ranking has no idea of relevance in the absolute.</div><div class="callout green"><strong>In Formulaite:</strong> formulaite_tools.py: catalogue_lookup is exact today; a vector index over supplier pages would let read_supplier_page find passages by meaning.</div></div></div><div class="concept" data-key="A vector collection with upsert"><div class="chead" role="button" tabindex="0"><div><span class="idx">03</span><b>A vector collection with upsert</b> <span class="chip ch">ch 6</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>An in-memory list works for three products and fails for three thousand. A collection stores each vector with its wording, an id and metadata. upsert inserts what is new and replaces what changed, so running it twice is safe. The library returns distance, where smaller is closer.</p><div class="callout blue"><strong>Picture it:</strong> A card index where every card has a fixed number: refiling a corrected card replaces the old one instead of adding a duplicate.</div><pre><code>import chromadb
+chroma = chromadb.PersistentClient(path=&quot;vectors&quot;)
+collection = chroma.get_or_create_collection(&quot;menu&quot;)
+
+def index_products():
+    passages = [describe(product) for product in PRODUCTS]
+    collection.upsert(
+        ids=[product[&quot;id&quot;] for product in PRODUCTS],
+        documents=passages,
+        embeddings=embed_documents(passages),
+        metadatas=[{&quot;name&quot;: p[&quot;name&quot;], &quot;price&quot;: p[&quot;price&quot;]} for p in PRODUCTS],
+    )</code></pre><div class="note">Stable ids make reindexing idempotent; metadata lets you filter before the vector comparison for free.</div><div class="callout"><strong>The trap:</strong> Mixing the two conventions: cosine similarity (bigger is closer) and Chroma distance (smaller is closer) gives inverted rankings.</div><div class="callout green"><strong>In Formulaite:</strong> formulaite_tools.py: the catalogue is a dict loaded from data/catalogue.json today; a collection is its natural next home.</div></div></div><div class="concept" data-key="Grounded prompt with a named fallback"><div class="chead" role="button" tabindex="0"><div><span class="idx">04</span><b>Grounded prompt with a named fallback</b> <span class="chip ch">ch 7</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>RAG is three steps: retrieve passages, format them as context, generate from that context only. The prompt must do three jobs: supply the material, forbid anything outside it, and say what to do when the material falls short. Leave out the fallback and the model invents one.</p><div class="callout blue"><strong>Picture it:</strong> A reference librarian who answers only from the books on the desk, and says &#x27;let me fetch a colleague&#x27; when the desk has nothing.</div><pre><code>GROUNDED_REPLY = &quot;&quot;&quot;A customer at Daily Grind has asked the following.
+{question}
+The shop records below are the only material we may use.
+{context}
+We reply in at most three sentences.
+We use only what these records state, and we cite the number of any record we rely on.
+When the records do not cover the question, we say so plainly and offer to fetch a colleague.
+We never guess a price, an ingredient, or an opening time.
+&quot;&quot;&quot;</code></pre><div class="note">Question above, context in the middle, constraints last; temperature 0 because a grounded reply should repeat the records, not vary.</div><div class="callout"><strong>The trap:</strong> Retrieving the right passage and then losing to the model&#x27;s general knowledge because the wording was soft.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py: the system brief tells the model to fill the drawer only from catalogue_lookup and read_supplier_page results, else leave the section empty.</div></div></div><div class="concept" data-key="Numbered citations"><div class="chead" role="button" tabindex="0"><div><span class="idx">05</span><b>Numbered citations</b> <span class="chip ch">ch 7</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Each passage gets a number and a source label, such as [1] Allergen sheet. The model cites the number. You can check any claim in seconds. Better, code can verify that every bracketed number in a reply exists among the passages you sent. A [7] after four records proves invention.</p><div class="callout blue"><strong>Picture it:</strong> A certificate of analysis that cites the test method for every value; a value with no method beside it deserves suspicion.</div><pre><code>def format_context(items):
+    return &quot;\n\n&quot;.join(
+        f&quot;[{position + 1}] {item[&#x27;source&#x27;]}. {item[&#x27;passage&#x27;]}&quot;
+        for position, item in enumerate(items)
+    )</code></pre><div class="note">Four characters per passage buy a check that runs in microseconds and never gives a false alarm.</div><div class="callout"><strong>The trap:</strong> Demanding citations for presentation and never checking whether the cited record supports the claim.</div><div class="callout green"><strong>In Formulaite:</strong> gates.py: check_has_sources requires the drawer&#x27;s sources section; a bracket-to-passage check would make it stricter.</div></div></div><div class="concept" data-key="Distance threshold before the model"><div class="chead" role="button" tabindex="0"><div><span class="idx">06</span><b>Distance threshold before the model</b> <span class="chip ch">ch 7</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A ranking always fills the requested slots, so weak matches appear when strong ones run out. Drop anything beyond a distance limit before building the prompt. If nothing survives, refuse before spending a token. Tune the threshold first; treat the count (3 to 5) as a ceiling.</p><div class="callout blue"><strong>Picture it:</strong> A sieve before the mixer: if nothing passes the mesh, you do not start the batch.</div><pre><code>DISTANCE_LIMIT = 0.75
+
+def respond(question, n_results=4):
+    items = [item for item in retrieve(question, n_results=n_results)
+             if item[&quot;distance&quot;] &lt;= DISTANCE_LIMIT]
+    if not items:
+        return &quot;We do not have that in our records, though a colleague at the counter can help.&quot;
+    prompt = render(GROUNDED_REPLY, question=question, context=format_context(items))
+    return ask([{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}], temperature=0.0)</code></pre><div class="note">The parking question never reaches the model; the refusal is free and honest. 0.75 is a starting point, not a law.</div><div class="callout"><strong>The trap:</strong> Trusting 0.75 from the book instead of tuning it against real questions on your own collection.</div><div class="callout green"><strong>In Formulaite:</strong> gates.py: a deterministic refusal before the model is the same instinct as the gate: plain Python decides, the model does not.</div></div></div><div class="concept" data-key="Clean, then chunk by paragraph"><div class="chead" role="button" tabindex="0"><div><span class="idx">07</span><b>Clean, then chunk by paragraph</b> <span class="chip ch">ch 8</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Loaders leave four kinds of damage: non-breaking spaces, hyphenated line breaks, blank-line runs, repeated spaces. Repair those and nothing else; do not lowercase or strip punctuation. Then split on paragraph boundaries with a character ceiling (900) and about 15% overlap so a fact spanning a boundary survives.</p><div class="callout blue"><strong>Picture it:</strong> Cutting a supplier data sheet along its own section headings, not every ten centimetres with a ruler.</div><pre><code>def chunk_by_paragraph(content, max_chars=900, overlap=150):
+    blocks = [block.strip() for block in content.split(&quot;\n\n&quot;) if block.strip()]
+    chunks, current = [], &quot;&quot;
+    for block in blocks:
+        if current and len(current) + len(block) + 2 &gt; max_chars:
+            chunks.append(current)
+            current = current[-overlap:] if overlap else &quot;&quot;
+        current = f&quot;{current}\n\n{block}&quot;.strip()
+    if current:
+        chunks.append(current)
+    return chunks</code></pre><div class="note">The ceiling is a limit not a target: a 200-character policy stays whole. Carry the nearest heading into each chunk for cheap context.</div><div class="callout"><strong>The trap:</strong> Chunking at a fixed 500 characters and embedding one vector for four unrelated subjects.</div><div class="callout green"><strong>In Formulaite:</strong> formulaite_tools.py: read_supplier_page returns raw page text; a clean-and-chunk step is what turns it into passages a drawer can cite.</div></div></div><div class="concept" data-key="Fingerprint refresh: embed only what changed"><div class="chead" role="button" tabindex="0"><div><span class="idx">08</span><b>Fingerprint refresh: embed only what changed</b> <span class="chip ch">ch 8</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Re-embedding everything on every run is simple and wasteful. Hash each passage&#x27;s wording and store the hash in metadata. Next run, embed only passages whose hash differs. Delete ids that vanished from the sources; that is the step everybody forgets. The whole refresh is one idempotent command.</p><div class="callout blue"><strong>Picture it:</strong> Checking a stock list against last week&#x27;s: reorder only what changed and remove the lines for discontinued items.</div><pre><code>import hashlib
+def fingerprint(content):
+    return hashlib.sha256(content.encode(&quot;utf-8&quot;)).hexdigest()[:16]
+
+def sync(passages):
+    stored = collection.get(include=[&quot;metadatas&quot;])
+    known = {entry: meta.get(&quot;fingerprint&quot;)
+             for entry, meta in zip(stored[&quot;ids&quot;], stored[&quot;metadatas&quot;])}
+    incoming = {row[&quot;id&quot;]: {**row, &quot;fingerprint&quot;: fingerprint(row[&quot;content&quot;])} for row in passages}
+    changed = [row for key, row in incoming.items() if known.get(key) != row[&quot;fingerprint&quot;]]
+    removed = [key for key in known if key not in incoming]
+    return changed, removed</code></pre><div class="note">Stable ids like &#x27;handbook::3&#x27; mean an edit at the end re-embeds only the tail. A second run prints &#x27;embedded 0, removed 0&#x27;.</div><div class="callout"><strong>The trap:</strong> Withdrawing a product from the menu but leaving its vector, so the assistant keeps recommending it.</div><div class="callout green"><strong>In Formulaite:</strong> formulaite_tools.py: the local pages under data/pages are the sources; a fingerprint sync keeps a supplier index fresh without re-reading every page.</div></div></div><div class="concept" data-key="An image is just another content block"><div class="chead" role="button" tabindex="0"><div><span class="idx">09</span><b>An image is just another content block</b> <span class="chip ch">ch 10</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A vision model takes images inside the same message list. The user content becomes a list of blocks: one image block, one text block. Encode the file as base64 with the right media type. Resize to about 1500 pixels on the long edge first, or a phone photo costs many times the tokens it needs. The Order schema and retry loop read a photographed slip unchanged.</p><div class="callout blue"><strong>Picture it:</strong> Photographing a handwritten supplier label and typing what you see into the same form you always use.</div><pre><code>import base64
+from pathlib import Path
+MEDIA_TYPES = {&quot;.jpg&quot;: &quot;image/jpeg&quot;, &quot;.jpeg&quot;: &quot;image/jpeg&quot;, &quot;.png&quot;: &quot;image/png&quot;, &quot;.webp&quot;: &quot;image/webp&quot;}
+
+def image_block(path):
+    path = Path(path)
+    return {
+        &quot;type&quot;: &quot;image&quot;,
+        &quot;source&quot;: {&quot;type&quot;: &quot;base64&quot;,
+                   &quot;media_type&quot;: MEDIA_TYPES[path.suffix.lower()],
+                   &quot;data&quot;: base64.standard_b64encode(path.read_bytes()).decode(&quot;utf-8&quot;)},
+    }</code></pre><div class="note">Only this function knows about encodings; the rest of the app treats an image like any other input. Tell the model to leave a field empty rather than guess.</div><div class="callout"><strong>The trap:</strong> Sending a 12-megapixel photo and meeting the bill; the model downsizes anyway, so the detail bought nothing.</div><div class="callout green"><strong>In Formulaite:</strong> formulaite_tools.py: read_supplier_page could accept a photographed spec sheet through the same image_block boundary.</div></div></div><div class="concept" data-key="Describing a tool to the model"><div class="chead" role="button" tabindex="0"><div><span class="idx">10</span><b>Describing a tool to the model</b> <span class="chip ch">ch 11</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Retrieval serves anything written down and fails for anything that moves: live stock, a loyalty balance, placing an order. A tool is three parts: a name, a description saying when to use it, and an input_schema. Pydantic&#x27;s model_json_schema() is the schema, so one class describes the tool and validates its arguments.</p><div class="callout blue"><strong>Picture it:</strong> A label on each lab instrument: what it is called, when to reach for it, and what you must put in.</div><pre><code>from pydantic import BaseModel, Field
+class StockQuery(BaseModel):
+    product_id: str = Field(description=&quot;The product identifier, such as cold-brew&quot;)
+TOOLS = [{
+    &quot;name&quot;: &quot;check_stock&quot;,
+    &quot;description&quot;: &quot;Report how many units of a product remain in stock right now. &quot;
+                   &quot;Use whenever a customer asks about availability.&quot;,
+    &quot;input_schema&quot;: StockQuery.model_json_schema(),
+}]
+HANDLERS = {&quot;check_stock&quot;: check_stock}
+def run_tool(name, arguments):
+    return HANDLERS[name](**arguments)</code></pre><div class="note">The description is written for the model, not a colleague; a vague one gets the tool called at the wrong moments.</div><div class="callout"><strong>The trap:</strong> Describing what a tool does but not when to use it, then wondering why the model calls it for everything.</div><div class="callout green"><strong>In Formulaite:</strong> tools.py: Tool.to_api() produces exactly this name, description, input_schema shape, and ToolRegistry.call() is run_tool.</div></div></div><div class="concept" data-key="The agent loop"><div class="chead" role="button" tabindex="0"><div><span class="idx">11</span><b>The agent loop</b> <span class="chip ch">ch 11</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>An agent is a loop. Call the model with the tool list. If stop_reason is not tool_use, return the text. Otherwise append the assistant content, run each tool_use block, append a user turn of tool_result blocks keyed by tool_use_id, and go round again. Fifteen lines. Your code never decides which tool runs or in what order.</p><div class="callout blue"><strong>Picture it:</strong> A junior researcher who keeps coming back to your desk: &#x27;I need the catalogue&#x27;, &#x27;now I need the supplier page&#x27;, until they hand in the finished card.</div><pre><code>def act(question, max_steps=5):
+    messages = [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: question}]
+    for _ in range(max_steps):
+        response = client.messages.create(model=MODEL, max_tokens=600, temperature=0.0,
+                                          system=SHOP_BRIEF, tools=TOOLS, messages=messages)
+        if response.stop_reason != &quot;tool_use&quot;:
+            return response.content[0].text
+        messages.append({&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: response.content})
+        results = [{&quot;type&quot;: &quot;tool_result&quot;, &quot;tool_use_id&quot;: block.id, &quot;content&quot;: run_tool(block.name, block.input)}
+                   for block in response.content if block.type == &quot;tool_use&quot;]
+        messages.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: results})
+    return &quot;We could not complete that. A colleague at the counter can help.&quot;</code></pre><div class="note">Every result carries the id of the request it answers; the step limit and the hand-over message are in the first version, not added after an incident.</div><div class="callout"><strong>The trap:</strong> Forgetting the third message (sending the result back), leaving the model holding a request nobody answered.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py: Agent.run() is this loop with max_steps, plus one twist: when the model calls fill_drawer the gate decides PASS or FAIL.</div></div></div></div><div class="panel" data-level="advanced"><div class="prog"><span class="lbl">Advanced</span><div class="bar"><i></i></div><span class="txt">0 / 10 got it</span></div><div class="concept" data-key="Three limits on every agent"><div class="chead" role="button" tabindex="0"><div><span class="idx">01</span><b>Three limits on every agent</b> <span class="chip ch">ch 11</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Flexibility and unpredictability arrive together, so every agent gets three limits. A step ceiling: five is plenty, more means confusion. Steps and tokens recorded per request, so a rising average points at bad tool descriptions. An allowlist dispatcher that returns wording instead of raising, so an invented tool name teaches the model rather than crashing the run.</p><div class="callout blue"><strong>Picture it:</strong> A trainee with a five-call budget, a timesheet, and a list of which instruments they may touch.</div><pre><code>def run_tool(name, arguments):
+    handler = HANDLERS.get(name)
+    if handler is None:
+        return f&quot;No tool called {name} exists. Available tools are {&#x27;, &#x27;.join(HANDLERS)}.&quot;
+    try:
+        return handler(**arguments)
+    except TypeError as error:
+        return f&quot;The arguments were wrong for {name}. {error}&quot;</code></pre><div class="note">The refusal comes back as a tool_result, so the loop recovers on the next step. Treat every result as data, never as direction.</div><div class="callout"><strong>The trap:</strong> Letting a KeyError kill the run on a plausible-but-wrong tool name, or letting a tool result expand the model&#x27;s permissions.</div><div class="callout green"><strong>In Formulaite:</strong> tools.py: ToolRegistry.call raises ToolError and agent.py turns it into a tool_result with is_error so the run continues; glassbox.py records steps and tokens.</div></div></div><div class="concept" data-key="A confirmation ticket for write tools"><div class="chead" role="button" tabindex="0"><div><span class="idx">02</span><b>A confirmation ticket for write tools</b> <span class="chip ch">ch 11</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Read tools run freely. A tool that spends money or changes records must never fire from the model&#x27;s wording alone. The write tool prepares the action and returns a ticket. A separate function performs it only when handed that exact ticket. pop() makes the ticket single-use, so a duplicate confirmation refuses.</p><div class="callout blue"><strong>Picture it:</strong> A purchase order the buyer signs: the assistant drafts it, a human signs it, and a signed order cannot be paid twice.</div><pre><code>import uuid
+PENDING = {}
+def prepare_order(drink, quantity):
+    ticket = str(uuid.uuid4())[:8]
+    PENDING[ticket] = {&quot;drink&quot;: drink, &quot;quantity&quot;: quantity}
+    return f&quot;Ready to place {quantity} x {drink}. Confirm with ticket {ticket}.&quot;
+
+def confirm_order(ticket):
+    order = PENDING.pop(ticket, None)
+    if order is None:
+        return &quot;That ticket is unknown or already used.&quot;
+    return f&quot;Placed {order[&#x27;quantity&#x27;]} x {order[&#x27;drink&#x27;]}.&quot;</code></pre><div class="note">Not a phrase the model can produce triggers confirm_order on its own; the pop makes a network retry harmless.</div><div class="callout"><strong>The trap:</strong> Mixing read and write tools on day one and trying to retrofit the split once twenty tools exist across three apps.</div><div class="callout green"><strong>In Formulaite:</strong> gates.py: a drawer is only written into the app after run_gates() returns PASS; a human-confirmed ticket would guard the final save-to-catalogue step.</div></div></div><div class="concept" data-key="An MCP server in one file"><div class="chead" role="button" tabindex="0"><div><span class="idx">03</span><b>An MCP server in one file</b> <span class="chip ch">ch 11</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>FastMCP turns a typed function into a tool. The schema comes from the type annotations. The description comes from the docstring, so say when to use it. The client connects over stdio, lists the tools, and one comprehension converts them into the shape the agent loop already expects. Adopt it when a second application needs the same tools.</p><div class="callout blue"><strong>Picture it:</strong> Putting the lab&#x27;s instruments on a shared bench that any team can walk up to, instead of one set per office.</div><pre><code>from mcp.server.fastmcp import FastMCP
+mcp = FastMCP(&quot;daily-grind&quot;)
+STOCK = {&quot;cold-brew&quot;: 14, &quot;iced-latte&quot;: 0, &quot;flat-white&quot;: 9}
+@mcp.tool()
+def check_stock(product_id: str) -&gt; str:
+    &quot;&quot;&quot;Report how many units of a product remain right now.
+    Use whenever a customer asks whether something is available.
+    &quot;&quot;&quot;
+    remaining = STOCK.get(product_id)
+    if remaining is None:
+        return f&quot;No product called {product_id} exists.&quot;
+    return f&quot;{product_id} has {remaining} units remaining.&quot;</code></pre><div class="note">Every argument needs a type annotation or the server cannot build the schema; log every tool call with name, arguments and duration.</div><div class="callout"><strong>The trap:</strong> Adopting MCP for a single application; wait until a staff dashboard or a second client actually exists.</div><div class="callout green"><strong>In Formulaite:</strong> tools.py: the @registry.tool decorator mirrors @mcp.tool(); build_registry() in formulaite_tools.py could be served over MCP to a second Formulaite client.</div></div></div><div class="concept" data-key="Prompting, retrieval, tuning: cheapest first"><div class="chead" role="button" tabindex="0"><div><span class="idx">04</span><b>Prompting, retrieval, tuning: cheapest first</b> <span class="chip ch">ch 9</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Name the fault before the remedy. Wrong facts need retrieval. Right facts in the wrong shape need prompting. Only a stable, high-volume task with an exact metric, already working eight times in ten, deserves fine-tuning. Tuning shifts weights; it cannot store facts, stay fresh, or add reasoning the base model lacks.</p><div class="callout blue"><strong>Picture it:</strong> Before reformulating a whole product, check whether the label was wrong (prompting) or the ingredient list was out of date (retrieval).</div><div class="callout"><strong>The trap:</strong> Training a model on the price list to stop invented prices; it learns the shape of a price, not the value of any.</div><div class="callout green"><strong>In Formulaite:</strong> formulaite_tools.py: Formulaite&#x27;s facts come from the catalogue and supplier pages (retrieval); the drawer&#x27;s shape comes from drawer.py (prompting); nothing yet qualifies for tuning.</div></div></div><div class="concept" data-key="An eval case"><div class="chead" role="button" tabindex="0"><div><span class="idx">05</span><b>An eval case</b> <span class="chip ch">ch 12</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Three questions typed by the prompt&#x27;s author is the worst sampling method there is. A case carries the input, a category, must_contain phrases, must_avoid phrases and the expected source. blocking=True marks the cases that stop a release outright, such as allergens. Twenty cases, four per category, drawn from real stored conversations.</p><div class="callout blue"><strong>Picture it:</strong> A stability panel: fixed samples tested the same way every time, so a drift shows up as a number rather than a feeling.</div><pre><code>from typing import List, Optional
+from pydantic import BaseModel, Field
+class Case(BaseModel):
+    input: str
+    category: str
+    must_contain: List[str] = Field(default_factory=list)
+    must_avoid: List[str] = Field(default_factory=list)
+    expected_source: Optional[str] = None
+    blocking: bool = False
+Case(input=&quot;does anything you sell contain nuts&quot;, category=&quot;allergen&quot;,
+     must_contain=[&quot;almond croissant&quot;, &quot;nuts&quot;], must_avoid=[&quot;no nuts at all&quot;, &quot;completely safe&quot;],
+     expected_source=&quot;Allergen sheet&quot;, blocking=True)</code></pre><div class="note">Never edit a case to match what the assistant currently does; that turns the measurement into a mirror.</div><div class="callout"><strong>The trap:</strong> Editing the case on a Friday afternoon so the run goes green.</div><div class="callout green"><strong>In Formulaite:</strong> gates.py: the gate checks are the must_avoid rules for one drawer; an evalset of 20 ingredients with expected sources would test the whole agent.</div></div></div><div class="concept" data-key="Rules first, judge second"><div class="chead" role="button" tabindex="0"><div><span class="idx">06</span><b>Rules first, judge second</b> <span class="chip ch">ch 12</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Score with rules wherever a rule can reach: required phrases present, forbidden phrases absent, expected source cited, every [n] maps to a passage. Free, instant, deterministic. Then a second, smaller model judges tone, helpfulness and clarity from 1 to 5 against a written rubric at temperature 0. Calibrate it against 20 hand scores before trusting it.</p><div class="callout blue"><strong>Picture it:</strong> A pH meter first; only then a trained sensory panel for the things a meter cannot measure.</div><pre><code>def score_rules(case, reply, sources):
+    failures = []
+    lowered = reply.lower()
+    for phrase in case.must_contain:
+        if phrase.lower() not in lowered:
+            failures.append(f&quot;missing phrase: {phrase}&quot;)
+    for phrase in case.must_avoid:
+        if phrase.lower() in lowered:
+            failures.append(f&quot;forbidden phrase: {phrase}&quot;)
+    if case.expected_source and case.expected_source not in sources:
+        failures.append(f&quot;expected source not cited: {case.expected_source}&quot;)
+    return failures</code></pre><div class="note">Failures come back with reasons. A judge agreeing with you on 18 of 20 earns authority; 12 of 20 means the rubric is vague.</div><div class="callout"><strong>The trap:</strong> A 1-to-100 judge scale that sounds precise and is noise; use 1 to 5 and add cases instead.</div><div class="callout green"><strong>In Formulaite:</strong> gates.py: run_gates() is score_rules for a drawer; a Verdict-style judge could rate the drawer&#x27;s safety wording after the gate passes.</div></div></div><div class="concept" data-key="Untrusted records and redaction"><div class="chead" role="button" tabindex="0"><div><span class="idx">07</span><b>Untrusted records and redaction</b> <span class="chip ch">ch 12</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Retrieved passages come from supplier PDFs and websites you do not control. A planted &#x27;ignore previous instructions&#x27; line arrives as ordinary context. State in the prompt that records are material, not direction. Scan passages at ingestion and flag them. Keep a planted-instruction eval case. Redact card numbers, emails and phones before anything reaches disk.</p><div class="callout blue"><strong>Picture it:</strong> Quarantining incoming raw materials, and removing customer names from the batch log before it is filed.</div><pre><code>import re
+PATTERNS = {
+    &quot;card&quot;: re.compile(r&quot;\bDG-\d{4}\b&quot;),
+    &quot;email&quot;: re.compile(r&quot;\b[\w.+-]+@[\w-]+\.[\w.]+\b&quot;),
+    &quot;phone&quot;: re.compile(r&quot;\b0\d{9,10}\b&quot;),
+}
+def redact(wording):
+    for label, pattern in PATTERNS.items():
+        wording = pattern.sub(f&quot;[{label} removed]&quot;, wording)
+    return wording</code></pre><div class="note">Redaction runs at write time, before sessions, tool logs or eval output are saved; a cleanup script later is too late.</div><div class="callout"><strong>The trap:</strong> Putting a customer&#x27;s question into a trace attribute, where it sits in a backend for months.</div><div class="callout green"><strong>In Formulaite:</strong> glassbox.py: Event meta should hold lengths and counts, not supplier text; read_supplier_page output in formulaite_tools.py is data to be flagged, never an instruction.</div></div></div><div class="concept" data-key="One command, one number, one record"><div class="chead" role="button" tabindex="0"><div><span class="idx">08</span><b>One command, one number, one record</b> <span class="chip ch">ch 12</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Running the evals must take zero effort or it gets skipped under deadline. One command runs every case, applies rules, calls the judge, prints a summary. Each run appends one JSONL line: date, prompt version, passed of total, blocked. The gate: no blocking failure, and the pass count may drop by at most one against the previous run.</p><div class="callout blue"><strong>Picture it:</strong> A release checklist signed before every batch leaves the building, with one line in the logbook per batch.</div><pre><code>def run():
+    passed, blocked = 0, []
+    for case in CASES:
+        reply, sources = respond_with_sources(case.input)
+        failures = score_rules(case, reply, sources)
+        passed += not failures
+        if case.blocking and failures:
+            blocked.append(case.input)
+    summary = {&quot;date&quot;: str(date.today()), &quot;prompt_version&quot;: PROMPT_VERSION,
+               &quot;passed&quot;: passed, &quot;total&quot;: len(CASES), &quot;blocked&quot;: blocked}
+    open(&quot;eval_history.jsonl&quot;, &quot;a&quot;, encoding=&quot;utf-8&quot;).write(json.dumps(summary) + &quot;\n&quot;)
+    return summary</code></pre><div class="note">Output looks like &#x27;18/20 passed | prompt recommendation-v3 | blocked: []&#x27;. The gate sits beside the reindex step in deployment.</div><div class="callout"><strong>The trap:</strong> A configurable, interesting runner that nobody runs; keep it blunt and fast.</div><div class="callout green"><strong>In Formulaite:</strong> glassbox.py: GlassBox.save() already writes one run to disk; an evals runner would loop the Agent over 20 INCI names and append a history line.</div></div></div><div class="concept" data-key="A FastAPI endpoint with typed shapes"><div class="chead" role="button" tabindex="0"><div><span class="idx">09</span><b>A FastAPI endpoint with typed shapes</b> <span class="chip ch">ch 13</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A script serves one keyboard; the till and a tablet need HTTP. FastAPI validates requests and replies with the same Pydantic models. One /ask endpoint wraps the whole pipeline. The reply carries the prompt version. A /health endpoint checks the collection is not empty and the key loads, without spending a token.</p><div class="callout blue"><strong>Picture it:</strong> Moving the recipe book from your desk to a counter hatch anyone in the building can walk up to.</div><pre><code>from fastapi import FastAPI
+app = FastAPI(title=&quot;Daily Grind Assistant&quot;)
+class Ask(BaseModel):
+    question: str
+class Reply(BaseModel):
+    reply: str
+    sources: List[str]
+    prompt_version: str
+@app.post(&quot;/ask&quot;, response_model=Reply)
+def ask(payload: Ask):
+    wording, sources = respond_with_sources(payload.question)
+    return Reply(reply=wording, sources=sources, prompt_version=PROMPT_VERSION)</code></pre><div class="note">Add a question length limit and a per-customer rate limit at this boundary, before strangers can send a novel.</div><div class="callout"><strong>The trap:</strong> Deploying without indexing; an empty collection replies plausibly while citing nothing, and only /health notices.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py: Agent.run(inci) returns a RunResult; a POST /research endpoint would wrap it and return the drawer plus the Glass Box run id.</div></div></div><div class="concept" data-key="Spans, cost and four alerts"><div class="chead" role="button" tabindex="0"><div><span class="idx">10</span><b>Spans, cost and four alerts</b> <span class="chip ch">ch 13</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A trace follows one request through every step. Each step is a span with a name, a duration and attributes: a parent &#x27;respond&#x27;, children &#x27;retrieve&#x27; and &#x27;generate&#x27;. Record numbers, never wording: prompt version, question length, result count, best distance, tokens. Turn tokens into money with a price table. Alert on four things only: error rate, p95 latency, refusal rate, cost per request.</p><div class="callout blue"><strong>Picture it:</strong> A batch traveller card stamped at every station with the time and the readings, so you can see where the hour went.</div><pre><code>def respond_traced(question):
+    with tracer.start_as_current_span(&quot;respond&quot;) as span:
+        span.set_attribute(&quot;prompt.version&quot;, PROMPT_VERSION)
+        span.set_attribute(&quot;question.length&quot;, len(question))
+        with tracer.start_as_current_span(&quot;retrieve&quot;) as retrieval:
+            items = retrieve(question)
+            retrieval.set_attribute(&quot;retrieval.results&quot;, len(items))
+        with tracer.start_as_current_span(&quot;generate&quot;) as generation:
+            response = call_model_raw(question, items)
+            generation.set_attribute(&quot;tokens.input&quot;, response.usage.input_tokens)
+            generation.set_attribute(&quot;tokens.output&quot;, response.usage.output_tokens)
+        return response.content[0].text</code></pre><div class="note">request_cost(usage) from a PRICE_PER_MILLION table joins the span; a short script must flush the provider before exiting or spans are lost.</div><div class="callout"><strong>The trap:</strong> Twenty alerts that nobody reads within a fortnight; attention is the scarce resource, not data.</div><div class="callout green"><strong>In Formulaite:</strong> glassbox.py: GlassBox.log(kind, *tags, **meta) is the lab&#x27;s span; add tokens and a cost figure to each model_reply event and watch the distribution.</div></div></div></div>
+</section>
+
+<section id="cheat">
+ <span class="num">05 · Cheat sheet</span>
+ <h2>Python AI Programming, Second Edition — cheat sheet</h2>
+ <p class="small">Everything on one sheet. <button class="btn" id="printBtn" type="button">Print this cheat sheet</button></p>
+ 
+<div class="cs-grid">
+ <div><h3>Vocabulary</h3><div class="tablewrap"><table><thead><tr><th>Term</th><th>Means</th></tr></thead><tbody><tr><td class="t">token</td><td>A chunk of about four characters; billing and the context window both count in tokens.</td></tr><tr><td class="t">context window</td><td>The token ceiling for one request: system, history and reply together.</td></tr><tr><td class="t">system</td><td>Standing instructions that hold for every turn: who the assistant is and its limits.</td></tr><tr><td class="t">message list</td><td>The whole history, user and assistant alternating, resent on every call.</td></tr><tr><td class="t">temperature</td><td>How adventurously the model samples; 0.0 for data, about 0.7 for fresh wording.</td></tr><tr><td class="t">prefill</td><td>An assistant turn you write (&#x27;{&#x27; or &#x27;1.&#x27;) that the model continues from.</td></tr><tr><td class="t">few-shot</td><td>Example user and assistant pairs placed before the real question.</td></tr><tr><td class="t">schema</td><td>A Pydantic class that states field names, types, allowed values and defaults once.</td></tr><tr><td class="t">validation error</td><td>Pydantic&#x27;s report naming the field and the reason; send it back as a correction turn.</td></tr><tr><td class="t">embedding</td><td>A fixed-length list of numbers standing for meaning; close means similar.</td></tr><tr><td class="t">collection</td><td>A vector store (Chroma) holding vectors with ids, wording and metadata.</td></tr><tr><td class="t">distance threshold</td><td>The cut-off beyond which retrieved passages are dropped before the prompt.</td></tr><tr><td class="t">grounded prompt</td><td>Context, plus &#x27;use only this&#x27;, plus a named fallback, plus a citation rule.</td></tr><tr><td class="t">chunk</td><td>A passage split on paragraph boundaries under a character ceiling, with overlap.</td></tr><tr><td class="t">tool</td><td>A name, a when-to-use description and an input_schema; the model asks, you run it.</td></tr><tr><td class="t">tool_use</td><td>The stop_reason that means run a tool and send the result back by id.</td></tr><tr><td class="t">agent loop</td><td>Call, check for tool_use, run, append the result, repeat, with a step limit.</td></tr><tr><td class="t">eval case</td><td>Input, must_contain, must_avoid, expected_source, blocking.</td></tr><tr><td class="t">judge</td><td>A second, smaller model scoring 1 to 5 against a fixed rubric at temperature 0.</td></tr><tr><td class="t">span</td><td>One traced step with a name, a duration and numeric attributes.</td></tr></tbody></table></div></div>
+ <div><h3>The pattern</h3><ol><li>system = who the assistant is and its limits; messages = the facts and the question.</li><li>Retrieve 3 to 5 passages, number them [n] source, drop anything past the distance threshold.</li><li>Ask for JSON at temperature 0 with a &#x27;{&#x27; prefill or a tool schema.</li><li>Validate with Pydantic; on error, append the report as a turn and retry (3 tries, then raise).</li><li>If stop_reason is tool_use: run the tool, return the result by id, loop (max 5 steps).</li><li>Anything that spends money waits for a ticket a human confirms.</li><li>Run 20 cases before shipping; log prompt version, steps, tokens and cost per request.</li></ol>
+  <h3>Decisions</h3><div class="tablewrap"><table><thead><tr><th>When</th><th>Use</th><th>Not</th></tr></thead><tbody><tr><td>The output is parsed by a program</td><td>temperature 0.0, a &#x27;{&#x27; prefill, Pydantic validation</td><td>a warm temperature and json.loads alone</td></tr><tr><td>The fact is written down somewhere</td><td>retrieval over a collection</td><td>fine-tuning, which learns the shape of a fact rather than its value</td></tr><tr><td>The fact changes minute by minute (stock, a live price)</td><td>a read tool the model can call</td><td>embedding it into the index</td></tr><tr><td>The action spends money or changes records</td><td>prepare plus a single-use confirm ticket</td><td>a direct write tool</td></tr><tr><td>A task has a mechanical metric, a stable definition and volume</td><td>DSPy compile against the metric</td><td>hand-tuning forever</td></tr><tr><td>Nothing passes the distance threshold</td><td>refuse before calling the model</td><td>sending four weak passages and hoping</td></tr><tr><td>A second application needs the same tools</td><td>an MCP server</td><td>MCP for one client</td></tr><tr><td>Batch work (embedding 400 passages, 20 eval cases)</td><td>AsyncAnthropic under asyncio.Semaphore(8)</td><td>async in the interactive path</td></tr></tbody></table></div></div>
+</div>
+<h3>Rules of thumb</h3><div class="tablewrap"><table><thead><tr><th>Do</th><th>Don't</th></tr></thead><tbody><tr><td>Put constraints last, as numbers (at most three sentences).</td><td>Bury the format rule mid-prompt and blame the model.</td></tr><tr><td>Name the fallback in every grounded prompt.</td><td>Leave the model no escape route; it will invent one.</td></tr><tr><td>Retry only temporary errors (429, 529, network) with backoff and jitter.</td><td>Catch everything and retry a 400 four times.</td></tr><tr><td>Feed the ValidationError text back as a correction turn.</td><td>Retry blind with the same prompt.</td></tr><tr><td>Ship the step limit and the hand-over message in the loop&#x27;s first version.</td><td>Add the ceiling after the first runaway bill.</td></tr><tr><td>Return a refusal string for an unknown tool or bad arguments.</td><td>Let a KeyError crash the run.</td></tr><tr><td>Split read tools from write tools on day one; writes need a ticket.</td><td>Let the model&#x27;s wording place an order.</td></tr><tr><td>Record numbers in traces: lengths, counts, tokens, cost.</td><td>Put customer wording or supplier text in a span attribute.</td></tr><tr><td>Score with rules first; calibrate any judge against 20 hand scores.</td><td>Trust a 1-to-100 judge scale; it is noise.</td></tr><tr><td>Repair loader damage only; keep punctuation and case.</td><td>Lowercase and strip stopwords before embedding.</td></tr></tbody></table></div>
+<h3>Skeletons</h3><h4>Retry with backoff</h4><pre><code>import random, time
+import anthropic
+
+def ask(messages, attempts=4, **options):
+    for attempt in range(attempts):
+        try:
+            return call_model(messages, **options)
+        except (anthropic.RateLimitError, anthropic.APIStatusError):
+            if attempt == attempts - 1:
+                raise
+            time.sleep((2 ** attempt) + random.random())</code></pre><h4>Validating extractor</h4><pre><code>def extract_order(sentence, attempts=3):
+    messages = [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: sentence}]
+    for attempt in range(attempts):
+        raw = &quot;{&quot; + call_model(messages + [{&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: &quot;{&quot;}],
+                               temperature=0.0, system=ORDER_INSTRUCTIONS)
+        try:
+            return Order.model_validate_json(raw)
+        except (ValidationError, json.JSONDecodeError) as error:
+            messages.append({&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: raw})
+            messages.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: f&quot;That reply failed validation.\n\n{error}\n\nWe return corrected JSON only.&quot;})
+    raise ValueError(&quot;The order could not be validated after three attempts.&quot;)</code></pre><h4>Grounded respond()</h4><pre><code>DISTANCE_LIMIT = 0.75
+def respond(question, n_results=4):
+    items = [item for item in retrieve(question, n_results=n_results)
+             if item[&quot;distance&quot;] &lt;= DISTANCE_LIMIT]
+    if not items:
+        return &quot;We do not have that in our records, though a colleague at the counter can help.&quot;
+    prompt = render(GROUNDED_REPLY, question=question, context=format_context(items))
+    return ask([{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}], temperature=0.0)</code></pre><h4>Agent loop</h4><pre><code>def act(question, max_steps=5):
+    messages = [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: question}]
+    for _ in range(max_steps):
+        response = client.messages.create(model=MODEL, max_tokens=600, temperature=0.0,
+                                          system=SHOP_BRIEF, tools=TOOLS, messages=messages)
+        if response.stop_reason != &quot;tool_use&quot;:
+            return response.content[0].text
+        messages.append({&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: response.content})
+        results = [{&quot;type&quot;: &quot;tool_result&quot;, &quot;tool_use_id&quot;: block.id, &quot;content&quot;: run_tool(block.name, block.input)}
+                   for block in response.content if block.type == &quot;tool_use&quot;]
+        messages.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: results})
+    return &quot;We could not complete that. A colleague at the counter can help.&quot;</code></pre>
+<h3>Before you ship</h3><ul class="check"><li><input type="checkbox" class="ship"><span>The key lives in .env with chmod 600 and a .gitignore line.</span></li><li><input type="checkbox" class="ship"><span>Every call records stop_reason, tokens and the prompt version.</span></li><li><input type="checkbox" class="ship"><span>Every grounded prompt names its fallback, and every citation maps to a passage you sent.</span></li><li><input type="checkbox" class="ship"><span>The loop has max_steps and a hand-over message; the dispatcher never raises.</span></li><li><input type="checkbox" class="ship"><span>Write tools need a single-use ticket; read tools are logged with name, arguments and duration.</span></li><li><input type="checkbox" class="ship"><span>20 eval cases run as one command; no blocking failure; the pass count may drop by at most one.</span></li><li><input type="checkbox" class="ship"><span>Traces carry numbers only; PII is redacted before sessions, logs or eval output reach disk.</span></li><li><input type="checkbox" class="ship"><span>index_all() and the eval gate run in the same deploy step; /health checks the collection is not empty.</span></li></ul>
+
+</section>
+
+<section id="s06">
+ <span class="num">06 · You're done when…</span>
+ <div class="callout green"><ol><li>You can write the 15-line agent loop from memory, with max_steps and a hand-over message, and explain why every tool_result carries an id.</li><li>You can take a bad JSON reply, show the ValidationError, and fix it by feeding the error back rather than editing the prompt.</li><li>You can run one command that scores 20 cases, appends a history line, and tells you whether the release is blocked.</li></ol></div>
+</section>
+
+<section id="s07">
+ <span class="num">07 · Where this comes from</span>
+ 
+<p><strong>Book:</strong> <em>Python AI Programming, Second Edition</em>, Patrick J, 257 pages. Markdown copy: <code>books-md/python-ai-programming-second-edition.md</code>. Notes with chapter citations: <code>docs/book-notes/python-ai-programming-second-edition.md</code>.</p>
+<p><strong>Chapters covered:</strong> 1 How AI Works Today?, 2 Working with Models, 3 Prompts that Works, 4 Reliable Outputs and Conversations, 5 Programming Prompts with DSPy, 6 Embeddings and Semantic Search, 7 Retrieval-Augmented Generation, 8 Getting Data Ready, 9 Model Needs Customization, 10 Working with Images and Sound, 11 Tools, Agents and MCP, 12 Examining AI with Evals and Safety Tests, 13 Shipping with FastAPI and OpenTelemetry.</p>
+<h3>In the author's words</h3><div class="quote">“A successful parse proves only that the braces matched.”<span class="who">chapter 4</span></div><div class="quote">“A reply that cannot be checked is a reply nobody should trust.”<span class="who">chapter 7</span></div><div class="quote">“The loop itself fits into fifteen lines.”<span class="who">chapter 11</span></div><div class="quote">“Our code never decides which tool runs, in what order, or how many times, since every one of those choices belongs to the model.”<span class="who">chapter 11</span></div><div class="quote">“a clear refusal returned as a result teaches it far more than a crash does”<span class="who">chapter 11</span></div><div class="quote">“A number nobody acts on is decoration.”<span class="who">chapter 12</span></div>
+<h3>Python constructs this book leans on</h3><div class="tablewrap"><table><thead><tr><th>Construct</th><th>What it does here</th><th>Where</th></tr></thead><tbody><tr><td class="t">pydantic.BaseModel with Field(default=, ge=, le=, description=)</td><td>One class states the shape; Field bounds and descriptions double as prompt text.</td><td class="small">Chapter 4, Defining Order Schema with Pydantic</td></tr><tr><td class="t">class Size(str, Enum)</td><td>Inheriting from str keeps JSON readable while Python stays strict.</td><td class="small">Chapter 4, Constraining Values with Types and Enums</td></tr><tr><td class="t">def ask(messages, attempts=4, **options)</td><td>**options forwards temperature and max_tokens through a layer without naming them.</td><td class="small">Chapter 2, Retrying with Exponential Backoff</td></tr><tr><td class="t">try / except anthropic.RateLimitError</td><td>Catch specific exception classes so temporary and permanent faults get different handling.</td><td class="small">Chapter 2, Failures We Actually Meet</td></tr><tr><td class="t">with client.messages.stream(...) as stream</td><td>A context manager that yields chunks and exposes get_final_message() after the loop.</td><td class="small">Chapter 2, Streaming from Assistant</td></tr><tr><td class="t">@classmethod def load(cls, customer_id)</td><td>An alternative constructor that returns a fresh object when no file exists.</td><td class="small">Chapter 4, Bringing Customer Back</td></tr><tr><td class="t">HANDLERS[name](**arguments)</td><td>A dict registry maps a tool name to a function; ** unpacks the model&#x27;s arguments.</td><td class="small">Chapter 11, Running Tool and Returning Result</td></tr><tr><td class="t">list comprehension over response.content</td><td>Builds one tool_result block per tool_use block in a single expression.</td><td class="small">Chapter 11, Loop Handling Multiple Steps</td></tr><tr><td class="t">@mcp.tool() with type annotations and a docstring</td><td>A decorator that builds the schema from annotations and the description from the docstring.</td><td class="small">Chapter 11, Exposing Tools over MCP</td></tr><tr><td class="t">async def, asyncio.Semaphore(8), asyncio.gather</td><td>Run eight calls at once while a semaphore caps concurrency; 38.2s became 5.1s.</td><td class="small">Chapter 13, Async with Concurrency Limit</td></tr><tr><td class="t">with tracer.start_as_current_span(&quot;retrieve&quot;) as span</td><td>Nested context managers open child spans; set_attribute records numbers.</td><td class="small">Chapter 13, Instrumenting Steps</td></tr></tbody></table></div>
+<h3>Deliberately left out of this guide</h3><ul><li><strong>Streaming replies at a prompt and the server-sent-event endpoint</strong> — Chapter 2 and Chapter 13</li><li><strong>The hosted fine-tuning job itself: JSONL upload, polling, and the router scoring 0.86 to 0.94</strong> — Chapter 9</li><li><strong>Speech: Whisper transcription, text-to-speech, and the invoice-checking use of vision</strong> — Chapter 10</li><li><strong>The Hugging Face datasets library, batched map and filter</strong> — Chapter 8</li><li><strong>DSPy optimizer internals, inspect_history and the compilation cost</strong> — Chapter 5</li></ul>
+
+ <details><summary>How you'd have built this guide yourself</summary>
+  <p>List the chapter headings first, then read the book in chapter order and write one card per idea that changes what you would build. Sort the cards into three piles: needed for the simplest working thing, needed for the version you would show someone, needed for the version that runs unattended. Those piles are the levels; the simplest thing in each pile is the build ladder. Copy quotes exactly and keep the chapter number next to every card, so you can go back to the source when a card stops making sense.</p>
+ </details>
+</section>
+</main>
+<script>
+(function(){
+ const KEY='bookguide.python-ai-programming-second-edition';
+ let state={got:{},ship:{},tab:'foundation'};
+ try{const s=localStorage.getItem(KEY); if(s) state=Object.assign(state,JSON.parse(s));}catch(e){}
+ function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+ // ladder
+ document.querySelectorAll('.rung').forEach(r=>{const go=()=>{document.querySelectorAll('.rung,.rungbody').forEach(x=>x.classList.toggle('on',x.dataset.rung===r.dataset.rung));}; r.onclick=go; r.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};});
+ // chapter rows
+ document.querySelectorAll('.chrow').forEach(r=>{const go=()=>r.classList.toggle('on'); r.onclick=go; r.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};});
+ // tabs
+ const tabs=document.querySelectorAll('#ctabs button');
+ function showTab(lvl){tabs.forEach(b=>b.classList.toggle('on',b.dataset.level===lvl)); document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.dataset.level===lvl)); state.tab=lvl; save();}
+ tabs.forEach(b=>b.onclick=()=>showTab(b.dataset.level));
+ // concepts
+ function progress(){document.querySelectorAll('.panel').forEach(p=>{const all=p.querySelectorAll('.got'), n=[...all].filter(c=>c.checked).length; p.querySelector('.bar i').style.width=(all.length?100*n/all.length:0)+'%'; p.querySelector('.txt').textContent=n+' / '+all.length+' got it';});}
+ document.querySelectorAll('.concept').forEach(c=>{
+  const head=c.querySelector('.chead'), box=c.querySelector('.got'), key=c.dataset.key;
+  box.checked=!!state.got[key]; c.classList.toggle('done',box.checked);
+  head.onclick=e=>{if(e.target.closest('label')) return; c.classList.toggle('open');};
+  head.onkeydown=e=>{if(e.key==='Enter'){c.classList.toggle('open');}};
+  box.onchange=()=>{state.got[key]=box.checked; c.classList.toggle('done',box.checked); save(); progress();};
+ });
+ document.querySelectorAll('.ship').forEach((b,i)=>{b.checked=!!state.ship[i]; b.onchange=()=>{state.ship[i]=b.checked; save();};});
+ showTab(state.tab||'foundation'); progress();
+ const pb=document.getElementById('printBtn'); if(pb){pb.onclick=()=>{document.body.classList.add('printing'); window.print();}; window.onafterprint=()=>document.body.classList.remove('printing');}
+ const ob=document.getElementById('openFirst'); if(ob){ob.onclick=()=>{showTab('foundation'); const first=document.querySelector('.panel[data-level=foundation] .concept'); if(first){first.classList.add('open'); first.scrollIntoView({behavior:'smooth',block:'start'});}};}
+})();
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad:true,theme:"neutral",securityLevel:"loose"});</script>
+</body>
+</html>

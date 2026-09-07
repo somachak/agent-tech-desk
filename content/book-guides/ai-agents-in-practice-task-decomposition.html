@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+</head>
+<body>
+<title>AI Agents in Practice: Task Decomposition, Delegation, and Human-in-the-Loop Control</title>
+<style>
+:root{color-scheme:light;
+ --surface:#faf9f5;--surface-2:#f2f0e9;--surface-3:#e8e6dc;--surface-ink:#141413;--line:#d9d7cc;--line-soft:#e8e6dc;
+ --ink:#141413;--ink-2:#5c5b57;--ink-3:#6b6a65;--on-ink:#faf9f5;
+ --accent:#d97757;--accent-2:#6a9bcc;--accent-3:#788c5d;
+ --font-head:"Poppins",Arial,sans-serif;--font-body:"Lora",Georgia,serif;--font-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--surface);color:var(--ink-2);font-family:var(--font-body);font-size:17px;line-height:1.7}
+main{max-width:980px;margin:0 auto;padding:36px 22px 90px}
+h1,h2,h3,h4{font-family:var(--font-head);color:var(--ink);line-height:1.2;margin:0 0 10px;text-wrap:balance}
+h1{font-size:38px;letter-spacing:-.02em;font-weight:600}
+h2{font-size:25px;font-weight:600}
+h3{font-size:18px;font-weight:600}
+h4{font-size:15px;font-weight:600;margin-bottom:6px}
+p{margin:0 0 12px;max-width:70ch}
+strong{color:var(--ink)}
+a{color:var(--ink);text-decoration-color:var(--accent);text-underline-offset:3px}
+code,.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+code{font-size:.86em;background:var(--surface-3);padding:1px 5px;border-radius:5px;color:var(--ink)}
+pre{background:var(--surface-3);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-family:var(--font-mono);font-size:12.5px;line-height:1.6;color:var(--ink);overflow-x:auto;margin:8px 0 6px;white-space:pre}
+pre code{background:none;padding:0;font-size:inherit}
+section{margin-top:52px}
+.num{font-family:var(--font-mono);color:var(--ink-3);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px}
+.eyebrow{font-family:var(--font-mono);color:var(--ink-3);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase}
+.byline{font-family:var(--font-head);font-size:14px;color:var(--ink-3);margin:-4px 0 12px}
+.strip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0 10px}
+.strip div{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:13px 15px;font-size:15px}
+.strip b{display:block;font-family:var(--font-head);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
+.callout{border-left:3px solid var(--accent);background:var(--surface-2);border-radius:0 12px 12px 0;padding:12px 16px;margin:14px 0;font-size:15.5px}
+.callout.blue{border-color:var(--accent-2)}.callout.green{border-color:var(--accent-3)}
+.callout ol,.callout ul{margin:6px 0 0 18px;padding:0}.callout li{margin:4px 0}
+.callout p:last-child{margin-bottom:0}
+.chip{display:inline-block;font-family:var(--font-head);font-size:11px;font-weight:600;letter-spacing:.04em;border-radius:6px;padding:2px 8px;color:#141413;vertical-align:middle}
+.chip.foundation{background:var(--accent-3)}.chip.intermediate{background:var(--accent-2)}.chip.advanced{background:var(--accent)}
+.chip.ch{background:var(--surface-3);color:var(--ink-2);font-family:var(--font-mono);font-weight:500}
+.diagram{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:14px;margin:14px 0;overflow-x:auto}
+.diagram pre.mermaid{background:none;border:none;padding:0;margin:0;white-space:pre;overflow:visible;text-align:center}
+.diagram svg{max-width:100%;height:auto}
+/* ladder */
+.ladder{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0}
+.rung{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:16px 18px;cursor:pointer}
+.rung:hover{border-color:var(--accent)}
+.rung.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+.rung .lvl{font-family:var(--font-head);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.rung h3{margin:4px 0 6px}
+.rung p{font-size:14.5px;margin:0}
+.rung .time{font-family:var(--font-mono);font-size:12px;color:var(--ink-3);margin-top:8px}
+.rungbody{display:none;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-top:-2px}
+.rungbody.on{display:block}
+.rungbody ol{margin:6px 0 10px 20px;padding:0}.rungbody li{margin:5px 0}
+.meta{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-3)}
+/* chapter map */
+.chmap{border-top:1px solid var(--line);margin-top:10px}
+.chrow{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:start;padding:10px 6px;border-bottom:1px solid var(--line-soft);cursor:pointer}
+.chrow:hover{background:var(--surface-2)}
+.chrow .n{font-family:var(--font-mono);color:var(--ink-3);font-size:13px;padding-top:4px}
+.chrow b{font-family:var(--font-head);font-size:15px;color:var(--ink);display:block}
+.chrow span.adds{font-size:14.5px;color:var(--ink-2)}
+.chrow .secs{display:none;font-size:13.5px;color:var(--ink-3);margin-top:6px;font-family:var(--font-mono)}
+.chrow.on .secs{display:block}
+/* concepts */
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 6px}
+.tabs button{font-family:var(--font-head);font-weight:600;font-size:13.5px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:10px;padding:9px 14px;cursor:pointer}
+.tabs button:hover{border-color:var(--accent)}
+.tabs button.on{background:var(--accent);border-color:var(--accent);color:#141413}
+.tabs button .cnt{font-family:var(--font-mono);font-weight:500;font-size:12px;margin-left:6px;color:var(--ink-3)}
+.tabs button.on .cnt{color:#141413}
+.prog{display:flex;align-items:center;gap:10px;margin:8px 0 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-3)}
+.prog .bar{flex:1;height:9px;background:var(--surface-3);border-radius:0 4px 4px 0;overflow:hidden}
+.prog .bar i{display:block;height:100%;width:0;background:var(--accent-3);transition:width .25s}
+.panel{display:none}.panel.on{display:block}
+.concept{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;margin:10px 0;overflow:hidden}
+.concept.done{border-color:var(--accent-3)}
+.chead{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px 16px;cursor:pointer}
+.chead:hover{background:var(--surface-3)}
+.chead b{font-family:var(--font-head);font-size:15.5px;color:var(--ink)}
+.chead .idx{font-family:var(--font-mono);color:var(--ink-3);font-size:12px;margin-right:8px}
+.chead label{font-family:var(--font-head);font-size:12.5px;color:var(--ink-2);display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap}
+.chead input{width:16px;height:16px;accent-color:#788c5d}
+.cbody{display:none;padding:4px 16px 16px;border-top:1px solid var(--line-soft)}
+.concept.open .cbody{display:block}
+.cbody p{font-size:15.5px}
+.cbody .callout{margin:10px 0;font-size:14.5px}
+.cbody .note{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-3);margin:0 0 8px}
+.showall{margin:8px 0 0;font-family:var(--font-head);font-size:13px;color:var(--ink-3)}
+/* tables */
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin:8px 0 14px}
+th{font-family:var(--font-head);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:7px 8px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+td.t{font-family:var(--font-mono);font-size:13px;color:var(--ink);white-space:nowrap}
+.tablewrap{overflow-x:auto}
+.check{list-style:none;padding:0;margin:6px 0}
+.check li{display:flex;gap:10px;align-items:flex-start;padding:5px 0;font-size:15px}
+.check input{margin-top:5px;accent-color:#788c5d}
+.btn{font-family:var(--font-head);font-weight:600;font-size:13.5px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:10px;padding:8px 14px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.go{background:var(--accent);border-color:var(--accent);color:#141413}
+.cs-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:800px){.cs-grid,.strip,.ladder{grid-template-columns:1fr}.chrow{grid-template-columns:36px 1fr}.chrow .chip{grid-column:2}}
+details{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:12px 18px;margin-top:14px}
+summary{font-family:var(--font-head);font-weight:600;color:var(--ink);cursor:pointer}
+.quote{border-left:3px solid var(--accent-2);padding:4px 14px;margin:10px 0;font-style:italic;font-size:15.5px}
+.quote .who{display:block;font-style:normal;font-family:var(--font-mono);font-size:12px;color:var(--ink-3);margin-top:2px}
+.small{font-size:14px;color:var(--ink-3)}
+.toplinks{display:flex;flex-wrap:wrap;gap:8px 16px;font-family:var(--font-head);font-size:13.5px;margin:10px 0 0}
+.toplinks a{color:var(--ink-2)}
+@media print{
+ body{font-size:12px} main{padding:0;max-width:none}
+ body.printing main>*:not(#cheat){display:none} .btn,.toplinks{display:none}
+ pre{white-space:pre-wrap;font-size:10.5px} .cs-grid{grid-template-columns:1fr 1fr} section{margin-top:16px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+</style>
+<main>
+<header>
+ <span class="eyebrow">Formulaite bookshelf · book 8 of 14 · Decompose and delegate</span>
+ <h1>AI Agents in Practice: Task Decomposition, Delegation, and Human-in-the-Loop Control</h1>
+ <div class="byline">Sophie Langford · 94 pages · 31 concept cards</div>
+ <p>A 22-step implementation guide for splitting agent work into scoped tasks, delegating each under a contract, and keeping a human on every write.</p>
+ <div class="callout blue"><strong>Read this first.</strong> Honesty note: when this book was read for the guide, its chapter bodies turned out to be repetitive template prose (the same sentences re-ordered in every chapter, and one identical &#x27;Applied Notes&#x27; block repeated 22 times). The useful signal is the chapter titles and the four Applied Notes. This guide builds the decomposition → delegation → human-gate arc from those, phrased for Formulaite — treat it as a structured outline, not as a summary of deep source material.</div>
+ <div class="strip">
+  <div><b>Goal</b>By the end you can run Formulaite ingredient research as briefed sub-questions with read-only tools, merge the packets, pass a deterministic gate, and stop at a human checkpoint before the catalogue changes.</div>
+  <div><b>Output</b>A build ladder (3 rungs), 22 chapters mapped, 31 concept cards you tick off, and a printable cheat sheet.</div>
+  <div><b>Time</b>Foundation ~26 min · Intermediate ~22 min · Advanced ~14 min. Whole guide ~74 min over several sittings.</div>
+ </div>
+ <div class="callout"><strong>How to drive this page.</strong>
+  <ol>
+   <li>Press <button class="btn go" id="openFirst" type="button">Open the first card</button> — it jumps to the Foundation cards and opens card 01.</li>
+   <li>Read one card, tick <strong>Got it</strong>, open the next. The bar shows your progress and remembers it on this browser.</li>
+   <li>When Foundation is done, do <strong>Rung 1</strong> of the build ladder before reading Intermediate. Print the cheat sheet from section 05.</li>
+  </ol>
+  <div class="toplinks"><a href="ai-agents-in-practice-task-decomposition-cheatsheet.md">Cheat sheet as Markdown</a> · <a href="index.html">All nine guides</a></div>
+ </div>
+</header>
+
+<section id="s01">
+ <span class="num">01 · Where this is going</span>
+ <h2>Decompose to the drawer&#x27;s fixed sections, delegate each under a written contract, and put the human gate exactly where the write happens.</h2>
+ <p><strong>Read this book when:</strong> Open it when Formulaite&#x27;s research loop needs to grow from one agent doing everything into briefed sub-tasks with a person approving the catalogue write.</p>
+ <p>The one picture that holds the whole book. Every chapter adds a box or an arrow to it; nothing later replaces it.</p>
+ <div class="diagram"><pre class="mermaid">flowchart TD
+  G[Research one ingredient] --&gt; S[Scope and risk tier]
+  S --&gt; Q[Split into sub-questions from drawer sections]
+  Q --&gt; B[Delegation brief per sub-question]
+  B --&gt; A[Sub-agent or tool - read only]
+  A --&gt; H[Handoff packet back]
+  H --&gt; M[Coordinator merges the drawer]
+  M --&gt; D[Deterministic gate]
+  D --&gt;|fail with reasons| Q
+  D --&gt;|pass| R[Human review gate]
+  R --&gt;|approve| W[Catalogue write]
+  R --&gt;|reject or edit| Q
+  M --&gt; X[Glass Box trace]
+  R --&gt; X</pre></div>
+</section>
+
+<section id="s02">
+ <span class="num">02 · Build ladder</span>
+ <h2>Three things to build, in order</h2>
+ <p>Each rung is a Formulaite feature. Click a rung for its steps. Do rung 1 after the Foundation cards, rung 2 after Intermediate, rung 3 after Advanced.</p>
+ <div class="ladder"><div class="rung on" data-rung="0" role="button" tabindex="0"><div class="lvl">Rung 1 · Simple</div><h3>Scoped, decomposed research for one ingredient</h3><p>A Formulaite run where the scope is one INCI, each drawer section is a written sub-question mapped to a tool, and the Glass Box shows which sub-question each step served.</p><div class="time">~1 hour</div></div><div class="rung" data-rung="1" role="button" tabindex="0"><div class="lvl">Rung 2 · Intermediate</div><h3>Briefed sub-runs with a human gate on the catalogue write</h3><p>Read-only sub-runs that each get a Brief and return a Handoff packet, a coordinator that merges them, and an approve step before anything is written.</p><div class="time">~half a day</div></div><div class="rung" data-rung="2" role="button" tabindex="0"><div class="lvl">Rung 3 · Advanced</div><h3>Governed, drilled, measured agent that can take on new tools</h3><p>A version-stamped Formulaite agent with a one-page policy the loop reads, a scenario folder that runs before every change, and a staged path for adding a live supplier fetch.</p><div class="time">~2 days</div></div></div><div class="rungbody on" data-rung="0"><h4>Steps for rung 1: Scoped, decomposed research for one ingredient</h4><ol><li>Write the one-sentence scope and check it matches Agent.run(inci).</li><li>Turn REQUIRED_SECTIONS in drawer.py into a list of sub-questions.</li><li>Map each sub-question to catalogue_lookup or read_supplier_page.</li><li>Run the offline agent on Glycerin and open the saved Glass Box.</li><li>Label each event with the sub-question it answered.</li></ol><div class="meta">Chapters 1, 2, 3, 4 · Agent Lab files: <code>drawer.py</code> · <code>formulaite_tools.py</code> · <code>agent.py</code> · <code>glassbox.py</code> · ~1 hour</div></div><div class="rungbody" data-rung="1"><h4>Steps for rung 2: Briefed sub-runs with a human gate on the catalogue write</h4><ol><li>Add Brief and Handoff dataclasses next to drawer.py.</li><li>Build a read-only ToolRegistry and give each sub-run its own max_steps.</li><li>Write merge() that escalates on low confidence or open questions.</li><li>Add approve() showing drawer, gate reasons and sources before the write.</li><li>Log the human answer and the gate verdict as Glass Box events.</li></ol><div class="meta">Chapters 5, 6, 7, 11, 12 · Agent Lab files: <code>tools.py</code> · <code>gates.py</code> · <code>agent.py</code> · <code>glassbox.py</code> · <code>memory.py</code> · ~half a day</div></div><div class="rungbody" data-rung="2"><h4>Steps for rung 3: Governed, drilled, measured agent that can take on new tools</h4><ol><li>Log a versions event with prompt, model, catalogue and gate versions on every run.</li><li>Run the fail_first drill and assert one gate_fail event.</li><li>Add a POLICY dict in gates.py and check it before each tool call.</li><li>Build scenarios for happy, missing, contradicting and rejected paths.</li><li>Add a live read_supplier_page at the sandbox stage and promote it only after scenarios pass.</li></ol><div class="meta">Chapters 9, 13, 18, 19, 21, 22 · Agent Lab files: <code>models.py</code> · <code>gates.py</code> · <code>agent.py</code> · <code>formulaite_tools.py</code> · <code>glassbox.py</code> · ~2 days</div></div>
+</section>
+
+<section id="s03">
+ <span class="num">03 · Chapter map</span>
+ <h2>What each chapter adds to the machine</h2>
+ <p>Colour = the level it belongs to. Click a chapter to see its sections.</p>
+ <div class="chmap"><div class="chrow" role="button" tabindex="0"><div class="n">1</div><div><b>Chapter 1: Define Scope and Risk</b><span class="adds">The starting line: one sentence of scope and a risk tier for every action before any splitting happens.</span><div class="secs">Applied Notes</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">2</div><div><b>Chapter 2: Map the System Surface</b><span class="adds">The map: every store, page and file the agent can touch, and the drawer sections that become sub-questions.</span><div class="secs">Applied Notes</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">3</div><div><b>Chapter 3: Prioritize Controls</b><span class="adds">The ranking: strongest control on writes, a plain-code gate on proposals, only a budget on reads.</span><div class="secs">Applied Notes</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">4</div><div><b>Chapter 4: Set Input Standards</b><span class="adds">The input standard: a role, context, constraints brief that becomes the delegation contract for every sub-task.</span><div class="secs">Applied Notes</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">5</div><div><b>Chapter 5: Design Human Review Gates</b><span class="adds">The checkpoint: where the human gate sits, what the reviewer sees, and the three answers they can give.</span><div class="secs">Applied Notes</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">6</div><div><b>Chapter 6: Harden Access</b><span class="adds">Access limits: read tools for sub-agents, the write tool only behind the human gate.</span><div class="secs">Applied Notes</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">7</div><div><b>Chapter 7: Build Backup and Recovery</b><span class="adds">Safety net: save the trace before any write and keep the old entry so a bad write can be undone.</span><div class="secs">Applied Notes</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">8</div><div><b>Chapter 8: Track Operational Signals</b><span class="adds">The dials: steps, gate failures, override rate and tokens per run, with thresholds instead of trace reading.</span><div class="secs">Applied Notes</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">9</div><div><b>Chapter 9: Run Incident Drills</b><span class="adds">The rehearsal: force a bad drawer on purpose and watch the gate and escalation do their job.</span><div class="secs">Applied Notes</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">10</div><div><b>Chapter 10: Automate Repeatable Checks</b><span class="adds">Checks as code: every rule is a function in a list, run every time, never a line of prompt.</span><div class="secs">Applied Notes</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">11</div><div><b>Chapter 11: Improve Handoff Protocol</b><span class="adds">The handoff: a fixed packet from sub-agent to coordinator and a one-question packet from agent to human.</span><div class="secs">Applied Notes</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">12</div><div><b>Chapter 12: Measure Trust and Quality</b><span class="adds">Trust measured: quality, speed and edit effort tracked per run so trust is earned, not assumed.</span><div class="secs">Applied Notes</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">13</div><div><b>Chapter 13: Control Version Drift</b><span class="adds">Drift control: prompt, model, catalogue and gate versions stamped on every run.</span><div class="secs">Applied Notes</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">14</div><div><b>Chapter 14: Train Habit Loops</b><span class="adds">The rhythm: act, practise, review, checkpoint as a weekly habit for the people running the agent.</span><div class="secs">Applied Notes</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">15</div><div><b>Chapter 15: Handle Edge Cases</b><span class="adds">Edge shapes: missing, ambiguous and contradictory inputs each get a named outcome.</span><div class="secs">Applied Notes</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">16</div><div><b>Chapter 16: Simplify Support Workflows</b><span class="adds">Simplification: fewer tools, one escalation path, one approval screen.</span><div class="secs">Applied Notes</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">17</div><div><b>Chapter 17: Set Quarterly Goals</b><span class="adds">Targets: three numbers per quarter that say whether the agent got better.</span><div class="secs">Applied Notes</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">18</div><div><b>Chapter 18: Deploy Lightweight Governance</b><span class="adds">Governance in one page: who approves, what runs alone, what is never automated, enforced as data the loop reads.</span><div class="secs">Applied Notes</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">19</div><div><b>Chapter 19: Validate With Scenarios</b><span class="adds">Scenarios: one full path per edge shape, each with an expected verdict, run before every change ships.</span><div class="secs">Applied Notes</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">20</div><div><b>Chapter 20: Sustain the Practice</b><span class="adds">Keeping it alive: retire checks that never fire, rotate reviewers, revisit the page each quarter.</span><div class="secs">Applied Notes</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">21</div><div><b>Chapter 21: Expand to New Tools</b><span class="adds">Growth: a new tool climbs sandbox, read, propose, write one stage at a time.</span><div class="secs">Applied Notes</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">22</div><div><b>Chapter 22: Integrate Policy and Behavior</b><span class="adds">Closing the loop: each policy line lives in the prompt and in a gate check, and the code wins.</span><div class="secs">Applied Notes</div></div><span class="chip advanced">advanced</span></div></div>
+</section>
+
+<section id="s04">
+ <span class="num">04 · Concept cards</span>
+ <h2>Foundation → Intermediate → Advanced</h2>
+ <p>One idea per card: what it is, a picture for it, the code if there is any, the trap, and where it lives in Formulaite. Tick a card when you could explain it to someone else.</p>
+ <div class="tabs" id="ctabs"><button data-level="foundation" class="on">Foundation<span class="cnt">13 cards · ~26 min</span></button><button data-level="intermediate" class="">Intermediate<span class="cnt">11 cards · ~22 min</span></button><button data-level="advanced" class="">Advanced<span class="cnt">7 cards · ~14 min</span></button></div><div class="panel on" data-level="foundation"><div class="prog"><span class="lbl">Foundation</span><div class="bar"><i></i></div><span class="txt">0 / 13 got it</span></div><div class="concept" data-key="Scope statement"><div class="chead" role="button" tabindex="0"><div><span class="idx">01</span><b>Scope statement</b> <span class="chip ch">ch 1</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Before any decomposition, write one sentence that says what the agent is for. Formulaite&#x27;s is: fill one Ingredient Drawer for one INCI name. Anything outside that sentence is out of scope. The sentence is what you later split into sub-questions.</p><div class="callout blue"><strong>Picture it:</strong> A lab work order names one product and one batch. Nobody starts weighing until the order is on the bench.</div><div class="callout"><strong>The trap:</strong> Starting with &#x27;research cosmetics&#x27; and hoping the model narrows it down for you.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py: Agent.run(inci) takes exactly one INCI name; that argument is the scope statement made concrete.</div></div></div><div class="concept" data-key="Risk tiers per action"><div class="chead" role="button" tabindex="0"><div><span class="idx">02</span><b>Risk tiers per action</b> <span class="chip ch">ch 1</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Not every action carries the same risk. Sort each one by what happens if it is wrong. Reading a supplier page is cheap to undo. Writing a bad use level into the catalogue is not. The tier decides how much control the action gets.</p><div class="callout blue"><strong>Picture it:</strong> Tasting a sample is low risk. Shipping a batch is high risk. You check the second one far harder.</div><pre><code>class Risk(Enum):
+    READ = 1      # reversible, runs free
+    PROPOSE = 2   # drawer draft, deterministic gate
+    WRITE = 3     # catalogue write, human gate
+
+RISK = {
+    &quot;catalogue_lookup&quot;: Risk.READ,
+    &quot;read_supplier_page&quot;: Risk.READ,
+    &quot;fill_drawer&quot;: Risk.PROPOSE,
+    &quot;catalogue_write&quot;: Risk.WRITE,
+}</code></pre><div class="note">One tier per tool name; the loop looks the tier up before it runs anything.</div><div class="callout"><strong>The trap:</strong> Giving the whole agent one risk level, so reads get slowed down and writes get waved through.</div><div class="callout green"><strong>In Formulaite:</strong> tools.py: add a risk field to Tool so gates.py and agent.py pick the control from the tier, not from the tool name.</div></div></div><div class="concept" data-key="System surface map"><div class="chead" role="button" tabindex="0"><div><span class="idx">03</span><b>System surface map</b> <span class="chip ch">ch 2</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>List every place the agent can touch. For Formulaite that is the catalogue, the supplier pages, the drawer, the Glass Box file and, later, the live app. Each item is a place a sub-task can read or write. You cannot delegate safely until this list exists.</p><div class="callout blue"><strong>Picture it:</strong> Before a deep clean you walk the lab and list every bench, cupboard and drain. The list is the surface.</div><div class="callout"><strong>The trap:</strong> Mapping only the tools you wrote and forgetting the files and stores they write to.</div><div class="callout green"><strong>In Formulaite:</strong> formulaite_tools.py names the surface: the catalogue JSON, the stubbed supplier pages and fill_drawer; glassbox.py adds the saved run file.</div></div></div><div class="concept" data-key="Sub-questions from the drawer"><div class="chead" role="button" tabindex="0"><div><span class="idx">04</span><b>Sub-questions from the drawer</b> <span class="chip ch">ch 2</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Decomposition means turning one goal into small questions with a known answer shape. Formulaite already has the shape: the drawer&#x27;s required sections. Each section becomes one sub-question. Each sub-question maps to one or two tools.</p><div class="callout blue"><strong>Picture it:</strong> A recipe card has fixed boxes: phase, percentage, pH. You fill boxes, you do not write an essay.</div><pre><code>from agent_lab.drawer import IngredientDrawer
+
+def sub_questions(inci: str) -&gt; list[str]:
+    return [f&quot;{inci}: what is the {s.replace(&#x27;_&#x27;, &#x27; &#x27;)}?&quot;
+            for s in IngredientDrawer.REQUIRED_SECTIONS
+            if s != &quot;sources&quot;]
+
+# [&#x27;Glycerin: what is the inci name?&#x27;,
+#  &#x27;Glycerin: what is the function?&#x27;, ...]</code></pre><div class="note">The section list is the decomposition; no clever planner needed.</div><div class="callout"><strong>The trap:</strong> Letting the model invent its own sub-questions, so every run splits the work differently.</div><div class="callout green"><strong>In Formulaite:</strong> drawer.py: REQUIRED_SECTIONS is the fixed list of sub-questions; missing() tells you which are still open.</div></div></div><div class="concept" data-key="Delegate only independent parts"><div class="chead" role="button" tabindex="0"><div><span class="idx">05</span><b>Delegate only independent parts</b> <span class="chip ch">ch 2</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Split work only where the parts are independent. Function and pH range can be researched apart. Use level depends on function, so keep those two together. If sub-agents keep contradicting each other, the split was wrong.</p><div class="callout blue"><strong>Picture it:</strong> Two people can weigh the water phase and the oil phase at once. They cannot both stir the same pot.</div><div class="callout"><strong>The trap:</strong> Delegating dependent questions and then paying to reconcile the answers.</div><div class="callout green"><strong>In Formulaite:</strong> drawer.py: group REQUIRED_SECTIONS into two or three briefs, keeping typical_use_level and use_level_pct in the same brief.</div></div></div><div class="concept" data-key="Controls ranked by blast radius"><div class="chead" role="button" tabindex="0"><div><span class="idx">06</span><b>Controls ranked by blast radius</b> <span class="chip ch">ch 3</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>You cannot check everything equally. Rank controls by how much damage a wrong action does. The strongest control goes where writes happen. Lighter checks cover proposals. Reads get logging and a step budget, nothing more.</p><div class="callout blue"><strong>Picture it:</strong> The fume cupboard gets the alarm. The pencil drawer does not.</div><div class="callout"><strong>The trap:</strong> Spending the review budget on harmless reads and leaving the write path with the least attention.</div><div class="callout green"><strong>In Formulaite:</strong> gates.py holds the strong controls for the drawer; agent.py&#x27;s max_steps is the light control on reads.</div></div></div><div class="concept" data-key="Deterministic gate first"><div class="chead" role="button" tabindex="0"><div><span class="idx">07</span><b>Deterministic gate first</b> <span class="chip ch">ch 3</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>The first control on any proposal is plain code, not another model call. It compares the drawer to the catalogue and to fixed rules. It returns pass or fail with reasons. Only a passing drawer reaches a human. This keeps human time for real decisions.</p><div class="callout blue"><strong>Picture it:</strong> A sieve before the microscope. Lumps get caught by the mesh; only fine powder gets the expert&#x27;s eye.</div><pre><code>from agent_lab.gates import run_gates
+
+verdict = run_gates(drawer, catalogue_entry=entry)
+if not verdict:
+    # send reasons back to the model and loop again
+    print(verdict.reasons)
+else:
+    ask_human(drawer)   # only now</code></pre><div class="note">The verdict is truthy on pass; reasons are a plain list of strings.</div><div class="callout"><strong>The trap:</strong> Asking the model to review its own drawer and calling that a gate.</div><div class="callout green"><strong>In Formulaite:</strong> gates.py: run_gates and the check_* functions; agent.py calls it every time fill_drawer is invoked.</div></div></div><div class="concept" data-key="Step budget as a control"><div class="chead" role="button" tabindex="0"><div><span class="idx">08</span><b>Step budget as a control</b> <span class="chip ch">ch 3</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A budget is the simplest control. Each brief carries a maximum number of tool calls. When it runs out the sub-agent stops and reports what it has. A budget cannot be argued with, so it is the control you trust when nothing else fires.</p><div class="callout blue"><strong>Picture it:</strong> A timer on the mixer. It stops whether or not the cream looks ready.</div><div class="callout"><strong>The trap:</strong> One global budget for the whole run, so a slow sub-question starves the others.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py: max_steps is the budget; give each sub-run its own, smaller one.</div></div></div><div class="concept" data-key="Role, context, constraints brief"><div class="chead" role="button" tabindex="0"><div><span class="idx">09</span><b>Role, context, constraints brief</b> <span class="chip ch">ch 4</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>The book&#x27;s practice lab is one prompt shape: role, context, constraints. That shape is the input standard for every delegation. Role says who the sub-agent is. Context gives the facts it needs. Constraints say what it may not do and when to stop.</p><div class="callout blue"><strong>Picture it:</strong> A job sheet for a temp: what you are, what you are given, what you must not touch.</div><pre><code>SYSTEM = &quot;&quot;&quot;Role: ingredient researcher for Formulaite.
+Context: INCI {inci}. Catalogue entry: {entry}.
+Constraints:
+- read only; never invent a number
+- cite a source url for every section
+- if the page contradicts the catalogue, stop and say so
+- at most {budget} tool calls&quot;&quot;&quot;</code></pre><div class="note">Three labelled blocks; the constraints block is where control lives.</div><div class="callout"><strong>The trap:</strong> Writing a long friendly prompt with no constraints block, then blaming the model for over-reaching.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py builds the system prompt; make it these three blocks so every sub-run starts from the same standard.</div></div></div><div class="concept" data-key="Delegation contract"><div class="chead" role="button" tabindex="0"><div><span class="idx">10</span><b>Delegation contract</b> <span class="chip ch">ch 4</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Delegation is a contract, not a wish. Write down what goes out and what must come back. Out: the sub-question, the allowed tools, the step budget, the output shape. Back: values, sources, confidence, open questions. If a return does not match, the coordinator rejects it.</p><div class="callout blue"><strong>Picture it:</strong> A purchase order lists the item, the spec and the delivery date. The goods are checked against the order, not against memory.</div><pre><code>@dataclass(frozen=True)
+class Brief:                      # what goes out
+    inci: str
+    sections: tuple[str, ...]
+    tools: tuple[str, ...] = (&quot;catalogue_lookup&quot;, &quot;read_supplier_page&quot;)
+    max_steps: int = 4
+@dataclass
+class Handoff:                    # what must come back
+    values: dict[str, str]
+    sources: list[str]
+    confidence: float
+    open_questions: list[str] = field(default_factory=list)</code></pre><div class="note">Brief is frozen so a sub-agent cannot widen its own scope; Handoff is what comes back.</div><div class="callout"><strong>The trap:</strong> Delegating with a sentence of prose and accepting whatever text comes back.</div><div class="callout green"><strong>In Formulaite:</strong> tools.py: a Tool&#x27;s input_schema is the contract with the model; a Brief dataclass does the same job for a sub-agent run.</div></div></div><div class="concept" data-key="Human review gate placement"><div class="chead" role="button" tabindex="0"><div><span class="idx">11</span><b>Human review gate placement</b> <span class="chip ch">ch 5</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A human gate is a checkpoint where a person must say yes before the agent continues. Put it where writes happen and nowhere else. One gate at the catalogue write is stronger than five gates on reads. Too many gates and the reviewer stops reading.</p><div class="callout blue"><strong>Picture it:</strong> One signature on the batch release form, not a signature every time someone opens a jar.</div><div class="callout"><strong>The trap:</strong> Putting a human gate on every step, which trains the reviewer to click approve without looking.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py: after run_gates passes and before any catalogue write, call an approve() function; gates.py stays deterministic.</div></div></div><div class="concept" data-key="What the reviewer sees"><div class="chead" role="button" tabindex="0"><div><span class="idx">12</span><b>What the reviewer sees</b> <span class="chip ch">ch 5</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A gate is only as good as the screen the human sees. Show the proposed drawer, the reasons the gate passed, the sources used, and what will change. Keep it to one screen. Offer three answers: approve, edit, reject with a reason.</p><div class="callout blue"><strong>Picture it:</strong> A pharmacist checks the label, the dose and the prescription side by side. Not a chat log.</div><pre><code>def approve(drawer, verdict, box) -&gt; bool:
+    print(&quot;INCI:&quot;, drawer.inci_name)
+    print(&quot;Use level:&quot;, drawer.typical_use_level)
+    print(&quot;Sources:&quot;, *drawer.sources, sep=&quot;\n  &quot;)
+    print(&quot;Gate:&quot;, &quot;PASS&quot; if verdict else verdict.reasons)
+    answer = input(&quot;approve / edit / reject: &quot;).strip()
+    box.log(&quot;human_gate&quot;, drawer.inci_name, answer=answer)
+    return answer == &quot;approve&quot;</code></pre><div class="note">Everything the decision needs is printed before the question; the answer is logged.</div><div class="callout"><strong>The trap:</strong> Showing the human the raw conversation and calling that transparency.</div><div class="callout green"><strong>In Formulaite:</strong> glassbox.py records the human answer as an Event; the Formulaite app renders the same fields as a review card.</div></div></div><div class="concept" data-key="Least privilege per sub-task"><div class="chead" role="button" tabindex="0"><div><span class="idx">13</span><b>Least privilege per sub-task</b> <span class="chip ch">ch 6</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Each sub-task gets only the tools it needs. Research sub-runs get read tools. Only the coordinator holds the write tool, and only after the human gate. Hardening access this way means a confused sub-agent cannot do damage.</p><div class="callout blue"><strong>Picture it:</strong> The intern has a key to the library, not to the raw-materials store.</div><pre><code>from agent_lab.tools import ToolRegistry
+from agent_lab.formulaite_tools import build_registry
+
+full = build_registry()
+read_only = ToolRegistry(*(t for t in full
+                          if t.name != &quot;catalogue_write&quot;))
+
+sub_agent = Agent(model=model, tools=read_only, max_steps=4)</code></pre><div class="note">A second registry built from the first; the write tool never reaches the sub-agent.</div><div class="callout"><strong>The trap:</strong> Handing every sub-agent the full registry because it is easier.</div><div class="callout green"><strong>In Formulaite:</strong> tools.py: ToolRegistry accepts any subset of tools, so a read-only sub-run is a one-line filter.</div></div></div></div><div class="panel" data-level="intermediate"><div class="prog"><span class="lbl">Intermediate</span><div class="bar"><i></i></div><span class="txt">0 / 11 got it</span></div><div class="concept" data-key="Save the trace before you act"><div class="chead" role="button" tabindex="0"><div><span class="idx">01</span><b>Save the trace before you act</b> <span class="chip ch">ch 7</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Backup means you can get back to a known state. Save the Glass Box before any write. Keep the old catalogue entry beside the new one. If the write turns out wrong, you replay the run and restore the old entry.</p><div class="callout blue"><strong>Picture it:</strong> Photograph the formula sheet before you correct it in pen.</div><pre><code>box.save(f&quot;runs/{run_id}.json&quot;)          # before the write
+old = catalogue_entry(drawer.inci_name)
+backup[drawer.inci_name] = old
+catalogue_write(drawer)
+
+# rollback
+catalogue_write_raw(backup[drawer.inci_name])</code></pre><div class="note">The save happens before the write, so a crash mid-write still leaves a trace.</div><div class="callout"><strong>The trap:</strong> Saving the trace only when the run succeeds, which loses exactly the runs you need.</div><div class="callout green"><strong>In Formulaite:</strong> glassbox.py: GlassBox.save and GlassBox.load are the backup and the replay.</div></div></div><div class="concept" data-key="Operational signals"><div class="chead" role="button" tabindex="0"><div><span class="idx">02</span><b>Operational signals</b> <span class="chip ch">ch 8</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Track a few numbers per run so drift is visible. Steps used, gate failures, retries, human override rate, tokens. A rising override rate means the drawers are getting worse. Alert on thresholds instead of reading every trace.</p><div class="callout blue"><strong>Picture it:</strong> Batch records track viscosity and pH each run. One number drifting tells you before a customer does.</div><div class="callout"><strong>The trap:</strong> Collecting a dashboard of twenty metrics that nobody reads.</div><div class="callout green"><strong>In Formulaite:</strong> glassbox.py: count of_kind(&#x27;gate_fail&#x27;) and of_kind(&#x27;human_gate&#x27;) per saved run; memory.py&#x27;s token_estimate gives the cost line.</div></div></div><div class="concept" data-key="Incident drills"><div class="chead" role="button" tabindex="0"><div><span class="idx">03</span><b>Incident drills</b> <span class="chip ch">ch 9</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Do not wait for a bad supplier page in production. Rehearse it. Make the model fail its first drawer on purpose. Feed a page that contradicts the catalogue. Watch the gate catch it, watch the escalation fire, and time how long recovery takes.</p><div class="callout blue"><strong>Picture it:</strong> A fire drill. Everyone learns where the exits are while nothing is burning.</div><pre><code>from agent_lab.models import ScriptedModel
+from agent_lab.agent import Agent
+
+agent = Agent(model=ScriptedModel(fail_first=True),
+              tools=build_registry(), max_steps=6)
+result = agent.run(&quot;Glycerin&quot;)
+assert result.ok
+assert len(result.box.of_kind(&quot;gate_fail&quot;)) == 1</code></pre><div class="note">fail_first forces one bad drawer; the assert proves the gate caught it.</div><div class="callout"><strong>The trap:</strong> Testing only the happy path, so the first real failure is also the first drill.</div><div class="callout green"><strong>In Formulaite:</strong> models.py: ScriptedModel(fail_first=True) is the built-in drill; scripts/check_gate_control.py runs it.</div></div></div><div class="concept" data-key="Repeatable checks as code"><div class="chead" role="button" tabindex="0"><div><span class="idx">04</span><b>Repeatable checks as code</b> <span class="chip ch">ch 10</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Any check you run twice by hand should become a function. Store the checks in a list. Run the list every time. New rules are new functions, not new prompt text. This is what lets the gate grow without getting fragile.</p><div class="callout blue"><strong>Picture it:</strong> A pre-flight checklist printed and clipped to the dash, not remembered.</div><pre><code>CHECKS = [
+    check_all_sections_filled,
+    check_inci_matches,
+    check_use_level_in_range,
+    check_not_banned,
+    check_has_sources,
+]
+reasons = [r for c in CHECKS if (r := c(drawer, entry))]</code></pre><div class="note">Functions as values in a list; the comprehension keeps only the failures.</div><div class="callout"><strong>The trap:</strong> Adding rules to the prompt instead of the check list, so nobody can test them.</div><div class="callout green"><strong>In Formulaite:</strong> gates.py: run_gates loops over exactly this kind of list; scripts/check_*.py are the repo-level version.</div></div></div><div class="concept" data-key="Handoff packet"><div class="chead" role="button" tabindex="0"><div><span class="idx">05</span><b>Handoff packet</b> <span class="chip ch">ch 11</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>When a sub-agent finishes it must hand back a fixed packet. Status, values, sources, confidence, open questions. The coordinator merges packets into one drawer. A packet with low confidence or open questions becomes an escalation, not a guess.</p><div class="callout blue"><strong>Picture it:</strong> A shift handover note: what was done, what was measured, what is still unclear.</div><pre><code>def merge(packets: list[Handoff]) -&gt; IngredientDrawer:
+    values, sources = {}, []
+    for p in packets:
+        if p.confidence &lt; 0.6 or p.open_questions:
+            raise Escalate(p.open_questions)
+        values.update(p.values)
+        sources += p.sources
+    return IngredientDrawer.from_model_input(**values, sources=sources)</code></pre><div class="note">Merging stops at the first weak packet; the coordinator never fills a gap itself.</div><div class="callout"><strong>The trap:</strong> Accepting free-text summaries from sub-agents and letting the coordinator paper over the gaps.</div><div class="callout green"><strong>In Formulaite:</strong> drawer.py: from_model_input is the merge target; agent.py&#x27;s _handle_answer is where packets would be merged.</div></div></div><div class="concept" data-key="Coordinator that never solves"><div class="chead" role="button" tabindex="0"><div><span class="idx">06</span><b>Coordinator that never solves</b> <span class="chip ch">ch 11</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>The coordinator splits the goal, sends briefs, collects packets, merges and gates. It never answers a sub-question itself. If it starts filling gaps, delegation has failed and you should collapse back to one agent. Keep it boring.</p><div class="callout blue"><strong>Picture it:</strong> A head chef plates and checks. The moment they are chopping onions, the kitchen is understaffed.</div><pre><code>def coordinate(inci: str) -&gt; IngredientDrawer:
+    packets = [run_sub_agent(Brief(inci, (s,)))
+               for s in IngredientDrawer.REQUIRED_SECTIONS
+               if s != &quot;sources&quot;]
+    drawer = merge(packets)
+    verdict = run_gates(drawer, catalogue_entry=catalogue_entry(inci))
+    if not verdict:
+        raise Escalate(verdict.reasons)
+    return drawer</code></pre><div class="note">Four verbs: brief, collect, merge, gate. No research happens in this function.</div><div class="callout"><strong>The trap:</strong> A coordinator with its own read tools that quietly does the research itself.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py: Agent is a single loop today; a coordinate() wrapper above it would run one Agent per brief.</div></div></div><div class="concept" data-key="Escalation packet for humans"><div class="chead" role="button" tabindex="0"><div><span class="idx">07</span><b>Escalation packet for humans</b> <span class="chip ch">ch 11</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Handoff to a human is also a protocol. When the agent stops early, it sends what it tried, what it found, and one clear question. The human should be able to answer in under a minute. No raw logs, no apology paragraphs.</p><div class="callout blue"><strong>Picture it:</strong> A lab tech asks: &#x27;Catalogue says 5 percent, supplier says 10. Which one?&#x27; Not: &#x27;I am confused about glycerin.&#x27;</div><div class="callout"><strong>The trap:</strong> Escalating with &#x27;something went wrong&#x27; and the whole conversation attached.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py: when max_steps is hit or the gate fails twice, build the packet from box.of_kind(&#x27;gate_fail&#x27;) and the last tool results.</div></div></div><div class="concept" data-key="Quality, speed, edit effort"><div class="chead" role="button" tabindex="0"><div><span class="idx">08</span><b>Quality, speed, edit effort</b> <span class="chip ch">ch 12</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>The book&#x27;s review prompt names three measures: quality, speed and edit effort. Trust is earned when all three improve. Quality is gate pass rate and reviewer approval. Speed is steps and seconds. Edit effort is how much the human changed before approving.</p><div class="callout blue"><strong>Picture it:</strong> A junior formulator is trusted when their sheets need fewer red-pen marks each month.</div><div class="callout"><strong>The trap:</strong> Measuring only speed, which rewards agents that guess fast.</div><div class="callout green"><strong>In Formulaite:</strong> glassbox.py: log the human&#x27;s edited drawer beside the proposed one so edit effort is a diff, not an opinion.</div></div></div><div class="concept" data-key="Version drift control"><div class="chead" role="button" tabindex="0"><div><span class="idx">09</span><b>Version drift control</b> <span class="chip ch">ch 13</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Prompts, models, catalogues and gate rules all change. If you cannot say which versions produced a drawer, you cannot explain a change in quality. Stamp every run with the version of each. Compare runs only within the same stamp.</p><div class="callout blue"><strong>Picture it:</strong> Every batch record names the raw-material lot numbers. Change one lot and you know where to look.</div><pre><code>STAMP = {
+    &quot;prompt&quot;: &quot;rcc-v3&quot;,
+    &quot;model&quot;: DEFAULT_MODEL,
+    &quot;catalogue&quot;: catalogue_version(),
+    &quot;gates&quot;: &quot;2026-09&quot;,
+}
+box.log(&quot;versions&quot;, inci, **STAMP)</code></pre><div class="note">One event at the start of every run carries every version in its meta.</div><div class="callout"><strong>The trap:</strong> Swapping the model and the prompt in the same week, then arguing about which one broke things.</div><div class="callout green"><strong>In Formulaite:</strong> models.py: the ScriptedModel or ClaudeModel flag is one version; log it with the others in glassbox.py.</div></div></div><div class="concept" data-key="Habit loop: act, practise, review, checkpoint"><div class="chead" role="button" tabindex="0"><div><span class="idx">10</span><b>Habit loop: act, practise, review, checkpoint</b> <span class="chip ch">ch 14</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Every chapter ends with the same four moves. Take one action. Run one practice. Review the output. Ask one checkpoint question. Applied to an agent, this is a weekly rhythm: ship one change, run the scenarios, read five traces, ask what to adjust.</p><div class="callout blue"><strong>Picture it:</strong> A weekly stock-take. Same list, same day, so nothing is forgotten.</div><div class="callout"><strong>The trap:</strong> Big review sessions every quarter instead of small ones every week.</div><div class="callout green"><strong>In Formulaite:</strong> Keep a runs/ folder from glassbox.py saves and read five at random each week; write the checkpoint answer in docs/.</div></div></div><div class="concept" data-key="Edge cases: missing, ambiguous, contradictory"><div class="chead" role="button" tabindex="0"><div><span class="idx">11</span><b>Edge cases: missing, ambiguous, contradictory</b> <span class="chip ch">ch 15</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Three edge shapes cover most trouble. Missing: the INCI is not in the catalogue. Ambiguous: two names for one ingredient. Contradictory: the supplier page disagrees with the catalogue. Each needs a named outcome, not a guess. Contradiction means re-decompose or escalate.</p><div class="callout blue"><strong>Picture it:</strong> An unlabelled jar, two jars with the same label, or a label that disagrees with the certificate.</div><div class="callout"><strong>The trap:</strong> Treating every edge case as a retry.</div><div class="callout green"><strong>In Formulaite:</strong> formulaite_tools.py: catalogue_lookup returns a string when missing; gates.py check_use_level_in_range catches contradiction.</div></div></div></div><div class="panel" data-level="advanced"><div class="prog"><span class="lbl">Advanced</span><div class="bar"><i></i></div><span class="txt">0 / 7 got it</span></div><div class="concept" data-key="Fewer, simpler paths"><div class="chead" role="button" tabindex="0"><div><span class="idx">01</span><b>Fewer, simpler paths</b> <span class="chip ch">ch 16</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Every branch in the workflow is a place to get lost. Merge overlapping tools. Keep one escalation path. Keep one approval screen. A support workflow with three routes is easier to trust than one with twelve.</p><div class="callout blue"><strong>Picture it:</strong> One clearly marked exit beats six unmarked doors.</div><div class="callout"><strong>The trap:</strong> Adding a special route for every new edge case until nobody can draw the flow.</div><div class="callout green"><strong>In Formulaite:</strong> formulaite_tools.py keeps three tools; resist a fourth until a scenario proves the three cannot cover it.</div></div></div><div class="concept" data-key="Measurable quarterly targets"><div class="chead" role="button" tabindex="0"><div><span class="idx">02</span><b>Measurable quarterly targets</b> <span class="chip ch">ch 17</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Set a small number of targets for the agent each quarter. Gate pass rate above a line. Override rate below a line. Cost per drawer under a number. Targets turn &#x27;the agent seems better&#x27; into a yes or no.</p><div class="callout blue"><strong>Picture it:</strong> This quarter: batch rejects under two percent. Everyone knows if it happened.</div><div class="callout"><strong>The trap:</strong> Ten targets, none owned, none measured.</div><div class="callout green"><strong>In Formulaite:</strong> A scripts/report_runs.py that reads glassbox.py saves and prints the three numbers against the targets.</div></div></div><div class="concept" data-key="One-page governance"><div class="chead" role="button" tabindex="0"><div><span class="idx">03</span><b>One-page governance</b> <span class="chip ch">ch 18</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Governance can be one page. Who may approve a catalogue write. Which actions run alone. Which never will. Who reviews traces and how often. Lightweight means readable in five minutes and enforced by code where possible.</p><div class="callout blue"><strong>Picture it:</strong> The lab safety sheet on the wall, not a forty-page binder in a cupboard.</div><pre><code>POLICY = {
+    &quot;auto&quot;: {&quot;catalogue_lookup&quot;, &quot;read_supplier_page&quot;, &quot;fill_drawer&quot;},
+    &quot;human_gate&quot;: {&quot;catalogue_write&quot;},
+    &quot;never&quot;: {&quot;catalogue_delete&quot;, &quot;publish_to_app&quot;},
+}
+
+def allowed(tool: str) -&gt; str:
+    return next(k for k, v in POLICY.items() if tool in v)</code></pre><div class="note">The policy is data the loop reads; changing governance is a one-line diff.</div><div class="callout"><strong>The trap:</strong> Writing policy in a document that the code never reads.</div><div class="callout green"><strong>In Formulaite:</strong> gates.py: a policy dict beside the checks; agent.py consults it before every tool call.</div></div></div><div class="concept" data-key="Scenario validation"><div class="chead" role="button" tabindex="0"><div><span class="idx">04</span><b>Scenario validation</b> <span class="chip ch">ch 19</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A scenario is one full path through the decomposition. Happy path. Missing INCI. Contradicting page. Reviewer rejects. Each scenario has an expected outcome and an expected trace shape. Run all scenarios before any change ships.</p><div class="callout blue"><strong>Picture it:</strong> Stability testing: the same cream through heat, cold and light, with a pass line for each.</div><pre><code>SCENARIOS = {
+    &quot;happy&quot;:      (&quot;Glycerin&quot;, True),
+    &quot;missing&quot;:    (&quot;Unobtainium&quot;, False),
+    &quot;contradict&quot;: (&quot;Niacinamide&quot;, False),
+}
+for name, (inci, expect_ok) in SCENARIOS.items():
+    r = Agent(model=ScriptedModel(), tools=build_registry()).run(inci)
+    assert r.ok == expect_ok, name</code></pre><div class="note">Each scenario is a name, an input and an expected verdict.</div><div class="callout"><strong>The trap:</strong> Validating with one ingredient that always worked.</div><div class="callout green"><strong>In Formulaite:</strong> scripts/check_offline_run.py is scenario one; add a scenarios/ folder that agent.py runs the same way.</div></div></div><div class="concept" data-key="Sustaining the practice"><div class="chead" role="button" tabindex="0"><div><span class="idx">05</span><b>Sustaining the practice</b> <span class="chip ch">ch 20</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A control that nobody runs decays. Retire checks that never fire. Keep the ones that catch things. Rotate who reads traces. Review the governance page each quarter. The aim is a small set of habits that survive a busy month.</p><div class="callout blue"><strong>Picture it:</strong> Calibration reminders in the calendar, not in someone&#x27;s head.</div><div class="callout"><strong>The trap:</strong> Adding controls forever and never removing one.</div><div class="callout green"><strong>In Formulaite:</strong> Keep the check list in gates.py short; delete a check_* function when a quarter of runs never triggers it.</div></div></div><div class="concept" data-key="Staged promotion for new tools"><div class="chead" role="button" tabindex="0"><div><span class="idx">06</span><b>Staged promotion for new tools</b> <span class="chip ch">ch 21</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A new tool enters at the lowest risk tier. First sandboxed with stub data. Then read-only in real runs. Then allowed to propose. Only after scenarios pass does it touch a write. Each stage is a governance decision, not a code change.</p><div class="callout blue"><strong>Picture it:</strong> A new supplier ships a sample first, then a pilot lot, then a full order.</div><pre><code>STAGE = {&quot;web_search&quot;: &quot;sandbox&quot;}   # sandbox -&gt; read -&gt; propose -&gt; write
+
+def promote(tool: str, scenarios_passed: bool) -&gt; None:
+    order = [&quot;sandbox&quot;, &quot;read&quot;, &quot;propose&quot;, &quot;write&quot;]
+    if scenarios_passed:
+        STAGE[tool] = order[order.index(STAGE[tool]) + 1]</code></pre><div class="note">The stage list is the only path a tool can take upward.</div><div class="callout"><strong>The trap:</strong> Plugging a live web tool straight into the write path because the demo looked good.</div><div class="callout green"><strong>In Formulaite:</strong> formulaite_tools.py: read_supplier_page is stubbed with local files, which is the sandbox stage; a live fetch would be the next stage.</div></div></div><div class="concept" data-key="Policy becomes code and prompt"><div class="chead" role="button" tabindex="0"><div><span class="idx">07</span><b>Policy becomes code and prompt</b> <span class="chip ch">ch 22</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A policy that lives only in a document does nothing. Each policy line should exist twice. Once in the prompt&#x27;s constraints block so the model knows. Once in a gate check so the code enforces. When the two disagree, the code wins.</p><div class="callout blue"><strong>Picture it:</strong> The sign says &#x27;goggles on&#x27;. The door also will not open without the badge.</div><pre><code># policy line: never claim an ingredient treats a disease
+CONSTRAINT = &quot;Never state that an ingredient treats or cures a condition.&quot;
+
+def check_no_forbidden_claims(drawer, entry):
+    text = &quot; &quot;.join(str(getattr(drawer, n))
+                    for n in drawer.REQUIRED_SECTIONS)
+    if any(w in text.lower() for w in (&quot;cures&quot;, &quot;treats&quot;)):
+        return &quot;forbidden medical claim&quot;</code></pre><div class="note">Same rule, two homes: the prompt and the check.</div><div class="callout"><strong>The trap:</strong> Trusting the prompt to enforce a policy the gate never checks.</div><div class="callout green"><strong>In Formulaite:</strong> gates.py: check_no_forbidden_claims already exists; add the matching line to agent.py&#x27;s system prompt.</div></div></div></div>
+</section>
+
+<section id="cheat">
+ <span class="num">05 · Cheat sheet</span>
+ <h2>AI Agents in Practice: Task Decomposition, Delegation, and Human-in-the-Loop Control — cheat sheet</h2>
+ <p class="small">Everything on one sheet. <button class="btn" id="printBtn" type="button">Print this cheat sheet</button></p>
+ 
+<div class="cs-grid">
+ <div><h3>Vocabulary</h3><div class="tablewrap"><table><thead><tr><th>Term</th><th>Means</th></tr></thead><tbody><tr><td class="t">Scope statement</td><td>One sentence naming what the agent is for and nothing more.</td></tr><tr><td class="t">Risk tier</td><td>Read, propose or write; decides how much control an action gets.</td></tr><tr><td class="t">System surface</td><td>Every store, page and file the agent can read or write.</td></tr><tr><td class="t">Sub-question</td><td>One drawer section phrased as a question with a known answer shape.</td></tr><tr><td class="t">Delegation brief</td><td>What goes out: sub-question, allowed tools, budget, output shape.</td></tr><tr><td class="t">Handoff packet</td><td>What comes back: values, sources, confidence, open questions.</td></tr><tr><td class="t">Coordinator</td><td>The part that briefs, collects, merges and gates; it never researches.</td></tr><tr><td class="t">Sub-agent</td><td>A small loop with read tools, one brief and its own budget.</td></tr><tr><td class="t">Deterministic gate</td><td>Plain code that passes or fails a drawer with reasons.</td></tr><tr><td class="t">Human review gate</td><td>A checkpoint where a person approves, edits or rejects before a write.</td></tr><tr><td class="t">Least privilege</td><td>Each sub-task gets only the tools it needs.</td></tr><tr><td class="t">Step budget</td><td>A hard cap on tool calls per brief.</td></tr><tr><td class="t">Escalation</td><td>Stopping early and handing a human one clear question.</td></tr><tr><td class="t">Operational signal</td><td>A per-run number such as gate failures or override rate.</td></tr><tr><td class="t">Override rate</td><td>How often the human changes or rejects what the gate passed.</td></tr><tr><td class="t">Version stamp</td><td>Prompt, model, catalogue and gate versions logged per run.</td></tr><tr><td class="t">Incident drill</td><td>A rehearsed failure run to prove gates and escalation work.</td></tr><tr><td class="t">Scenario</td><td>One full path through the decomposition with an expected outcome.</td></tr><tr><td class="t">Staged promotion</td><td>Sandbox, read, propose, write; a new tool climbs one step at a time.</td></tr><tr><td class="t">Governance page</td><td>One page saying who approves what and what is never automated.</td></tr></tbody></table></div></div>
+ <div><h3>The pattern</h3><ol><li>Write the scope: one INCI, one drawer.</li><li>Split into sub-questions from REQUIRED_SECTIONS; keep dependent ones together.</li><li>Brief each sub-question: role, context, constraints, read tools, budget.</li><li>Collect handoff packets; escalate any with low confidence or open questions.</li><li>Merge into a drawer and run the deterministic gate.</li><li>Show the human one screen: drawer, reasons, sources; approve, edit or reject.</li><li>Write to the catalogue only after approval; save the trace first.</li></ol>
+  <h3>Decisions</h3><div class="tablewrap"><table><thead><tr><th>When</th><th>Use</th><th>Not</th></tr></thead><tbody><tr><td>Sub-questions are independent</td><td>one brief per group, run side by side</td><td>one long loop</td></tr><tr><td>One section depends on another, like use level on function</td><td>one brief covering both</td><td>two sub-agents that must reconcile</td></tr><tr><td>An action only reads</td><td>logging and a step budget</td><td>a human gate</td></tr><tr><td>An action writes to the catalogue</td><td>deterministic gate, then human gate</td><td>either one alone</td></tr><tr><td>A packet has low confidence or open questions</td><td>escalate with one clear question</td><td>let the coordinator guess</td></tr><tr><td>Quality drops after a change</td><td>compare runs within the same version stamp</td><td>argue from memory</td></tr><tr><td>A new tool looks useful</td><td>sandbox, then read, then propose, then write</td><td>straight into production</td></tr><tr><td>The coordinator keeps filling gaps itself</td><td>collapse back to one agent</td><td>more sub-agents</td></tr></tbody></table></div></div>
+</div>
+<h3>Rules of thumb</h3><div class="tablewrap"><table><thead><tr><th>Do</th><th>Don't</th></tr></thead><tbody><tr><td>Write the scope sentence before writing any prompt.</td><td>Start from &#x27;research this ingredient&#x27;.</td></tr><tr><td>Derive sub-questions from the drawer&#x27;s fixed sections.</td><td>Let the model invent the split each run.</td></tr><tr><td>Give every brief a budget, a tool list and an output shape.</td><td>Delegate with a sentence of prose.</td></tr><tr><td>Put the human gate where the write happens.</td><td>Gate every read.</td></tr><tr><td>Show the reviewer drawer, gate reasons and sources on one screen.</td><td>Show the raw conversation.</td></tr><tr><td>Run the deterministic gate before any human sees a drawer.</td><td>Ask the model to review itself.</td></tr><tr><td>Give sub-agents read tools only.</td><td>Pass the full registry for convenience.</td></tr><tr><td>Save the Glass Box before every write.</td><td>Save only successful runs.</td></tr><tr><td>Stamp each run with prompt, model, catalogue and gate versions.</td><td>Change two of them in the same week.</td></tr><tr><td>Promote a new tool one stage at a time.</td><td>Wire a live tool straight into the write path.</td></tr></tbody></table></div>
+<h3>Skeletons</h3><h4>Brief out, Handoff back</h4><pre><code>@dataclass(frozen=True)
+class Brief:
+    inci: str
+    sections: tuple[str, ...]
+    tools: tuple[str, ...] = (&quot;catalogue_lookup&quot;, &quot;read_supplier_page&quot;)
+    max_steps: int = 4
+@dataclass
+class Handoff:
+    values: dict[str, str]
+    sources: list[str]
+    confidence: float
+    open_questions: list[str] = field(default_factory=list)</code></pre><h4>Coordinator: brief, collect, merge, gate</h4><pre><code>def coordinate(inci: str) -&gt; IngredientDrawer:
+    groups = [(&quot;inci_name&quot;, &quot;function&quot;, &quot;typical_use_level&quot;, &quot;use_level_pct&quot;),
+              (&quot;phase_and_solubility&quot;, &quot;ph_range&quot;),
+              (&quot;compatibility&quot;, &quot;safety_notes&quot;)]
+    packets = [run_sub_agent(Brief(inci, g)) for g in groups]
+    drawer = merge(packets)                      # escalates on weak packets
+    verdict = run_gates(drawer, catalogue_entry=catalogue_entry(inci))
+    if not verdict:
+        raise Escalate(verdict.reasons)
+    return drawer</code></pre><h4>Human gate before the write</h4><pre><code>def publish(drawer, verdict, box, ask=input) -&gt; str:
+    box.save(f&quot;runs/{box.run_id}.json&quot;)          # backup first
+    print(drawer.to_dict()); print(&quot;gate:&quot;, verdict.reasons or &quot;PASS&quot;)
+    answer = ask(&quot;approve / edit / reject: &quot;).strip()
+    box.log(&quot;human_gate&quot;, drawer.inci_name, answer=answer)
+    if answer != &quot;approve&quot;:
+        return answer
+    catalogue_write(drawer)
+    return &quot;written&quot;</code></pre><h4>Scenario runner</h4><pre><code>SCENARIOS = {
+    &quot;happy&quot;:      (&quot;Glycerin&quot;, True),
+    &quot;missing&quot;:    (&quot;Unobtainium&quot;, False),
+    &quot;contradict&quot;: (&quot;Niacinamide&quot;, False),
+}
+for name, (inci, expect_ok) in SCENARIOS.items():
+    box_ok = Agent(model=ScriptedModel(), tools=build_registry()).run(inci).ok
+    assert box_ok == expect_ok, name</code></pre>
+<h3>Before you ship</h3><ul class="check"><li><input type="checkbox" class="ship"><span>Scope sentence written and it matches Agent.run&#x27;s single INCI argument.</span></li><li><input type="checkbox" class="ship"><span>Every drawer section maps to a sub-question and a tool.</span></li><li><input type="checkbox" class="ship"><span>Every brief has a budget, a tool list and an output shape.</span></li><li><input type="checkbox" class="ship"><span>Sub-agents hold read tools only; the write tool sits behind the human gate.</span></li><li><input type="checkbox" class="ship"><span>The reviewer screen shows drawer, gate reasons and sources, with approve, edit, reject.</span></li><li><input type="checkbox" class="ship"><span>Glass Box saved before every write; the rollback path tested once.</span></li><li><input type="checkbox" class="ship"><span>Version stamp logged on every run.</span></li><li><input type="checkbox" class="ship"><span>Scenarios for happy, missing, contradicting and rejected paths pass before shipping.</span></li></ul>
+
+</section>
+
+<section id="s06">
+ <span class="num">06 · You're done when…</span>
+ <div class="callout green"><ol><li>Turn one INCI request into a list of Briefs from REQUIRED_SECTIONS, run each with a read-only ToolRegistry, and merge the Handoff packets into one drawer.</li><li>Add a human gate before the catalogue write that shows drawer, gate reasons and sources, and prove from the Glass Box that a reject stopped the write.</li><li>Run four scenarios (happy, missing, contradicting, rejected) with a version stamp on each and report three numbers: gate pass rate, override rate, steps per drawer.</li></ol></div>
+</section>
+
+<section id="s07">
+ <span class="num">07 · Where this comes from</span>
+ 
+<p><strong>Book:</strong> <em>AI Agents in Practice: Task Decomposition, Delegation, and Human-in-the-Loop Control</em>, Sophie Langford, 94 pages. Markdown copy: <code>books-md/ai-agents-in-practice-task-decomposition.md</code>. Notes with chapter citations: <code>docs/book-notes/ai-agents-in-practice-task-decomposition.md</code>.</p>
+<p><strong>Chapters covered:</strong> 1 Chapter 1: Define Scope and Risk, 2 Chapter 2: Map the System Surface, 3 Chapter 3: Prioritize Controls, 4 Chapter 4: Set Input Standards, 5 Chapter 5: Design Human Review Gates, 6 Chapter 6: Harden Access, 7 Chapter 7: Build Backup and Recovery, 8 Chapter 8: Track Operational Signals, 9 Chapter 9: Run Incident Drills, 10 Chapter 10: Automate Repeatable Checks, 11 Chapter 11: Improve Handoff Protocol, 12 Chapter 12: Measure Trust and Quality, 13 Chapter 13: Control Version Drift, 14 Chapter 14: Train Habit Loops, 15 Chapter 15: Handle Edge Cases, 16 Chapter 16: Simplify Support Workflows, 17 Chapter 17: Set Quarterly Goals, 18 Chapter 18: Deploy Lightweight Governance, 19 Chapter 19: Validate With Scenarios, 20 Chapter 20: Sustain the Practice, 21 Chapter 21: Expand to New Tools, 22 Chapter 22: Integrate Policy and Behavior.</p>
+<h3>In the author's words</h3><div class="quote">“A practical implementation guide for designing AI-agent workflows, defining boundaries, routing tasks, and ensuring human oversight on critical decisions.”<span class="who">chapter 1</span></div><div class="quote">“Write one role + context + constraints prompt and test it on two different AI tools.”<span class="who">chapter 4</span></div><div class="quote">“Which constraint reduced quality most, and how will you adjust it?”<span class="who">chapter 5</span></div><div class="quote">“Compare the two outputs and document quality, speed, and edit effort.”<span class="who">chapter 12</span></div><div class="quote">“Choose one concrete implementation step and schedule it today.”<span class="who">chapter 14</span></div>
+<h3>Python constructs this book leans on</h3><div class="tablewrap"><table><thead><tr><th>Construct</th><th>What it does here</th><th>Where</th></tr></thead><tbody><tr><td class="t">@dataclass(frozen=True)</td><td>A Brief the sub-agent cannot widen: frozen means no field can be changed after creation.</td><td class="small">Chapter 4, Set Input Standards (implied; the book shows no code)</td></tr><tr><td class="t">Class-level tuple constant</td><td>IngredientDrawer.REQUIRED_SECTIONS is the fixed list every decomposition starts from.</td><td class="small">Chapter 2, Map the System Surface (implied)</td></tr><tr><td class="t">Enum</td><td>Risk.READ, PROPOSE, WRITE as named tiers instead of magic numbers.</td><td class="small">Chapter 1, Define Scope and Risk (implied)</td></tr><tr><td class="t">Functions as values in a list</td><td>CHECKS = [check_a, check_b]; the gate loops over the list and calls each one.</td><td class="small">Chapter 10, Automate Repeatable Checks (implied)</td></tr><tr><td class="t">Walrus := inside a comprehension</td><td>[r for c in CHECKS if (r := c(drawer, entry))] keeps only non-empty failure reasons.</td><td class="small">Chapter 10, Automate Repeatable Checks (implied)</td></tr><tr><td class="t">Callable parameter with input as default</td><td>publish(..., ask=input) lets a test pass a fake ask function instead of a real person.</td><td class="small">Chapter 5, Design Human Review Gates (implied)</td></tr><tr><td class="t">dict as a policy table</td><td>POLICY maps auto, human_gate and never to sets of tool names the loop reads.</td><td class="small">Chapter 18, Deploy Lightweight Governance (implied)</td></tr><tr><td class="t">**meta keyword pass-through</td><td>box.log(&#x27;versions&#x27;, inci, **STAMP) spreads a dict of versions into one Glass Box event.</td><td class="small">Chapter 13, Control Version Drift (implied)</td></tr><tr><td class="t">assert in a loop</td><td>One assert per scenario with the scenario name as the message, so a failure names its path.</td><td class="small">Chapter 19, Validate With Scenarios (implied)</td></tr></tbody></table></div>
+<h3>Deliberately left out of this guide</h3><ul><li><strong>The chapter bodies themselves: they repeat a small set of template sentences, so this guide builds on the chapter titles, the blurb and the Applied Notes.</strong> — All chapters</li><li><strong>Quarterly goal-setting and team habit-building as management practice rather than agent design</strong> — Chapters 14, 17, 20</li><li><strong>Support-desk workflow design beyond the agent&#x27;s own escalation path</strong> — Chapter 16</li><li><strong>Access hardening at the infrastructure level: keys, secrets, network</strong> — Chapter 6</li></ul>
+
+ <details><summary>How you'd have built this guide yourself</summary>
+  <p>List the chapter headings first, then read the book in chapter order and write one card per idea that changes what you would build. Sort the cards into three piles: needed for the simplest working thing, needed for the version you would show someone, needed for the version that runs unattended. Those piles are the levels; the simplest thing in each pile is the build ladder. Copy quotes exactly and keep the chapter number next to every card, so you can go back to the source when a card stops making sense.</p>
+ </details>
+</section>
+</main>
+<script>
+(function(){
+ const KEY='bookguide.ai-agents-in-practice-task-decomposition';
+ let state={got:{},ship:{},tab:'foundation'};
+ try{const s=localStorage.getItem(KEY); if(s) state=Object.assign(state,JSON.parse(s));}catch(e){}
+ function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+ // ladder
+ document.querySelectorAll('.rung').forEach(r=>{const go=()=>{document.querySelectorAll('.rung,.rungbody').forEach(x=>x.classList.toggle('on',x.dataset.rung===r.dataset.rung));}; r.onclick=go; r.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};});
+ // chapter rows
+ document.querySelectorAll('.chrow').forEach(r=>{const go=()=>r.classList.toggle('on'); r.onclick=go; r.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};});
+ // tabs
+ const tabs=document.querySelectorAll('#ctabs button');
+ function showTab(lvl){tabs.forEach(b=>b.classList.toggle('on',b.dataset.level===lvl)); document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.dataset.level===lvl)); state.tab=lvl; save();}
+ tabs.forEach(b=>b.onclick=()=>showTab(b.dataset.level));
+ // concepts
+ function progress(){document.querySelectorAll('.panel').forEach(p=>{const all=p.querySelectorAll('.got'), n=[...all].filter(c=>c.checked).length; p.querySelector('.bar i').style.width=(all.length?100*n/all.length:0)+'%'; p.querySelector('.txt').textContent=n+' / '+all.length+' got it';});}
+ document.querySelectorAll('.concept').forEach(c=>{
+  const head=c.querySelector('.chead'), box=c.querySelector('.got'), key=c.dataset.key;
+  box.checked=!!state.got[key]; c.classList.toggle('done',box.checked);
+  head.onclick=e=>{if(e.target.closest('label')) return; c.classList.toggle('open');};
+  head.onkeydown=e=>{if(e.key==='Enter'){c.classList.toggle('open');}};
+  box.onchange=()=>{state.got[key]=box.checked; c.classList.toggle('done',box.checked); save(); progress();};
+ });
+ document.querySelectorAll('.ship').forEach((b,i)=>{b.checked=!!state.ship[i]; b.onchange=()=>{state.ship[i]=b.checked; save();};});
+ showTab(state.tab||'foundation'); progress();
+ const pb=document.getElementById('printBtn'); if(pb){pb.onclick=()=>{document.body.classList.add('printing'); window.print();}; window.onafterprint=()=>document.body.classList.remove('printing');}
+ const ob=document.getElementById('openFirst'); if(ob){ob.onclick=()=>{showTab('foundation'); const first=document.querySelector('.panel[data-level=foundation] .concept'); if(first){first.classList.add('open'); first.scrollIntoView({behavior:'smooth',block:'start'});}};}
+})();
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad:true,theme:"neutral",securityLevel:"loose"});</script>
+</body>
+</html>

@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+</head>
+<body>
+<title>Agentic Design Patterns</title>
+<style>
+:root{color-scheme:light;
+ --surface:#faf9f5;--surface-2:#f2f0e9;--surface-3:#e8e6dc;--surface-ink:#141413;--line:#d9d7cc;--line-soft:#e8e6dc;
+ --ink:#141413;--ink-2:#5c5b57;--ink-3:#6b6a65;--on-ink:#faf9f5;
+ --accent:#d97757;--accent-2:#6a9bcc;--accent-3:#788c5d;
+ --font-head:"Poppins",Arial,sans-serif;--font-body:"Lora",Georgia,serif;--font-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--surface);color:var(--ink-2);font-family:var(--font-body);font-size:17px;line-height:1.7}
+main{max-width:980px;margin:0 auto;padding:36px 22px 90px}
+h1,h2,h3,h4{font-family:var(--font-head);color:var(--ink);line-height:1.2;margin:0 0 10px;text-wrap:balance}
+h1{font-size:38px;letter-spacing:-.02em;font-weight:600}
+h2{font-size:25px;font-weight:600}
+h3{font-size:18px;font-weight:600}
+h4{font-size:15px;font-weight:600;margin-bottom:6px}
+p{margin:0 0 12px;max-width:70ch}
+strong{color:var(--ink)}
+a{color:var(--ink);text-decoration-color:var(--accent);text-underline-offset:3px}
+code,.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+code{font-size:.86em;background:var(--surface-3);padding:1px 5px;border-radius:5px;color:var(--ink)}
+pre{background:var(--surface-3);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-family:var(--font-mono);font-size:12.5px;line-height:1.6;color:var(--ink);overflow-x:auto;margin:8px 0 6px;white-space:pre}
+pre code{background:none;padding:0;font-size:inherit}
+section{margin-top:52px}
+.num{font-family:var(--font-mono);color:var(--ink-3);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px}
+.eyebrow{font-family:var(--font-mono);color:var(--ink-3);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase}
+.byline{font-family:var(--font-head);font-size:14px;color:var(--ink-3);margin:-4px 0 12px}
+.strip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0 10px}
+.strip div{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:13px 15px;font-size:15px}
+.strip b{display:block;font-family:var(--font-head);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
+.callout{border-left:3px solid var(--accent);background:var(--surface-2);border-radius:0 12px 12px 0;padding:12px 16px;margin:14px 0;font-size:15.5px}
+.callout.blue{border-color:var(--accent-2)}.callout.green{border-color:var(--accent-3)}
+.callout ol,.callout ul{margin:6px 0 0 18px;padding:0}.callout li{margin:4px 0}
+.callout p:last-child{margin-bottom:0}
+.chip{display:inline-block;font-family:var(--font-head);font-size:11px;font-weight:600;letter-spacing:.04em;border-radius:6px;padding:2px 8px;color:#141413;vertical-align:middle}
+.chip.foundation{background:var(--accent-3)}.chip.intermediate{background:var(--accent-2)}.chip.advanced{background:var(--accent)}
+.chip.ch{background:var(--surface-3);color:var(--ink-2);font-family:var(--font-mono);font-weight:500}
+.diagram{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:14px;margin:14px 0;overflow-x:auto}
+.diagram pre.mermaid{background:none;border:none;padding:0;margin:0;white-space:pre;overflow:visible;text-align:center}
+.diagram svg{max-width:100%;height:auto}
+/* ladder */
+.ladder{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0}
+.rung{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:16px 18px;cursor:pointer}
+.rung:hover{border-color:var(--accent)}
+.rung.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+.rung .lvl{font-family:var(--font-head);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.rung h3{margin:4px 0 6px}
+.rung p{font-size:14.5px;margin:0}
+.rung .time{font-family:var(--font-mono);font-size:12px;color:var(--ink-3);margin-top:8px}
+.rungbody{display:none;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-top:-2px}
+.rungbody.on{display:block}
+.rungbody ol{margin:6px 0 10px 20px;padding:0}.rungbody li{margin:5px 0}
+.meta{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-3)}
+/* chapter map */
+.chmap{border-top:1px solid var(--line);margin-top:10px}
+.chrow{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:start;padding:10px 6px;border-bottom:1px solid var(--line-soft);cursor:pointer}
+.chrow:hover{background:var(--surface-2)}
+.chrow .n{font-family:var(--font-mono);color:var(--ink-3);font-size:13px;padding-top:4px}
+.chrow b{font-family:var(--font-head);font-size:15px;color:var(--ink);display:block}
+.chrow span.adds{font-size:14.5px;color:var(--ink-2)}
+.chrow .secs{display:none;font-size:13.5px;color:var(--ink-3);margin-top:6px;font-family:var(--font-mono)}
+.chrow.on .secs{display:block}
+/* concepts */
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 6px}
+.tabs button{font-family:var(--font-head);font-weight:600;font-size:13.5px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:10px;padding:9px 14px;cursor:pointer}
+.tabs button:hover{border-color:var(--accent)}
+.tabs button.on{background:var(--accent);border-color:var(--accent);color:#141413}
+.tabs button .cnt{font-family:var(--font-mono);font-weight:500;font-size:12px;margin-left:6px;color:var(--ink-3)}
+.tabs button.on .cnt{color:#141413}
+.prog{display:flex;align-items:center;gap:10px;margin:8px 0 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-3)}
+.prog .bar{flex:1;height:9px;background:var(--surface-3);border-radius:0 4px 4px 0;overflow:hidden}
+.prog .bar i{display:block;height:100%;width:0;background:var(--accent-3);transition:width .25s}
+.panel{display:none}.panel.on{display:block}
+.concept{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;margin:10px 0;overflow:hidden}
+.concept.done{border-color:var(--accent-3)}
+.chead{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px 16px;cursor:pointer}
+.chead:hover{background:var(--surface-3)}
+.chead b{font-family:var(--font-head);font-size:15.5px;color:var(--ink)}
+.chead .idx{font-family:var(--font-mono);color:var(--ink-3);font-size:12px;margin-right:8px}
+.chead label{font-family:var(--font-head);font-size:12.5px;color:var(--ink-2);display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap}
+.chead input{width:16px;height:16px;accent-color:#788c5d}
+.cbody{display:none;padding:4px 16px 16px;border-top:1px solid var(--line-soft)}
+.concept.open .cbody{display:block}
+.cbody p{font-size:15.5px}
+.cbody .callout{margin:10px 0;font-size:14.5px}
+.cbody .note{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-3);margin:0 0 8px}
+.showall{margin:8px 0 0;font-family:var(--font-head);font-size:13px;color:var(--ink-3)}
+/* tables */
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin:8px 0 14px}
+th{font-family:var(--font-head);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:7px 8px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+td.t{font-family:var(--font-mono);font-size:13px;color:var(--ink);white-space:nowrap}
+.tablewrap{overflow-x:auto}
+.check{list-style:none;padding:0;margin:6px 0}
+.check li{display:flex;gap:10px;align-items:flex-start;padding:5px 0;font-size:15px}
+.check input{margin-top:5px;accent-color:#788c5d}
+.btn{font-family:var(--font-head);font-weight:600;font-size:13.5px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:10px;padding:8px 14px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.go{background:var(--accent);border-color:var(--accent);color:#141413}
+.cs-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:800px){.cs-grid,.strip,.ladder{grid-template-columns:1fr}.chrow{grid-template-columns:36px 1fr}.chrow .chip{grid-column:2}}
+details{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:12px 18px;margin-top:14px}
+summary{font-family:var(--font-head);font-weight:600;color:var(--ink);cursor:pointer}
+.quote{border-left:3px solid var(--accent-2);padding:4px 14px;margin:10px 0;font-style:italic;font-size:15.5px}
+.quote .who{display:block;font-style:normal;font-family:var(--font-mono);font-size:12px;color:var(--ink-3);margin-top:2px}
+.small{font-size:14px;color:var(--ink-3)}
+.toplinks{display:flex;flex-wrap:wrap;gap:8px 16px;font-family:var(--font-head);font-size:13.5px;margin:10px 0 0}
+.toplinks a{color:var(--ink-2)}
+@media print{
+ body{font-size:12px} main{padding:0;max-width:none}
+ body.printing main>*:not(#cheat){display:none} .btn,.toplinks{display:none}
+ pre{white-space:pre-wrap;font-size:10.5px} .cs-grid{grid-template-columns:1fr 1fr} section{margin-top:16px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+</style>
+<main>
+<header>
+ <span class="eyebrow">Formulaite bookshelf · book 7 of 14 · Pattern catalogue</span>
+ <h1>Agentic Design Patterns</h1>
+ <div class="byline">Antonio Gulli · 448 pages · 34 concept cards</div>
+ <p>A catalogue of 21 reusable building blocks for agents, one pattern per chapter, each with a plain overview, a rule of thumb and framework code.</p>
+ 
+ <div class="strip">
+  <div><b>Goal</b>By the end you can draw the Formulaite ingredient-research agent as a set of named patterns and add routing, reflection, memory, guardrails and evals as separate, testable pieces.</div>
+  <div><b>Output</b>A build ladder (3 rungs), 24 chapters mapped, 34 concept cards you tick off, and a printable cheat sheet.</div>
+  <div><b>Time</b>Foundation ~18 min · Intermediate ~22 min · Advanced ~28 min. Whole guide ~80 min over several sittings.</div>
+ </div>
+ <div class="callout"><strong>How to drive this page.</strong>
+  <ol>
+   <li>Press <button class="btn go" id="openFirst" type="button">Open the first card</button> — it jumps to the Foundation cards and opens card 01.</li>
+   <li>Read one card, tick <strong>Got it</strong>, open the next. The bar shows your progress and remembers it on this browser.</li>
+   <li>When Foundation is done, do <strong>Rung 1</strong> of the build ladder before reading Intermediate. Print the cheat sheet from section 05.</li>
+  </ol>
+  <div class="toplinks"><a href="agentic-design-patterns-cheatsheet.md">Cheat sheet as Markdown</a> · <a href="index.html">All nine guides</a></div>
+ </div>
+</header>
+
+<section id="s01">
+ <span class="num">01 · Where this is going</span>
+ <h2>An agent is not one clever prompt; it is a handful of named patterns, chained, routed, reflected, gated and remembered, that you compose like bricks.</h2>
+ <p><strong>Read this book when:</strong> Open it once you know what an agent loop is and want a name, a shape and a rule of thumb for each piece you are about to add.</p>
+ <p>The one picture that holds the whole book. Every chapter adds a box or an arrow to it; nothing later replaces it.</p>
+ <div class="diagram"><pre class="mermaid">flowchart TD
+  U[Goal] --&gt; P[Planning - list the steps]
+  P --&gt; R[Routing - choose a path]
+  R --&gt; C[Prompt chaining - one step at a time]
+  R --&gt; X[Parallelization - independent steps together]
+  C --&gt; T[Tool use - catalogue lookup, supplier page]
+  X --&gt; T
+  T --&gt; K[Knowledge retrieval - grounded facts]
+  K --&gt; D[Draft drawer]
+  T --&gt; D
+  D --&gt; F[Reflection - critic finds faults]
+  F --&gt;|reasons| D
+  F --&gt; G[Guardrails and gate]
+  G --&gt;|unsafe or unsure| H[Human in the loop]
+  G --&gt;|pass| O[Answer]
+  M[Memory - session state] --- D
+  E[Evaluation - trajectory and cost] --- O</pre></div>
+</section>
+
+<section id="s02">
+ <span class="num">02 · Build ladder</span>
+ <h2>Three things to build, in order</h2>
+ <p>Each rung is a Formulaite feature. Click a rung for its steps. Do rung 1 after the Foundation cards, rung 2 after Intermediate, rung 3 after Advanced.</p>
+ <div class="ladder"><div class="rung on" data-rung="0" role="button" tabindex="0"><div class="lvl">Rung 1 · Simple</div><h3>Chain, tool, critic: the drawer pipeline</h3><p>A fixed three-step chain (catalogue lookup, supplier page, fill drawer) where every tool is described by its docstring and a deterministic gate plays the critic.</p><div class="time">~2 hours</div></div><div class="rung" data-rung="1" role="button" tabindex="0"><div class="lvl">Rung 2 · Intermediate</div><h3>Router, fan-out, state and fallbacks</h3><p>A router in front of the loop, three supplier pages fetched at once, a session state dict beside the chat, and a fallback path when a page fails.</p><div class="time">~half a day</div></div><div class="rung" data-rung="2" role="button" tabindex="0"><div class="lvl">Rung 3 · Advanced</div><h3>Guardrails, MCP tools, cost routing and evals</h3><p>Formulaite tools served over MCP, a before-tool allow-list, a cheap-model pre-screen of supplier pages, model routing by task, a human approval step and a ten-ingredient eval set.</p><div class="time">~2 days</div></div></div><div class="rungbody on" data-rung="0"><h4>Steps for rung 1: Chain, tool, critic: the drawer pipeline</h4><ol><li>Write the drawer job as a chain in SYSTEM_PROMPT: catalogue_lookup, then read_supplier_page, then fill_drawer.</li><li>Register both tools with @registry.tool so the docstring becomes the description the model reads.</li><li>Make fill_drawer the only way to answer, so the output is structured, never prose.</li><li>Run run_gates on the drawer and send the reasons back as a REJECTED tool_result.</li><li>Log every model reply, tool call and verdict in the Glass Box and replay one run.</li></ol><div class="meta">Chapters 1, 4, 5, 22 · Agent Lab files: <code>agent.py</code> · <code>tools.py</code> · <code>formulaite_tools.py</code> · <code>gates.py</code> · <code>glassbox.py</code> · ~2 hours</div></div><div class="rungbody" data-rung="1"><h4>Steps for rung 2: Router, fan-out, state and fallbacks</h4><ol><li>Add a rule-based router before Agent.run: banned ingredient stops, unknown asks, known researches.</li><li>Fetch three supplier pages with asyncio.gather and merge them into one draft grounded only on those pages.</li><li>Keep ingredient, current step and sources found in a state dict, separate from the message list.</li><li>On a failed supplier page, fall back to the catalogue and mark the source as catalogue-only.</li><li>Turn REQUIRED_SECTIONS into the goal checklist and stop only when it is ticked or max_steps ends.</li></ol><div class="meta">Chapters 2, 3, 6, 8, 11, 12, 14 · Agent Lab files: <code>agent.py</code> · <code>memory.py</code> · <code>formulaite_tools.py</code> · <code>drawer.py</code> · <code>glassbox.py</code> · ~half a day</div></div><div class="rungbody" data-rung="2"><h4>Steps for rung 3: Guardrails, MCP tools, cost routing and evals</h4><ol><li>Serve catalogue_lookup and read_supplier_page from a FastMCP server and consume them with a tool_filter.</li><li>Screen every supplier page with a small cheap model for injection before it reaches the main model.</li><li>Add a before-tool check in ToolRegistry.call that blocks any tool or argument outside the allow-list.</li><li>Route simple lookups to the cheap model and full drawers to the strong one; log the model name and tokens.</li><li>Require a human approval tool before a drawer is written to the live catalogue.</li><li>Build a ten-INCI eval set with the expected tool order; compare trajectory and gate pass rate after every change.</li></ol><div class="meta">Chapters 7, 10, 13, 16, 18, 19 · Agent Lab files: <code>formulaite_tools.py</code> · <code>tools.py</code> · <code>gates.py</code> · <code>glassbox.py</code> · <code>models.py</code> · ~2 days</div></div>
+</section>
+
+<section id="s03">
+ <span class="num">03 · Chapter map</span>
+ <h2>What each chapter adds to the machine</h2>
+ <p>Colour = the level it belongs to. Click a chapter to see its sections.</p>
+ <div class="chmap"><div class="chrow" role="button" tabindex="0"><div class="n">1</div><div><b>Prompt Chaining</b><span class="adds">The pipeline: one focused prompt per step, structured output passed to the next.</span><div class="secs">Prompt Chaining Pattern Overview · Limitations of Single Prompts · The Role of Structured Output · Hands-On Code Example · Context Engineering and Prompt Engineering · Key Takeaways</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">2</div><div><b>Routing</b><span class="adds">A decision point: classify the input, then send it down the right path.</span><div class="secs">Routing Pattern Overview · Practical Applications and Use Cases · Hands-On Code Example (LangChain) · Hands-On Code Example (Google ADK) · At a Glance</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">3</div><div><b>Parallelization</b><span class="adds">Independent steps run at once, then a merge step; concurrency, not magic.</span><div class="secs">Parallelization Pattern Overview · Practical Applications and Use Cases · Hands-On Code Example (LangChain) · Hands-On Code Example (Google ADK) · Key Takeaways</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">4</div><div><b>Reflection</b><span class="adds">The feedback loop: produce, critique, refine, with a separate critic and a stop rule.</span><div class="secs">Reflection Pattern Overview · Practical Applications and Use Cases · Hands-On Code Example (LangChain) · Hands-On Code Example (ADK) · At a Glance</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">5</div><div><b>Tool Use (Function Calling)</b><span class="adds">The hands: described tools, a structured call from the model, execution by your code.</span><div class="secs">Tool Use Pattern Overview · Practical Applications and Use Cases · Hands-On Code Example (LangChain) · Hands-On Code Example (CrewAI) · Hands-On Code (Google ADK) · Google Search · Code Execution · Enterprise Search</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">6</div><div><b>Planning</b><span class="adds">Steps invented at run time when the how is unknown; a fixed workflow when it is known.</span><div class="secs">Planning Pattern Overview · Practical Applications and Use Cases · Hands-On Code (Crew AI) · Google DeepResearch · OpenAI Deep Research API</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">7</div><div><b>Multi-Agent Collaboration</b><span class="adds">Specialised roles, handoffs, supervisors and hierarchies; an agent used as a tool.</span><div class="secs">Multi-Agent Collaboration Pattern Overview · Multi-Agent Collaboration: Exploring Interrelationships and Communication Structures · Hands-On Code (Crew AI) · Hands-On Code (Google ADK)</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">8</div><div><b>Memory Management</b><span class="adds">Session, state and long-term memory; semantic, episodic and procedural kinds.</span><div class="secs">Hands-On Code: Memory Management in Google Agent Developer Kit (ADK) · Session: Keeping Track of Each Chat · State: The Session&#x27;s Scratchpad · Memory: Long-Term Knowledge with MemoryService · Hands-On Code: Memory Management in LangChain and LangGraph · Vertex Memory Bank</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">9</div><div><b>Learning and Adaptation</b><span class="adds">Agents that change from experience: a scored archive, an overseer, self-editing code.</span><div class="secs">The Big Picture · Practical Applications and Use Cases · Case Study: The Self-Improving Coding Agent (SICA) · AlphaEvolve and OpenEvolve</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">10</div><div><b>Model Context Protocol</b><span class="adds">A standard socket for tools: servers expose, clients discover; FastMCP in ten lines.</span><div class="secs">MCP Pattern Overview · MCP vs. Tool Function Calling · Additional Considerations for MCP · Hands-On Code Example with ADK · Creating an MCP Server with FastMCP</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">11</div><div><b>Goal Setting and Monitoring</b><span class="adds">Goals as a checklist, a monitor that answers True or False, and a limit on attempts.</span><div class="secs">Goal Setting and Monitoring Pattern Overview · Practical Applications and Use Cases · Hands-On Code Example · Caveats and Considerations</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">12</div><div><b>Exception Handling and Recovery</b><span class="adds">Detect, handle, recover: retries, fallbacks, graceful degradation, rollback, escalation.</span><div class="secs">Exception Handling and Recovery Pattern Overview · Practical Applications and Use Cases · Hands-On Code Example (ADK)</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">13</div><div><b>Human-in-the-Loop</b><span class="adds">Escalation as a tool, approval before risky actions, and the human-on-the-loop variant.</span><div class="secs">Human-in-the-Loop Pattern Overview · Practical Applications and Use Cases · Hands-On Code Example</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">14</div><div><b>Knowledge Retrieval (RAG)</b><span class="adds">Chunks, embeddings, vector search and an agent that reconciles what comes back.</span><div class="secs">Knowledge Retrieval (RAG) Pattern Overview · Embeddings · Chunking of Documents · Vector Databases · RAG&#x27;s Challenges · Graph RAG · Agentic RAG · Hands-On Code Example (ADK)</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">15</div><div><b>Inter-Agent Communication (A2A)</b><span class="adds">Agents on different frameworks talking over HTTP through a published Agent Card.</span><div class="secs">Inter-Agent Communication Pattern Overview · Core Concepts of A2A · A2A vs. MCP · Practical Applications and Use Cases · Hands-On Code Example</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">16</div><div><b>Resource-Aware Optimization</b><span class="adds">Classify first, then pick the cheapest model that can do the step; keep a fallback.</span><div class="secs">Practical Applications and Use Cases · Hands-On Code Example · Hands-On Code with OpenAI · Hands-On Code Example (OpenRouter) · Beyond Dynamic Model Switching: A Spectrum of Agent Resource Optimizations</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">17</div><div><b>Reasoning Techniques</b><span class="adds">Chain, tree and self-correction of thought; ReAct; more thinking time beats a bigger model.</span><div class="secs">Practical Applications and Use Cases · Reasoning Techniques · Scaling Inference Law · Hands-On Code Example · So, What Do Agents Think?</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">18</div><div><b>Guardrails/Safety Patterns</b><span class="adds">Layered defences: input screening, output checks, tool callbacks, least privilege, rollback.</span><div class="secs">Practical Applications and Use Cases · Hands-On Code CrewAI Example · Hands-On Code Vertex AI Example · Engineering Reliable Agents</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">19</div><div><b>Evaluation and Monitoring</b><span class="adds">Trajectory match, latency and token tracking, LLM-as-a-judge with a rubric, eval sets.</span><div class="secs">Practical Applications and Use Cases · Hands-On Code Example · Agents Trajectories · From Agents to Advanced Contractors · Google&#x27;s ADK</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">20</div><div><b>Prioritization</b><span class="adds">Criteria, scores and a queue so the agent works on the most important thing first.</span><div class="secs">Prioritization Pattern Overview · Practical Applications and Use Cases · Hands-On Code Example</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">21</div><div><b>Exploration and Discovery</b><span class="adds">Generate, debate and evolve hypotheses; a supervisor and specialist agents that seek the unknown.</span><div class="secs">Practical Applications and Use Cases · Google Co-scientist · Hands-On Code Example</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">22</div><div><b>Advanced Prompting Techniques</b><span class="adds">The prompt toolbox: principles, system prompts, delimiters, few-shot, structured output, CoT, ReAct.</span><div class="secs">Core Prompting Principles · Basic Prompting Techniques · Structuring Prompts · Contextual Engineering · Structured Output · Reasoning and Thought Process Techniques · Action and Interaction Techniques · Best Practices and Experimentation</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">24</div><div><b>A Quick Overview of Agentic Frameworks</b><span class="adds">Which canvas for which shape: LangChain lines, LangGraph loops, CrewAI teams, ADK pipelines.</span><div class="secs">LangChain · LangGraph · Which One Should You Use? · Google&#x27;s ADK · Crew.AI · Other Agent Development Framework</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">29</div><div><b>Conclusion</b><span class="adds">The four families of patterns and how five of them compose into one research assistant.</span><div class="secs">Review of Key Agentic Principles · Combining Patterns for Complex Systems · Looking to the Future</div></div><span class="chip advanced">advanced</span></div></div>
+</section>
+
+<section id="s04">
+ <span class="num">04 · Concept cards</span>
+ <h2>Foundation → Intermediate → Advanced</h2>
+ <p>One idea per card: what it is, a picture for it, the code if there is any, the trap, and where it lives in Formulaite. Tick a card when you could explain it to someone else.</p>
+ <div class="tabs" id="ctabs"><button data-level="foundation" class="on">Foundation<span class="cnt">9 cards · ~18 min</span></button><button data-level="intermediate" class="">Intermediate<span class="cnt">11 cards · ~22 min</span></button><button data-level="advanced" class="">Advanced<span class="cnt">14 cards · ~28 min</span></button></div><div class="panel on" data-level="foundation"><div class="prog"><span class="lbl">Foundation</span><div class="bar"><i></i></div><span class="txt">0 / 9 got it</span></div><div class="concept" data-key="Prompt chaining"><div class="chead" role="button" tabindex="0"><div><span class="idx">01</span><b>Prompt chaining</b> <span class="chip ch">ch 1</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>One big prompt makes the model juggle too much. It skips instructions, loses context and passes early errors forward. Prompt chaining splits the job into small prompts. Each one does one thing and hands its output to the next.</p><div class="callout blue"><strong>Picture it:</strong> A lab bench with stations: weigh, mix, check pH. Nobody tries to do all three in one bowl.</div><pre><code>from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+prompt_extract = ChatPromptTemplate.from_template(
+    &quot;Extract the technical specifications from:\n\n{text_input}&quot;)
+prompt_transform = ChatPromptTemplate.from_template(
+    &quot;Turn these specs into JSON with cpu, memory, storage keys:\n\n{specifications}&quot;)
+extraction_chain = prompt_extract | llm | StrOutputParser()
+full_chain = ({&quot;specifications&quot;: extraction_chain}
+              | prompt_transform | llm | StrOutputParser())
+print(full_chain.invoke({&quot;text_input&quot;: input_text}))</code></pre><div class="note">LangChain LCEL: the | pipe feeds one step&#x27;s output into the next; the dict maps it onto the next prompt&#x27;s variable.</div><div class="callout"><strong>The trap:</strong> Passing loose prose between steps, so a wobbly step-one answer breaks step two.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py — SYSTEM_PROMPT already is a chain: catalogue_lookup, then read_supplier_page, then fill_drawer, one step per turn.</div></div></div><div class="concept" data-key="Context engineering"><div class="chead" role="button" tabindex="0"><div><span class="idx">02</span><b>Context engineering</b> <span class="chip ch">ch 1</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Prompt engineering polishes the question. Context engineering builds the whole picture the model sees: system prompt, retrieved documents, tool outputs and who the user is. The book says output quality depends more on this context than on the model.</p><div class="callout blue"><strong>Picture it:</strong> A good brief for a freelance chemist: the target product, the supplier sheet, the banned list and last month&#x27;s notes, not just &#x27;make a moisturiser&#x27;.</div><div class="callout"><strong>The trap:</strong> Rewording the prompt ten times while the model still cannot see the supplier page.</div><div class="callout green"><strong>In Formulaite:</strong> memory.py — Conversation is the context: request, tool results and gate feedback assembled before every model call.</div></div></div><div class="concept" data-key="Reflection loop"><div class="chead" role="button" tabindex="0"><div><span class="idx">03</span><b>Reflection loop</b> <span class="chip ch">ch 4</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>The first draft is rarely right. Reflection adds a feedback loop: produce, critique, refine, repeat. A stop phrase or a maximum number of rounds ends the loop. It costs more calls but gives better output.</p><div class="callout blue"><strong>Picture it:</strong> You write the label copy, a colleague marks it up in red, you fix only the red bits, and you stop after three passes.</div><pre><code>message_history = [HumanMessage(content=task_prompt)]
+for i in range(max_iterations):
+    if i &gt; 0:
+        message_history.append(HumanMessage(
+            content=&quot;Please refine the code using the critiques provided.&quot;))
+    response = llm.invoke(message_history)
+    current_code = response.content
+    message_history.append(response)
+    critique = llm.invoke(reflector_prompt(task_prompt, current_code)).content
+    if &quot;CODE_IS_PERFECT&quot; in critique:
+        break
+    message_history.append(HumanMessage(content=f&quot;Critique:\n{critique}&quot;))</code></pre><div class="note">LangChain: one llm, two roles; the critic&#x27;s stop phrase CODE_IS_PERFECT and max_iterations are the two exits.</div><div class="callout"><strong>The trap:</strong> No max_iterations, so a picky critic keeps the loop and the bill running.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py — the REJECTED-by-gate tool_result is the critique; the model refines and calls fill_drawer again, capped by max_steps.</div></div></div><div class="concept" data-key="Producer and critic"><div class="chead" role="button" tabindex="0"><div><span class="idx">04</span><b>Producer and critic</b> <span class="chip ch">ch 4</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>One agent writes, a different agent reviews. The critic has its own persona and criteria, so it is not fooled by the producer&#x27;s confidence. The book calls this Generator-Critic. The critic&#x27;s output is structured: a status plus reasons.</p><div class="callout blue"><strong>Picture it:</strong> The formulator who mixed the batch does not sign off the QC sheet; a second person with a checklist does.</div><pre><code>from google.adk.agents import SequentialAgent, LlmAgent
+generator = LlmAgent(name=&quot;DraftWriter&quot;,
+    instruction=&quot;Write a short, informative paragraph about the user&#x27;s subject.&quot;,
+    output_key=&quot;draft_text&quot;)
+reviewer = LlmAgent(name=&quot;FactChecker&quot;,
+    instruction=&quot;&quot;&quot;Read state key &#x27;draft_text&#x27;. Verify every claim.
+    Output a dict with &quot;status&quot;: &quot;ACCURATE&quot; or &quot;INACCURATE&quot; and &quot;reasoning&quot;.&quot;&quot;&quot;,
+    output_key=&quot;review_output&quot;)
+review_pipeline = SequentialAgent(name=&quot;WriteAndReview_Pipeline&quot;,
+                                  sub_agents=[generator, reviewer])</code></pre><div class="note">Google ADK: output_key saves each agent&#x27;s reply into shared state; the reviewer reads draft_text and writes review_output.</div><div class="callout"><strong>The trap:</strong> Letting the producer grade its own work with the same prompt and the same blind spots.</div><div class="callout green"><strong>In Formulaite:</strong> gates.py — run_gates is the critic with no model at all: fixed checks, PASS or FAIL, a reasons tuple.</div></div></div><div class="concept" data-key="Tool use in six steps"><div class="chead" role="button" tabindex="0"><div><span class="idx">05</span><b>Tool use in six steps</b> <span class="chip ch">ch 5</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>The model cannot fetch or act. It reads tool descriptions, decides a tool is needed, and emits a structured call with arguments. Your framework runs the function and returns the result. The model then answers or calls again.</p><div class="callout blue"><strong>Picture it:</strong> A chef who cannot leave the kitchen writes a shopping note; the runner buys the items and brings back the receipt.</div><pre><code>from langchain_core.tools import tool as langchain_tool
+from langchain.agents import create_tool_calling_agent, AgentExecutor
+@langchain_tool
+def search_information(query: str) -&gt; str:
+    &quot;&quot;&quot;Provides factual information on a given topic.&quot;&quot;&quot;
+    return simulated_results.get(query.lower(), simulated_results[&quot;default&quot;])
+agent_prompt = ChatPromptTemplate.from_messages([
+    (&quot;system&quot;, &quot;You are a helpful assistant.&quot;),
+    (&quot;human&quot;, &quot;{input}&quot;), (&quot;placeholder&quot;, &quot;{agent_scratchpad}&quot;)])
+agent = create_tool_calling_agent(llm, [search_information], agent_prompt)
+agent_executor = AgentExecutor(agent=agent, tools=[search_information])</code></pre><div class="note">LangChain: the docstring is what the model reads; agent_scratchpad is where tool calls and results accumulate.</div><div class="callout"><strong>The trap:</strong> A vague docstring, so the model never picks the tool or calls it with the wrong argument.</div><div class="callout green"><strong>In Formulaite:</strong> tools.py — @registry.tool turns catalogue_lookup&#x27;s signature and docstring into the input_schema the model sees.</div></div></div><div class="concept" data-key="Tools raise, they do not return error strings"><div class="chead" role="button" tabindex="0"><div><span class="idx">06</span><b>Tools raise, they do not return error strings</b> <span class="chip ch">ch 5</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>The CrewAI example returns a float or raises ValueError. A raised error is a clear signal the agent can handle. An error hidden in a string looks like data. The task description then tells the agent what to do on failure.</p><div class="callout blue"><strong>Picture it:</strong> A thermometer that beeps when the probe is broken is safer than one that quietly shows 20 degrees.</div><pre><code>from crewai import Agent, Task, Crew
+@tool(&quot;Stock Price Lookup Tool&quot;)
+def get_stock_price(ticker: str) -&gt; float:
+    &quot;&quot;&quot;Fetches the latest simulated stock price. Raises ValueError if not found.&quot;&quot;&quot;
+    price = simulated_prices.get(ticker.upper())
+    if price is not None:
+        return price
+    raise ValueError(f&quot;Simulated price for ticker &#x27;{ticker.upper()}&#x27; not found.&quot;)
+analyze_task = Task(
+    description=&quot;Find AAPL&#x27;s price. If the ticker is not found, report that clearly.&quot;,
+    expected_output=&quot;One clear sentence with the price, or that it could not be found.&quot;,
+    agent=financial_analyst_agent)</code></pre><div class="note">CrewAI: the tool is plain Python; role, goal and backstory live on the Agent, the failure rule lives in the Task.</div><div class="callout"><strong>The trap:</strong> Returning &#x27;error: not found&#x27; as a string, which the model may read as a real value.</div><div class="callout green"><strong>In Formulaite:</strong> tools.py — ToolError is raised by the registry; agent.py turns it into an is_error tool_result so the model can recover.</div></div></div><div class="concept" data-key="System prompt, delimiters and examples"><div class="chead" role="button" tabindex="0"><div><span class="idx">07</span><b>System prompt, delimiters and examples</b> <span class="chip ch">ch 22</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Be clear, specific and concise. Tell the model what to do, not what to avoid. Put standing rules in a system prompt. Mark sections with delimiters such as XML tags. Add three to five examples when the format matters.</p><div class="callout blue"><strong>Picture it:</strong> A recipe card: title, an ingredients box, a method box, and a photo of the finished cream.</div><pre><code>&lt;instruction&gt;Summarize the following article, focusing on the main
+arguments presented by the author.&lt;/instruction&gt;
+&lt;article&gt;
+[Insert the full text of the article here]
+&lt;/article&gt;</code></pre><div class="note">A prompt, not Python: the tags are delimiters so the model cannot confuse instructions with the article text.</div><div class="callout"><strong>The trap:</strong> A wall of negative constraints, so the model focuses on avoiding rather than doing.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py — SYSTEM_PROMPT is four positive numbered rules plus one output rule; the numbering is the delimiter.</div></div></div><div class="concept" data-key="Pydantic parses the model&#x27;s JSON"><div class="chead" role="button" tabindex="0"><div><span class="idx">08</span><b>Pydantic parses the model&#x27;s JSON</b> <span class="chip ch">ch 22</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Ask for JSON, then parse it into a Pydantic model. One call checks the shape and the types and converts strings to dates. Bad output raises ValidationError, which you catch and retry. The book calls this &#x27;parse, don&#x27;t validate&#x27; at the boundary.</p><div class="callout blue"><strong>Picture it:</strong> A customs form with fixed boxes: the officer rejects it at the border instead of discovering a missing field three offices later.</div><pre><code>from pydantic import BaseModel, EmailStr, Field, ValidationError
+class User(BaseModel):
+    name: str = Field(..., description=&quot;The full name of the user.&quot;)
+    email: EmailStr
+    interests: List[str] = Field(default_factory=list)
+try:
+    user_object = User.model_validate_json(llm_output_json)
+    print(user_object.name, user_object.interests[0])
+except ValidationError as e:
+    print(&quot;Failed to validate JSON from LLM.&quot;)
+    print(e)</code></pre><div class="note">Plain Pydantic: model_validate_json parses and validates in one step; the Field descriptions double as the schema you show the model.</div><div class="callout"><strong>The trap:</strong> Trusting json.loads alone, so a missing key crashes three steps later.</div><div class="callout green"><strong>In Formulaite:</strong> drawer.py — IngredientDrawer.from_model_input plus missing() play the same role for the fill_drawer call.</div></div></div><div class="concept" data-key="ReAct: thought, action, observation"><div class="chead" role="button" tabindex="0"><div><span class="idx">09</span><b>ReAct: thought, action, observation</b> <span class="chip ch">ch 22</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>ReAct interleaves reasoning and acting. The model writes a thought, picks an action such as a tool call, and reads the observation that comes back. Then it thinks again. The loop ends with a Final Answer.</p><div class="callout blue"><strong>Picture it:</strong> Troubleshooting a separated emulsion: think about the cause, run one test, look at the result, think again.</div><pre><code>Thought: The user wants the capital of France and its population.
+Action: Search({&quot;query&quot;: &quot;capital of France&quot;})
+Observation: Paris
+Thought: Now I need the population of Paris.
+Action: Search({&quot;query&quot;: &quot;current population of Paris&quot;})
+Observation: About 2.1 million people in 2023.
+Final Answer: The capital of France is Paris, population about 2.1 million.</code></pre><div class="note">An illustrative trace, not Python: every Observation line is written by your code, never by the model.</div><div class="callout"><strong>The trap:</strong> Letting the model write its own Observation line, so it hallucinates tool output.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py — Agent.run is the ReAct loop: model_reply is thought and action, the tool_result is the observation.</div></div></div></div><div class="panel" data-level="intermediate"><div class="prog"><span class="lbl">Intermediate</span><div class="bar"><i></i></div><span class="txt">0 / 11 got it</span></div><div class="concept" data-key="Routing"><div class="chead" role="button" tabindex="0"><div><span class="idx">01</span><b>Routing</b> <span class="chip ch">ch 2</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A chain always takes the same path. Routing adds a decision: look at the input, pick a handler. The router can be an LLM prompt that outputs one word, an embedding match, a rule, or a small trained classifier. Unclear inputs go to a clarify branch.</p><div class="callout blue"><strong>Picture it:</strong> A pharmacy counter: prescriptions go left, advice goes right, anything odd goes to the pharmacist.</div><pre><code>from langchain_core.runnables import RunnablePassthrough, RunnableBranch
+coordinator_router_prompt = ChatPromptTemplate.from_messages([
+    (&quot;system&quot;, &quot;Output ONLY one word: &#x27;booker&#x27;, &#x27;info&#x27;, or &#x27;unclear&#x27;.&quot;),
+    (&quot;user&quot;, &quot;{request}&quot;)])
+coordinator_router_chain = coordinator_router_prompt | llm | StrOutputParser()
+delegation_branch = RunnableBranch(
+    (lambda x: x[&quot;decision&quot;].strip() == &quot;booker&quot;, branches[&quot;booker&quot;]),
+    (lambda x: x[&quot;decision&quot;].strip() == &quot;info&quot;, branches[&quot;info&quot;]),
+    branches[&quot;unclear&quot;])   # default branch
+coordinator_agent = ({&quot;decision&quot;: coordinator_router_chain,
+                      &quot;request&quot;: RunnablePassthrough()} | delegation_branch)</code></pre><div class="note">LangChain: the LLM only picks a label; RunnableBranch does the if/elif/else, and the last entry is the default.</div><div class="callout"><strong>The trap:</strong> No default branch, so one unexpected label crashes the whole request.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py — a rule-based router before Agent.run: banned ingredient stops, unknown asks, known researches.</div></div></div><div class="concept" data-key="Parallelization"><div class="chead" role="button" tabindex="0"><div><span class="idx">02</span><b>Parallelization</b> <span class="chip ch">ch 3</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Independent steps should not wait for each other. Run them at once and merge the results in a final step. This cuts latency most when steps wait on APIs. The book notes asyncio gives concurrency on one thread, not true parallelism.</p><div class="callout blue"><strong>Picture it:</strong> Three assistants each phone one supplier at the same time; you write the comparison when all three hang up.</div><pre><code>from langchain_core.runnables import RunnableParallel, RunnablePassthrough
+map_chain = RunnableParallel({
+    &quot;summary&quot;: summarize_chain,
+    &quot;questions&quot;: questions_chain,
+    &quot;key_terms&quot;: terms_chain,
+    &quot;topic&quot;: RunnablePassthrough(),   # keep the original input
+})
+full_parallel_chain = map_chain | synthesis_prompt | llm | StrOutputParser()
+async def run_parallel_example(topic: str) -&gt; None:
+    response = await full_parallel_chain.ainvoke(topic)
+    print(response)
+asyncio.run(run_parallel_example(&quot;The history of space exploration&quot;))</code></pre><div class="note">LangChain: a dict of runnables runs concurrently; the synthesis prompt receives all the keys at once.</div><div class="callout"><strong>The trap:</strong> Parallelising steps that secretly depend on each other, then debugging a race.</div><div class="callout green"><strong>In Formulaite:</strong> formulaite_tools.py — read_supplier_page for three suppliers at once, merged into one drawer draft.</div></div></div><div class="concept" data-key="Fan out, then merge"><div class="chead" role="button" tabindex="0"><div><span class="idx">03</span><b>Fan out, then merge</b> <span class="chip ch">ch 3</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>ADK gives this shape names. A ParallelAgent runs sub-agents concurrently; each writes to state under its output_key. A SequentialAgent then runs a merger agent that reads those keys. The merger is told to use only the provided summaries.</p><div class="callout blue"><strong>Picture it:</strong> Three scouts report to the same whiteboard; the writer is only allowed to use what is on the board.</div><pre><code>from google.adk.agents import LlmAgent, ParallelAgent, SequentialAgent
+parallel_research_agent = ParallelAgent(
+    name=&quot;ParallelWebResearchAgent&quot;,
+    sub_agents=[researcher_agent_1, researcher_agent_2, researcher_agent_3])
+merger_agent = LlmAgent(name=&quot;SynthesisAgent&quot;, model=GEMINI_MODEL,
+    instruction=&quot;&quot;&quot;Combine the research summaries into a report.
+    Your entire response MUST be grounded exclusively on the Input Summaries:
+    {renewable_energy_result} {ev_technology_result} {carbon_capture_result}&quot;&quot;&quot;)
+sequential_pipeline_agent = SequentialAgent(
+    name=&quot;ResearchAndSynthesisPipeline&quot;,
+    sub_agents=[parallel_research_agent, merger_agent])</code></pre><div class="note">Google ADK: {renewable_energy_result} is filled from session state written by a researcher&#x27;s output_key.</div><div class="callout"><strong>The trap:</strong> A merger prompt that lets the model add outside knowledge, so the report contains facts nobody fetched.</div><div class="callout green"><strong>In Formulaite:</strong> gates.py — check_has_sources is the &#x27;grounded exclusively&#x27; rule made deterministic.</div></div></div><div class="concept" data-key="Planning: discover the how"><div class="chead" role="button" tabindex="0"><div><span class="idx">04</span><b>Planning: discover the how</b> <span class="chip ch">ch 6</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Planning turns a goal into ordered steps the agent invents at run time. Use it when the path is unknown. When the recipe is known and repeatable, a fixed workflow is safer and more predictable. A good plan adapts when a step fails.</p><div class="callout blue"><strong>Picture it:</strong> Organising a team offsite needs a plan; restocking the same ten raw materials every month needs a checklist.</div><pre><code>from crewai import Agent, Task, Crew, Process
+planner_writer_agent = Agent(role=&quot;Article Planner and Writer&quot;,
+    goal=&quot;Plan and then write a concise, engaging summary on a specified topic.&quot;,
+    backstory=&quot;You create a clear, actionable plan before writing.&quot;, llm=llm)
+high_level_task = Task(
+    description=f&quot;1. Create a bullet-point plan for a summary on: &#x27;{topic}&#x27;.\n&quot;
+                f&quot;2. Write the summary based on your plan, around 200 words.&quot;,
+    expected_output=&quot;### Plan\n- bullets\n\n### Summary\n- the summary&quot;,
+    agent=planner_writer_agent)
+crew = Crew(agents=[planner_writer_agent], tasks=[high_level_task],
+            process=Process.sequential)
+result = crew.kickoff()</code></pre><div class="note">CrewAI: the plan is forced by the task description and expected_output; plan and execution stay in one agent.</div><div class="callout"><strong>The trap:</strong> Using a planning agent for a job you already know how to do, trading predictability for nothing.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py — SYSTEM_PROMPT is a fixed plan on purpose; planning would only enter for a new ingredient class with no known recipe.</div></div></div><div class="concept" data-key="Session, state and memory"><div class="chead" role="button" tabindex="0"><div><span class="idx">05</span><b>Session, state and memory</b> <span class="chip ch">ch 8</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>ADK splits memory into three. A Session is one chat thread with its events. State is that thread&#x27;s scratchpad dict. Memory is a searchable store across sessions. Key prefixes user:, app: and temp: say how long a value lives.</p><div class="callout blue"><strong>Picture it:</strong> A lab notebook page (session), the sticky notes on it (state), and the filing cabinet in the corridor (memory).</div><pre><code>def log_user_login(tool_context: ToolContext) -&gt; dict:
+    &quot;&quot;&quot;Updates the session state upon a user login event.&quot;&quot;&quot;
+    state = tool_context.state
+    login_count = state.get(&quot;user:login_count&quot;, 0) + 1
+    state[&quot;user:login_count&quot;] = login_count
+    state[&quot;task_status&quot;] = &quot;active&quot;
+    state[&quot;user:last_login_ts&quot;] = time.time()
+    state[&quot;temp:validation_needed&quot;] = True
+    return {&quot;status&quot;: &quot;success&quot;,
+            &quot;message&quot;: f&quot;User login tracked. Total logins: {login_count}.&quot;}</code></pre><div class="note">Google ADK: state changes happen inside a tool via ToolContext, so they are recorded as events and persisted.</div><div class="callout"><strong>The trap:</strong> Editing session.state directly after fetching it, which skips the event log and may never be saved.</div><div class="callout green"><strong>In Formulaite:</strong> memory.py — Conversation is the session; a state dict for ingredient, step and sources would sit beside it.</div></div></div><div class="concept" data-key="Three kinds of long-term memory"><div class="chead" role="button" tabindex="0"><div><span class="idx">06</span><b>Three kinds of long-term memory</b> <span class="chip ch">ch 8</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Semantic memory is facts, like a user profile. Episodic memory is past experiences, often reused as few-shot examples. Procedural memory is the rules: the system prompt itself, which an agent can rewrite by reflection. LangGraph stores all three as JSON under a namespace and key.</p><div class="callout blue"><strong>Picture it:</strong> What you know about a client, what happened last time you worked together, and your own house rules.</div><pre><code>from langgraph.store.memory import InMemoryStore
+store = InMemoryStore(index={&quot;embed&quot;: embed, &quot;dims&quot;: 2})
+namespace = (&quot;my-user&quot;, &quot;chitchat&quot;)
+store.put(namespace, &quot;a-memory&quot;,
+          {&quot;rules&quot;: [&quot;User likes short, direct language&quot;,
+                     &quot;User only speaks English &amp; python&quot;],
+           &quot;my-key&quot;: &quot;my-value&quot;})
+item = store.get(namespace, &quot;a-memory&quot;)
+items = store.search(namespace, filter={&quot;my-key&quot;: &quot;my-value&quot;},
+                     query=&quot;language preferences&quot;)</code></pre><div class="note">LangGraph: namespace is the folder, key is the filename; search combines a filter with vector similarity.</div><div class="callout"><strong>The trap:</strong> Stuffing every past chat into the prompt instead of storing facts and retrieving the few that matter.</div><div class="callout green"><strong>In Formulaite:</strong> memory.py — a namespace per formulator holding known-good use levels would be the semantic layer next to Conversation.</div></div></div><div class="concept" data-key="Goal setting and monitoring"><div class="chead" role="button" tabindex="0"><div><span class="idx">07</span><b>Goal setting and monitoring</b> <span class="chip ch">ch 11</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>State the goals as a checklist. Generate, ask for feedback against the checklist, then ask one yes-or-no question: are the goals met? Loop until True or the attempt limit. The book warns that a model judging its own work may not notice it is off course.</p><div class="callout blue"><strong>Picture it:</strong> A spec sheet taped above the bench: pH 5.5, viscosity in range, no separation at 40 degrees. Every batch is tested against it.</div><pre><code>def run_code_agent(use_case: str, goals_input: str, max_iterations: int = 5) -&gt; str:
+    goals = [g.strip() for g in goals_input.split(&quot;,&quot;)]
+    previous_code, feedback = &quot;&quot;, &quot;&quot;
+    for i in range(max_iterations):
+        prompt = generate_prompt(use_case, goals, previous_code, feedback)
+        code = clean_code_block(llm.invoke(prompt).content.strip())
+        feedback = get_code_feedback(code, goals).content.strip()
+        if goals_met(feedback, goals):     # LLM answers only True or False
+            break
+        previous_code = code
+    return save_code_to_file(add_comment_header(code, use_case), use_case)</code></pre><div class="note">LangChain + OpenAI: goals_met reduces the judge to one word so the loop has a clean exit; max_iterations is the safety net.</div><div class="callout"><strong>The trap:</strong> Trusting the model&#x27;s own True, so &#x27;goals met&#x27; means &#x27;the model thinks so&#x27; and nothing was ever run.</div><div class="callout green"><strong>In Formulaite:</strong> drawer.py — REQUIRED_SECTIONS is the goal checklist; gates.py decides met-or-not without asking a model.</div></div></div><div class="concept" data-key="Exception handling and recovery"><div class="chead" role="button" tabindex="0"><div><span class="idx">08</span><b>Exception handling and recovery</b> <span class="chip ch">ch 12</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Three stages. Detect: bad tool output, API error codes, timeouts, nonsense replies. Handle: log, retry, fall back, degrade gracefully, notify. Recover: roll back state, diagnose, replan or escalate. Never retry the same invalid action forever.</p><div class="callout blue"><strong>Picture it:</strong> The supplier site is down: note it, try once more, use last month&#x27;s data sheet marked as stale, and tell the formulator.</div><pre><code>from google.adk.agents import Agent, SequentialAgent
+primary_handler = Agent(name=&quot;primary_handler&quot;,
+    instruction=&quot;Use get_precise_location_info with the user&#x27;s address.&quot;,
+    tools=[get_precise_location_info])
+fallback_handler = Agent(name=&quot;fallback_handler&quot;,
+    instruction=&quot;&quot;&quot;If state[&quot;primary_location_failed&quot;] is True, extract the
+    city and use get_general_area_info. If False, do nothing.&quot;&quot;&quot;,
+    tools=[get_general_area_info])
+response_agent = Agent(name=&quot;response_agent&quot;, tools=[],
+    instruction=&quot;Present state[&#x27;location_result&#x27;]; apologise if it is empty.&quot;)
+robust_location_agent = SequentialAgent(name=&quot;robust_location_agent&quot;,
+    sub_agents=[primary_handler, fallback_handler, response_agent])</code></pre><div class="note">Google ADK: primary, fallback and responder run in guaranteed order; a state flag carries the failure between them.</div><div class="callout"><strong>The trap:</strong> Crashing the whole run because one supplier page returned 404.</div><div class="callout green"><strong>In Formulaite:</strong> formulaite_tools.py — if read_supplier_page fails, fall back to the catalogue and label the source &#x27;catalogue only&#x27;.</div></div></div><div class="concept" data-key="RAG: chunk, embed, retrieve, augment"><div class="chead" role="button" tabindex="0"><div><span class="idx">09</span><b>RAG: chunk, embed, retrieve, augment</b> <span class="chip ch">ch 14</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Split documents into chunks. Turn each chunk into an embedding, a list of numbers that captures meaning. Store them in a vector database. At question time, embed the question, fetch the closest chunks, and paste them into the prompt. Answers become grounded and citable.</p><div class="callout blue"><strong>Picture it:</strong> Instead of reading the whole 50-page manual, you look up the one troubleshooting page and quote it.</div><pre><code>from langchain.text_splitter import CharacterTextSplitter
+from langchain_community.vectorstores import Weaviate
+text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+chunks = text_splitter.split_documents(documents)
+vectorstore = Weaviate.from_documents(client=client, documents=chunks,
+                                      embedding=OpenAIEmbeddings(), by_text=False)
+retriever = vectorstore.as_retriever()
+def retrieve_documents_node(state: RAGGraphState) -&gt; RAGGraphState:
+    documents = retriever.invoke(state[&quot;question&quot;])
+    return {&quot;documents&quot;: documents, &quot;question&quot;: state[&quot;question&quot;], &quot;generation&quot;: &quot;&quot;}</code></pre><div class="note">LangChain + LangGraph: retrieve is one graph node, generate is the next; the prompt says &#x27;if you don&#x27;t know, say so&#x27;.</div><div class="callout"><strong>The trap:</strong> Chunks so big or so small that the answer is split across two of them and the retriever fetches neither.</div><div class="callout green"><strong>In Formulaite:</strong> formulaite_tools.py — read_supplier_page would become retrieve_supplier_chunks over an embedded library of data sheets.</div></div></div><div class="concept" data-key="Agentic RAG"><div class="chead" role="button" tabindex="0"><div><span class="idx">10</span><b>Agentic RAG</b> <span class="chip ch">ch 14</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Plain RAG accepts whatever comes back. Agentic RAG puts a reasoning step in front: check the source date, prefer the authoritative document, reconcile two numbers that disagree, split a big question into sub-queries, and call a web search when the store has a gap. It adds latency and can itself go wrong.</p><div class="callout blue"><strong>Picture it:</strong> Two data sheets give different use levels; the agent picks the 2025 supplier sheet over a 2020 blog post and says why.</div><div class="callout"><strong>The trap:</strong> Adding the reasoning layer without a loop limit, so the agent keeps re-searching a question it cannot answer.</div><div class="callout green"><strong>In Formulaite:</strong> gates.py — check_use_level_in_range is a one-rule reconciler: the catalogue beats the supplier page when they disagree.</div></div></div><div class="concept" data-key="Pick the framework by its shape"><div class="chead" role="button" tabindex="0"><div><span class="idx">11</span><b>Pick the framework by its shape</b> <span class="chip ch">ch 24</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>LangChain pipes steps in a straight line: good for extract, summarise, simple RAG. LangGraph is a graph with loops and explicit state, for agents that retry and reflect. CrewAI describes a team: roles, tasks, a process. ADK gives you SequentialAgent and ParallelAgent ready-made.</p><div class="callout blue"><strong>Picture it:</strong> A conveyor belt, a flowchart with loops, a team charter and a factory line, all for making the same cream.</div><pre><code># LangChain: linear
+chain = prompt | model | output_parser
+# CrewAI: a team
+return Crew(agents=self.agents, tasks=self.tasks,
+            process=Process.sequential, verbose=True)
+# Google ADK: pre-built orchestration
+dice_agent = LlmAgent(model=&quot;gemini-2.0-flash-exp&quot;,
+    name=&quot;question_answer_agent&quot;,
+    instruction=&quot;Respond to the query using google search&quot;,
+    tools=[google_search])</code></pre><div class="note">Three snippets from the book; choose LangGraph the moment your flow needs to loop back.</div><div class="callout"><strong>The trap:</strong> Picking a framework for its brand, then fighting it because your flow has a loop it does not model.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py — the lab hand-rolls the loop with no framework; the ModelClient Protocol in models.py is the seam where one could plug in.</div></div></div></div><div class="panel" data-level="advanced"><div class="prog"><span class="lbl">Advanced</span><div class="bar"><i></i></div><span class="txt">0 / 14 got it</span></div><div class="concept" data-key="Multi-agent shapes"><div class="chead" role="button" tabindex="0"><div><span class="idx">01</span><b>Multi-agent shapes</b> <span class="chip ch">ch 7</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Split a big job across specialised agents. Collaboration forms: sequential handoff, parallel, debate, hierarchical with a manager, expert teams, critic-reviewer. Structures run from a single agent to a network, a supervisor, a supervisor used as a tool, and layered hierarchies. A supervisor is a bottleneck and a single point of failure.</p><div class="callout blue"><strong>Picture it:</strong> A cosmetics launch: researcher, formulator, safety assessor and copywriter, each handing the next a finished piece.</div><pre><code>from crewai import Agent, Task, Crew, Process
+researcher = Agent(role=&quot;Senior Research Analyst&quot;,
+    goal=&quot;Find and summarize the latest trends in AI.&quot;, backstory=&quot;...&quot;)
+writer = Agent(role=&quot;Technical Content Writer&quot;,
+    goal=&quot;Write a clear and engaging blog post based on research findings.&quot;)
+research_task = Task(description=&quot;Research the top 3 emerging AI trends.&quot;,
+    expected_output=&quot;A detailed summary with key points and sources.&quot;, agent=researcher)
+writing_task = Task(description=&quot;Write a 500-word blog post from the findings.&quot;,
+    expected_output=&quot;A complete 500-word blog post.&quot;, agent=writer,
+    context=[research_task])
+blog_creation_crew = Crew(agents=[researcher, writer],
+    tasks=[research_task, writing_task], process=Process.sequential)</code></pre><div class="note">CrewAI: context=[research_task] is the handoff; Process.sequential fixes the order.</div><div class="callout"><strong>The trap:</strong> Adding agents to look sophisticated, then paying for handoffs a single chain would have done.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py — one Agent today; a supplier-reader, a drawer-filler and a safety-critic would be the first three roles.</div></div></div><div class="concept" data-key="Agent as a tool"><div class="chead" role="button" tabindex="0"><div><span class="idx">02</span><b>Agent as a tool</b> <span class="chip ch">ch 7</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A parent agent can call a child agent the way it calls a function. ADK wraps the child in an AgentTool with a description. The parent sees only that description. Actions stay in plain function tools; reasoning stays in agents.</p><div class="callout blue"><strong>Picture it:</strong> The lead formulator asks the colour specialist for a shade; she does not need to know how the specialist works.</div><pre><code>from google.adk.agents import LlmAgent
+from google.adk.tools import agent_tool
+image_generator_agent = LlmAgent(name=&quot;ImageGen&quot;, model=&quot;gemini-2.0-flash&quot;,
+    description=&quot;Generates an image based on a detailed text prompt.&quot;,
+    instruction=&quot;Use the generate_image tool with the user&#x27;s request as prompt.&quot;,
+    tools=[generate_image])
+image_tool = agent_tool.AgentTool(agent=image_generator_agent,
+    description=&quot;Use this tool to generate an image from a descriptive prompt.&quot;)
+artist_agent = LlmAgent(name=&quot;Artist&quot;, model=&quot;gemini-2.0-flash&quot;,
+    instruction=&quot;Invent a creative prompt, then use the ImageGen tool.&quot;,
+    tools=[image_tool])</code></pre><div class="note">Google ADK: the AgentTool description is the whole contract between parent and child.</div><div class="callout"><strong>The trap:</strong> Putting the real action inside the child&#x27;s instruction instead of a function tool, so nothing is testable.</div><div class="callout green"><strong>In Formulaite:</strong> tools.py — ToolRegistry could register a whole sub-agent under a name, the same way it registers catalogue_lookup.</div></div></div><div class="concept" data-key="Learning and adaptation"><div class="chead" role="button" tabindex="0"><div><span class="idx">03</span><b>Learning and adaptation</b> <span class="chip ch">ch 9</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>An agent adapts when it changes its behaviour from experience. Methods run from reinforcement learning to simple memory-based learning. SICA edits its own source code, keeps an archive of versions with scores, and an overseer LLM watches for loops. AlphaEvolve evolves programs against an evaluator.</p><div class="callout blue"><strong>Picture it:</strong> Keeping a scored log of every batch and reusing the settings of the best one next time.</div><div class="callout"><strong>The trap:</strong> Letting an agent change its own prompt without a benchmark, so &#x27;improvement&#x27; is just drift.</div><div class="callout green"><strong>In Formulaite:</strong> glassbox.py — saved runs with gate verdicts are the archive; a scored replay is the first step toward adaptation.</div></div></div><div class="concept" data-key="MCP versus function calling"><div class="chead" role="button" tabindex="0"><div><span class="idx">04</span><b>MCP versus function calling</b> <span class="chip ch">ch 10</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Function calling is one app telling one model about its own tools. MCP is an open standard: a server exposes tools, resources and prompts, and any client can discover and call them. MCP only wraps an API; if the API returns PDFs the agent cannot read, MCP does not fix that.</p><div class="callout blue"><strong>Picture it:</strong> Custom-built tools in your own workshop, versus a standard power socket any maker&#x27;s tool can plug into.</div><pre><code># fastmcp_server.py
+from fastmcp import FastMCP
+mcp_server = FastMCP()
+@mcp_server.tool
+def greet(name: str) -&gt; str:
+    &quot;&quot;&quot;Generates a personalized greeting.
+    Args:
+        name: The name of the person to greet.
+    &quot;&quot;&quot;
+    return f&quot;Hello, {name}! Nice to meet you.&quot;
+if __name__ == &quot;__main__&quot;:
+    mcp_server.run(transport=&quot;http&quot;, host=&quot;127.0.0.1&quot;, port=8000)</code></pre><div class="note">FastMCP: the decorator, type hints and docstring build the schema; an ADK MCPToolset with tool_filter=[&#x27;greet&#x27;] consumes it.</div><div class="callout"><strong>The trap:</strong> Wrapping a one-record-at-a-time legacy API in MCP and expecting the agent to summarise thousands of records.</div><div class="callout green"><strong>In Formulaite:</strong> formulaite_tools.py — catalogue_lookup and read_supplier_page behind a FastMCP server, so any client agent can use them.</div></div></div><div class="concept" data-key="Human in the loop"><div class="chead" role="button" tabindex="0"><div><span class="idx">05</span><b>Human in the loop</b> <span class="chip ch">ch 13</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Some decisions need a person: oversight, correction, feedback for learning, final approval. Escalation policies say when the agent hands off. Human-on-the-loop is the variant where a person sets the policy and the agent acts within it. It does not scale, and it needs real experts.</p><div class="callout blue"><strong>Picture it:</strong> The safety assessor signs every new formula; the agent can draft, but it cannot approve.</div><pre><code>def escalate_to_human(issue_type: str) -&gt; dict:
+    # This would typically transfer to a human queue in a real system
+    return {&quot;status&quot;: &quot;success&quot;,
+            &quot;message&quot;: f&quot;Escalated {issue_type} to a human specialist.&quot;}
+technical_support_agent = Agent(name=&quot;technical_support_specialist&quot;,
+    model=&quot;gemini-2.0-flash-exp&quot;,
+    instruction=&quot;&quot;&quot;1. Use troubleshoot_issue to analyze the problem.
+    2. Guide the user through basic steps. 3. If it persists, create_ticket.
+    For complex issues beyond basic troubleshooting: use escalate_to_human.&quot;&quot;&quot;,
+    tools=[troubleshoot_issue, create_ticket, escalate_to_human])</code></pre><div class="note">Google ADK: escalation is just another tool, so the model can choose it and the Glass Box can log it.</div><div class="callout"><strong>The trap:</strong> Escalating everything, so the human becomes the bottleneck and stops reading.</div><div class="callout green"><strong>In Formulaite:</strong> gates.py — a gate failure on a banned or novel ingredient should raise an approval request, not another retry.</div></div></div><div class="concept" data-key="A2A and the agent card"><div class="chead" role="button" tabindex="0"><div><span class="idx">06</span><b>A2A and the agent card</b> <span class="chip ch">ch 15</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A2A lets agents built on different frameworks talk over HTTP. Each agent publishes an Agent Card: a JSON file with its URL, skills, input modes and auth. Clients find cards at a well-known path or a registry. Work is a task with states; results are artifacts. MCP connects an agent to tools; A2A connects agents to agents.</p><div class="callout blue"><strong>Picture it:</strong> A trade directory entry: what the workshop does, where it is, and how to book an appointment.</div><pre><code>{
+  &quot;name&quot;: &quot;WeatherBot&quot;,
+  &quot;description&quot;: &quot;Provides accurate weather forecasts and historical data.&quot;,
+  &quot;url&quot;: &quot;http://weather-service.example.com/a2a&quot;,
+  &quot;version&quot;: &quot;1.0.0&quot;,
+  &quot;capabilities&quot;: {&quot;streaming&quot;: true, &quot;pushNotifications&quot;: false},
+  &quot;authentication&quot;: {&quot;schemes&quot;: [&quot;apiKey&quot;]},
+  &quot;skills&quot;: [{&quot;id&quot;: &quot;get_forecast&quot;, &quot;name&quot;: &quot;Get Forecast&quot;,
+              &quot;description&quot;: &quot;Get 5-day weather predictions.&quot;}]
+}</code></pre><div class="note">JSON, not Python: the Agent Card is what a client reads before sending a sendTask or sendTaskSubscribe request.</div><div class="callout"><strong>The trap:</strong> Confusing A2A with MCP, so a tool gets exposed as an agent or an agent as a tool.</div><div class="callout green"><strong>In Formulaite:</strong> models.py — the ModelClient Protocol is the lab&#x27;s tiny &#x27;card&#x27;; a Formulaite agent card would list fill_drawer as its skill.</div></div></div><div class="concept" data-key="Resource-aware routing"><div class="chead" role="button" tabindex="0"><div><span class="idx">07</span><b>Resource-aware routing</b> <span class="chip ch">ch 16</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Not every step needs the big model. Classify the request first: simple, reasoning, or needs search. Send simple ones to a cheap fast model and hard ones to the strong one. Keep a fallback model for when the first is down. A critic agent later flags bad routing choices.</p><div class="callout blue"><strong>Picture it:</strong> You do not send a routine pH check to the external lab; you send the stability study.</div><pre><code>def generate_response(prompt: str, classification: str, search_results=None):
+    if classification == &quot;simple&quot;:
+        model = &quot;gpt-4o-mini&quot;
+    elif classification == &quot;reasoning&quot;:
+        model = &quot;o4-mini&quot;
+    elif classification == &quot;internet_search&quot;:
+        model = &quot;gpt-4o&quot;
+        prompt = f&quot;Use the following web results to answer:\n{search_results}\n{prompt}&quot;
+    response = client.chat.completions.create(
+        model=model, messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}])
+    return response.choices[0].message.content, model</code></pre><div class="note">OpenAI SDK: classify_prompt first returns {&#x27;classification&#x27;: ...} as JSON; the model name is returned so you can log cost.</div><div class="callout"><strong>The trap:</strong> Routing on query length alone, so a short but hard question gets the weak model.</div><div class="callout green"><strong>In Formulaite:</strong> models.py — ScriptedModel for the cheap path, ClaudeModel for the full drawer; log the model name in the Glass Box.</div></div></div><div class="concept" data-key="Reasoning techniques and the thinking budget"><div class="chead" role="button" tabindex="0"><div><span class="idx">08</span><b>Reasoning techniques and the thinking budget</b> <span class="chip ch">ch 17</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Chain-of-Thought makes the model write its steps before the answer. Tree-of-Thought explores several branches and backtracks. Self-correction reviews a draft against the original brief. The Scaling Inference Law says a smaller model given more thinking time can beat a bigger one.</p><div class="callout blue"><strong>Picture it:</strong> A junior formulator who writes out the reasoning and tries two routes often beats a senior one guessing fast.</div><div class="callout"><strong>The trap:</strong> Buying a bigger model before trying a reflection step or a few more iterations.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py — max_steps is the thinking budget; raising it for hard ingredients is the cheapest experiment.</div></div></div><div class="concept" data-key="Guardrails as layers"><div class="chead" role="button" tabindex="0"><div><span class="idx">09</span><b>Guardrails as layers</b> <span class="chip ch">ch 18</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>No single guardrail is enough. Layer them: sanitise input, check output, constrain behaviour in the prompt, restrict tools, add external moderation, keep a human for critical calls. A small cheap model can pre-screen inputs. Validate tool arguments in a callback before the tool runs.</p><div class="callout blue"><strong>Picture it:</strong> Gloves, fume hood, labelled bottles and a locked cabinet: none of them is enough alone.</div><pre><code>def validate_tool_params(tool: BaseTool, args: Dict[str, Any],
+                         tool_context: ToolContext) -&gt; Optional[Dict]:
+    &quot;&quot;&quot;Validates tool arguments before execution.&quot;&quot;&quot;
+    expected_user_id = tool_context.state.get(&quot;session_user_id&quot;)
+    actual_user_id_in_args = args.get(&quot;user_id_param&quot;)
+    if actual_user_id_in_args and actual_user_id_in_args != expected_user_id:
+        return {&quot;status&quot;: &quot;error&quot;,   # returning a dict blocks the tool
+                &quot;error_message&quot;: &quot;Tool call blocked: User ID validation failed.&quot;}
+    return None                      # None lets the call proceed
+root_agent = Agent(model=&quot;gemini-2.0-flash-exp&quot;, name=&quot;root_agent&quot;,
+    before_tool_callback=validate_tool_params, tools=[...])</code></pre><div class="note">Google ADK: before_tool_callback runs on every call; return None to allow, a dict to block with a message.</div><div class="callout"><strong>The trap:</strong> Relying on the system prompt to stop injection hidden in a supplier page the model was told to trust.</div><div class="callout green"><strong>In Formulaite:</strong> tools.py — ToolRegistry.call is where an allow-list and argument check belong, before the function runs.</div></div></div><div class="concept" data-key="Engineer agents like software"><div class="chead" role="button" tabindex="0"><div><span class="idx">10</span><b>Engineer agents like software</b> <span class="chip ch">ch 18</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Treat the agent as a complex system. Checkpoint validated states and roll back on failure, like a database transaction. Keep agents small and separate. Log the whole chain of thought, tools and confidence. Give each agent the minimum permissions it needs.</p><div class="callout blue"><strong>Picture it:</strong> You would not run a new batch process without a stop button, a logbook and a locked chemical store.</div><div class="callout"><strong>The trap:</strong> A monolithic do-everything agent with every tool, so one prompt injection reaches everything.</div><div class="callout green"><strong>In Formulaite:</strong> glassbox.py — GlassBox.save is the checkpoint; max_steps in agent.py and the checks in gates.py are the fault tolerance.</div></div></div><div class="concept" data-key="Evaluate the trajectory, not just the answer"><div class="chead" role="button" tabindex="0"><div><span class="idx">11</span><b>Evaluate the trajectory, not just the answer</b> <span class="chip ch">ch 19</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Agents are probabilistic, so pass/fail tests are not enough. Compare the sequence of steps to an ideal one: exact, in-order or any-order match. Track latency and tokens per call. Use an LLM as a judge with a rubric for subjective qualities. ADK ships evalset files and adk eval.</p><div class="callout blue"><strong>Picture it:</strong> Grading a lab report on the method as well as the final number: did they calibrate the meter first?</div><pre><code>class LLMInteractionMonitor:
+    def __init__(self):
+        self.total_input_tokens = 0
+        self.total_output_tokens = 0
+    def record_interaction(self, prompt: str, response: str):
+        input_tokens = len(prompt.split())     # placeholder for a real tokenizer
+        output_tokens = len(response.split())
+        self.total_input_tokens += input_tokens
+        self.total_output_tokens += output_tokens
+    def get_total_tokens(self):
+        return self.total_input_tokens, self.total_output_tokens</code></pre><div class="note">Plain Python: swap the split() placeholder for the API&#x27;s usage counts; the book&#x27;s exact-match accuracy example fails on a paraphrase.</div><div class="callout"><strong>The trap:</strong> An exact string match as the metric, so &#x27;Paris is the capital&#x27; scores zero against &#x27;The capital is Paris&#x27;.</div><div class="callout green"><strong>In Formulaite:</strong> glassbox.py — GlassBox.replay is the trajectory; an eval set of ten INCI names with the expected tool order lives beside it.</div></div></div><div class="concept" data-key="Prioritisation"><div class="chead" role="button" tabindex="0"><div><span class="idx">12</span><b>Prioritisation</b> <span class="chip ch">ch 20</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>With many possible actions, rank them. Define criteria: urgency, importance, dependencies, resources, cost and benefit. Score each task, pick the next one, and re-rank when something changes. The book&#x27;s project-manager agent maps &#x27;urgent&#x27; to P0 and defaults the rest.</p><div class="callout blue"><strong>Picture it:</strong> A stability failure jumps the queue ahead of a label typo, even though the typo came in first.</div><pre><code>from pydantic import BaseModel, Field
+class Task(BaseModel):
+    id: str
+    description: str
+    priority: Optional[str] = None      # P0, P1, P2
+    assigned_to: Optional[str] = None
+class PriorityArgs(BaseModel):
+    task_id: str = Field(description=&quot;The ID of the task to update, e.g., &#x27;TASK-001&#x27;.&quot;)
+    priority: str = Field(description=&quot;Must be one of: &#x27;P0&#x27;, &#x27;P1&#x27;, &#x27;P2&#x27;.&quot;)
+def assign_priority_to_task_tool(task_id: str, priority: str) -&gt; str:
+    task = task_manager.update_task(task_id, priority=priority)
+    return f&quot;Set {task.id} to {priority}.&quot; if task else f&quot;Task {task_id} not found.&quot;</code></pre><div class="note">LangChain + Pydantic: args_schema on each Tool makes the allowed priority values explicit to the model.</div><div class="callout"><strong>The trap:</strong> Letting the model re-prioritise on every turn, so nothing ever finishes.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py — a queue of ingredients ordered by launch date and catalogue gaps, drained by calls to Agent.run.</div></div></div><div class="concept" data-key="Exploration: generate, debate, evolve"><div class="chead" role="button" tabindex="0"><div><span class="idx">13</span><b>Exploration: generate, debate, evolve</b> <span class="chip ch">ch 21</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Some tasks have no known answer. Google&#x27;s Co-scientist uses a supervisor and specialist agents: generate hypotheses, reflect like a peer reviewer, rank them in an Elo tournament, evolve the best, cluster similar ones, and meta-review. More test-time compute gives better hypotheses. Humans steer it.</p><div class="callout blue"><strong>Picture it:</strong> Brainstorming ten new actives, having a critic shred them, keeping the top three and refining those.</div><div class="callout"><strong>The trap:</strong> Trusting a ranked hypothesis without the wet-lab step; the system inherits the model&#x27;s hallucinations.</div><div class="callout green"><strong>In Formulaite:</strong> formulaite_tools.py — a candidate-ingredient generator gated by the same run_gates before anything reaches the drawer.</div></div></div><div class="concept" data-key="Composing patterns"><div class="chead" role="button" tabindex="0"><div><span class="idx">14</span><b>Composing patterns</b> <span class="chip ch">ch 29</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>The value is in the mix. The book&#x27;s research assistant uses Planning to structure, Tool Use to gather, Multi-Agent to split researcher and writer, Reflection with a critic, and Memory to hold state throughout. Each pattern is a separate piece you can test on its own.</p><div class="callout blue"><strong>Picture it:</strong> A finished cream is a recipe of named steps; you can change the emulsifier without touching the preservative.</div><div class="callout"><strong>The trap:</strong> Reaching for every pattern at once instead of adding one, measuring, then adding the next.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py — chain, tool use, reflection via the gate and memory are already composed; routing and evals are the next two boxes.</div></div></div></div>
+</section>
+
+<section id="cheat">
+ <span class="num">05 · Cheat sheet</span>
+ <h2>Agentic Design Patterns — cheat sheet</h2>
+ <p class="small">Everything on one sheet. <button class="btn" id="printBtn" type="button">Print this cheat sheet</button></p>
+ 
+<div class="cs-grid">
+ <div><h3>Vocabulary</h3><div class="tablewrap"><table><thead><tr><th>Term</th><th>Means</th></tr></thead><tbody><tr><td class="t">pattern</td><td>a named, reusable shape for one recurring agent problem</td></tr><tr><td class="t">prompt chaining</td><td>one focused prompt per step; output of one is input of the next</td></tr><tr><td class="t">routing</td><td>classify the input, then send it to the right chain, tool or agent</td></tr><tr><td class="t">parallelization</td><td>run independent steps at once, then merge</td></tr><tr><td class="t">reflection</td><td>produce, critique, refine, repeat, with a stop rule</td></tr><tr><td class="t">producer-critic</td><td>one agent writes, a different agent with its own criteria reviews</td></tr><tr><td class="t">tool use / function calling</td><td>the model emits a structured call; your code runs the function</td></tr><tr><td class="t">planning</td><td>invent the ordered steps at run time when the how is unknown</td></tr><tr><td class="t">multi-agent collaboration</td><td>specialised roles handing work to each other or to a supervisor</td></tr><tr><td class="t">session state</td><td>the scratchpad dict for one conversation thread</td></tr><tr><td class="t">long-term memory</td><td>facts, experiences and rules stored outside the context and searched back in</td></tr><tr><td class="t">RAG</td><td>chunk, embed, retrieve the closest chunks, paste them into the prompt</td></tr><tr><td class="t">embedding</td><td>a list of numbers that places a text by meaning</td></tr><tr><td class="t">MCP</td><td>an open standard for a server to expose tools that any client can discover</td></tr><tr><td class="t">A2A / agent card</td><td>agents on any framework talk over HTTP; the card is the JSON identity they publish</td></tr><tr><td class="t">guardrail</td><td>a layer that screens input, output, tool calls or behaviour</td></tr><tr><td class="t">human-in-the-loop</td><td>a person reviews, corrects or approves at a defined escalation point</td></tr><tr><td class="t">trajectory</td><td>the sequence of steps an agent took, compared against an ideal one</td></tr><tr><td class="t">LLM-as-a-judge</td><td>a model scoring another model&#x27;s output against a written rubric</td></tr><tr><td class="t">router agent</td><td>a first cheap step that decides which model or path a request deserves</td></tr></tbody></table></div></div>
+ <div><h3>The pattern</h3><ol><li>plan = planner(goal)                        # Planning: what steps, only if the how is unknown</li><li>for step in plan:                           # Prompt chaining: one focused prompt each</li><li>    path = route(step)                      # Routing: tool, model or sub-agent</li><li>    facts = run_tools(path)                 # Tool use / RAG: grounded, cited facts</li><li>    draft = produce(facts, state)           # Memory: session state between steps</li><li>    verdict = critic(draft)                 # Reflection + guardrail + deterministic gate</li><li>    if not verdict.ok: retry, fall back or escalate   # Exception handling / human in the loop</li><li>log trajectory, tokens, verdict             # Evaluation and monitoring</li></ol>
+  <h3>Decisions</h3><div class="tablewrap"><table><thead><tr><th>When</th><th>Use</th><th>Not</th></tr></thead><tbody><tr><td>each step needs the previous step&#x27;s output</td><td>prompt chaining</td><td>parallel branches</td></tr><tr><td>steps are independent and wait on APIs</td><td>parallelization with a merge step</td><td>one long sequence</td></tr><tr><td>inputs come in several kinds</td><td>routing with a default branch</td><td>one chain that handles everything</td></tr><tr><td>quality matters more than speed and cost</td><td>reflection with a separate critic</td><td>a single pass</td></tr><tr><td>the how is unknown or changes per request</td><td>planning</td><td>a fixed workflow</td></tr><tr><td>you have a few fixed tools in one app</td><td>function calling</td><td>an MCP server</td></tr><tr><td>agents on different frameworks must cooperate</td><td>A2A with agent cards</td><td>MCP, which is for tools</td></tr><tr><td>a mistake is costly or irreversible</td><td>human-in-the-loop approval</td><td>full autonomy</td></tr></tbody></table></div></div>
+</div>
+<h3>Rules of thumb</h3><div class="tablewrap"><table><thead><tr><th>Do</th><th>Don't</th></tr></thead><tbody><tr><td>Give each step one focused prompt and pass JSON to the next.</td><td>One monolithic prompt that summarises, extracts and drafts at once.</td></tr><tr><td>Use a separate critic with its own criteria.</td><td>Let the writer grade its own work with the same prompt.</td></tr><tr><td>Use a fixed workflow when the recipe is known.</td><td>Give a planning agent a job you could write as five lines.</td></tr><tr><td>Make tools raise clear errors and tell the agent what to do on failure.</td><td>Return &#x27;error: not found&#x27; as a string the model may read as data.</td></tr><tr><td>Update state through tools or events so it is logged and persisted.</td><td>Edit session.state directly and hope it sticks.</td></tr><tr><td>Give each agent the minimum tools and permissions for its task.</td><td>Hand every tool to every agent.</td></tr><tr><td>Layer guardrails: input screen, output check, tool callback, human.</td><td>Rely on the system prompt alone to stop injection.</td></tr><tr><td>Classify first and send simple steps to a cheap model.</td><td>Run every step on the biggest model you can afford.</td></tr><tr><td>Put a max_iterations on every loop and a default branch on every router.</td><td>Assume the critic will eventually say perfect.</td></tr><tr><td>Evaluate the trajectory, tokens and latency, not just the final text.</td><td>Grade with an exact string match.</td></tr></tbody></table></div>
+<h3>Skeletons</h3><h4>Two-step chain (LangChain LCEL)</h4><pre><code>extract = ChatPromptTemplate.from_template(&quot;Extract specs from:\n{text}&quot;)
+to_json = ChatPromptTemplate.from_template(&quot;As JSON with cpu, memory:\n{specs}&quot;)
+extraction_chain = extract | llm | StrOutputParser()
+full_chain = ({&quot;specs&quot;: extraction_chain} | to_json | llm | StrOutputParser())
+print(full_chain.invoke({&quot;text&quot;: input_text}))</code></pre><h4>Reflection loop with two exits</h4><pre><code>history = [HumanMessage(content=task)]
+for i in range(max_iterations):
+    draft = llm.invoke(history)
+    history.append(draft)
+    critique = llm.invoke(critic_prompt(task, draft.content)).content
+    if &quot;CODE_IS_PERFECT&quot; in critique:
+        break
+    history.append(HumanMessage(content=f&quot;Critique:\n{critique}&quot;))</code></pre><h4>Rule-based router with a default</h4><pre><code>def route(request: str, entry: dict | None) -&gt; str:
+    if entry is None:
+        return &quot;unclear&quot;        # ask the user, do not guess
+    if entry.get(&quot;banned&quot;):
+        return &quot;stop&quot;
+    return &quot;research&quot;
+handlers = {&quot;stop&quot;: stop_handler, &quot;unclear&quot;: clarify_handler,
+            &quot;research&quot;: agent.run}
+handlers[route(request, catalogue_entry(inci))](inci)</code></pre><h4>Before-tool guardrail (ADK style)</h4><pre><code>def validate_tool_params(tool, args, tool_context):
+    if tool.name not in ALLOWED_TOOLS:
+        return {&quot;status&quot;: &quot;error&quot;, &quot;error_message&quot;: &quot;Tool not allowed.&quot;}
+    if &quot;url&quot; in args and not args[&quot;url&quot;].startswith(TRUSTED_PREFIX):
+        return {&quot;status&quot;: &quot;error&quot;, &quot;error_message&quot;: &quot;Untrusted url.&quot;}
+    return None   # allow
+root_agent = Agent(name=&quot;root_agent&quot;, before_tool_callback=validate_tool_params,
+                   tools=[catalogue_lookup, read_supplier_page])</code></pre>
+<h3>Before you ship</h3><ul class="check"><li><input type="checkbox" class="ship"><span>Every step&#x27;s output is JSON that a parser or Pydantic model checks before the next step.</span></li><li><input type="checkbox" class="ship"><span>A critic or deterministic gate reviews every drawer before it leaves the loop.</span></li><li><input type="checkbox" class="ship"><span>Every loop has a max_iterations and every router has a default branch.</span></li><li><input type="checkbox" class="ship"><span>Every tool raises on failure and the agent has a logged fallback path.</span></li><li><input type="checkbox" class="ship"><span>Tool calls pass an allow-list callback; each agent has only the tools it needs.</span></li><li><input type="checkbox" class="ship"><span>Retrieved chunks carry their source and the prompt says &#x27;if you don&#x27;t know, say so&#x27;.</span></li><li><input type="checkbox" class="ship"><span>A fixed eval set runs after every prompt change; trajectory, tokens and latency are logged.</span></li><li><input type="checkbox" class="ship"><span>A human approval step sits before any irreversible or catalogue-writing action.</span></li></ul>
+
+</section>
+
+<section id="s06">
+ <span class="num">06 · You're done when…</span>
+ <div class="callout green"><ol><li>Draw the Formulaite agent as named boxes (chain, tool use, reflection, gate, memory) and say which chapter each box comes from.</li><li>Put a rule-based router in front of Agent.run that stops a banned ingredient before any tool runs, and prove it from the Glass Box replay.</li><li>Add a before-tool allow-list and a ten-ingredient eval set, then show trajectory, gate pass rate and token cost for one run.</li></ol></div>
+</section>
+
+<section id="s07">
+ <span class="num">07 · Where this comes from</span>
+ 
+<p><strong>Book:</strong> <em>Agentic Design Patterns</em>, Antonio Gulli, 448 pages. Markdown copy: <code>books-md/agentic-design-patterns.md</code>. Notes with chapter citations: <code>docs/book-notes/agentic-design-patterns.md</code>.</p>
+<p><strong>Chapters covered:</strong> 1 Prompt Chaining, 2 Routing, 3 Parallelization, 4 Reflection, 5 Tool Use (Function Calling), 6 Planning, 7 Multi-Agent Collaboration, 8 Memory Management, 9 Learning and Adaptation, 10 Model Context Protocol, 11 Goal Setting and Monitoring, 12 Exception Handling and Recovery, 13 Human-in-the-Loop, 14 Knowledge Retrieval (RAG), 15 Inter-Agent Communication (A2A), 16 Resource-Aware Optimization, 17 Reasoning Techniques, 18 Guardrails/Safety Patterns, 19 Evaluation and Monitoring, 20 Prioritization, 21 Exploration and Discovery, 22 Advanced Prompting Techniques, 24 A Quick Overview of Agentic Frameworks, 29 Conclusion.</p>
+<h3>In the author's words</h3><div class="quote">“The reliability of a prompt chain is highly dependent on the integrity of the data passed between steps.”<span class="who">chapter 1</span></div><div class="quote">“This separation of concerns is powerful because it prevents the “cognitive bias” of an agent reviewing its own work.”<span class="who">chapter 4</span></div><div class="quote">“Dynamic planning is a specific tool, not a universal solution.”<span class="who">chapter 6</span></div><div class="quote">“agents do not magically replace deterministic workflows; they often require stronger deterministic support to succeed”<span class="who">chapter 10</span></div><div class="quote">“An agent should be granted the absolute minimum set of permissions required to perform its task.”<span class="who">chapter 18</span></div>
+<h3>Python constructs this book leans on</h3><div class="tablewrap"><table><thead><tr><th>Construct</th><th>What it does here</th><th>Where</th></tr></thead><tbody><tr><td class="t">the | pipe on runnables (LCEL)</td><td>prompt | llm | StrOutputParser() works because LangChain objects override __or__; output flows left to right.</td><td class="small">Chapter 1, Hands-On Code Example</td></tr><tr><td class="t">@tool decorator on a typed function</td><td>The signature and docstring become the schema the model reads; the decorator registers the function.</td><td class="small">Chapter 5, Hands-On Code Example (LangChain)</td></tr><tr><td class="t">async def, await, asyncio.gather</td><td>await chain.ainvoke(topic) lets several network calls overlap on one thread.</td><td class="small">Chapter 3 and Chapter 5</td></tr><tr><td class="t">for i in range(max_iterations) with break on a stop phrase</td><td>The loop has two exits: the critic&#x27;s CODE_IS_PERFECT and the iteration cap.</td><td class="small">Chapter 4, Hands-On Code Example (LangChain)</td></tr><tr><td class="t">TypedDict as graph state</td><td>class RAGGraphState(TypedDict) names the keys every node reads and returns.</td><td class="small">Chapter 14, Hands-On Code Example (LangChain)</td></tr><tr><td class="t">Pydantic BaseModel + model_validate_json</td><td>One call parses the model&#x27;s JSON and checks every field&#x27;s type, raising ValidationError on a miss.</td><td class="small">Chapter 22, Structured Output</td></tr><tr><td class="t">except (json.JSONDecodeError, ValidationError)</td><td>Catch both parse and shape failures in one clause and return (False, reason) from the guardrail.</td><td class="small">Chapter 18, Hands-On Code CrewAI Example</td></tr><tr><td class="t">callback returning None to allow, a dict to block</td><td>before_tool_callback uses the return value as the decision, so no exceptions are needed.</td><td class="small">Chapter 18, Hands-On Code Vertex AI Example</td></tr><tr><td class="t">async generator with yield inside a class method</td><td>async def _run_async_impl(...) yields Event objects one at a time; escalate=True ends a LoopAgent.</td><td class="small">Chapter 7, Hands-On Code (Google ADK)</td></tr><tr><td class="t">model_copy(update=...) for safe updates</td><td>Pydantic returns a new validated object instead of mutating the old one in place.</td><td class="small">Chapter 20, Hands-On Code Example</td></tr></tbody></table></div>
+<h3>Deliberately left out of this guide</h3><ul><li><strong>Google Deep Research, the OpenAI Deep Research API and the AgentSpace product walkthrough</strong> — Chapters 6 and 25</li><li><strong>Reinforcement learning detail (PPO, DPO), SICA internals and AlphaEvolve</strong> — Chapter 9</li><li><strong>Vertex AI Memory Bank, Vertex RAG Engine and other Google Cloud managed services</strong> — Chapters 8, 14 and 18</li><li><strong>Chain of Debates, Graph of Debates and the MASS multi-agent search framework</strong> — Chapter 17</li><li><strong>CLI coding agents, GUI/real-world interaction and the &#x27;how I reason&#x27; transcripts from six chatbots</strong> — Chapters 23, 26, 27 and 28</li></ul>
+
+ <details><summary>How you'd have built this guide yourself</summary>
+  <p>List the chapter headings first, then read the book in chapter order and write one card per idea that changes what you would build. Sort the cards into three piles: needed for the simplest working thing, needed for the version you would show someone, needed for the version that runs unattended. Those piles are the levels; the simplest thing in each pile is the build ladder. Copy quotes exactly and keep the chapter number next to every card, so you can go back to the source when a card stops making sense.</p>
+ </details>
+</section>
+</main>
+<script>
+(function(){
+ const KEY='bookguide.agentic-design-patterns';
+ let state={got:{},ship:{},tab:'foundation'};
+ try{const s=localStorage.getItem(KEY); if(s) state=Object.assign(state,JSON.parse(s));}catch(e){}
+ function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+ // ladder
+ document.querySelectorAll('.rung').forEach(r=>{const go=()=>{document.querySelectorAll('.rung,.rungbody').forEach(x=>x.classList.toggle('on',x.dataset.rung===r.dataset.rung));}; r.onclick=go; r.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};});
+ // chapter rows
+ document.querySelectorAll('.chrow').forEach(r=>{const go=()=>r.classList.toggle('on'); r.onclick=go; r.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};});
+ // tabs
+ const tabs=document.querySelectorAll('#ctabs button');
+ function showTab(lvl){tabs.forEach(b=>b.classList.toggle('on',b.dataset.level===lvl)); document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.dataset.level===lvl)); state.tab=lvl; save();}
+ tabs.forEach(b=>b.onclick=()=>showTab(b.dataset.level));
+ // concepts
+ function progress(){document.querySelectorAll('.panel').forEach(p=>{const all=p.querySelectorAll('.got'), n=[...all].filter(c=>c.checked).length; p.querySelector('.bar i').style.width=(all.length?100*n/all.length:0)+'%'; p.querySelector('.txt').textContent=n+' / '+all.length+' got it';});}
+ document.querySelectorAll('.concept').forEach(c=>{
+  const head=c.querySelector('.chead'), box=c.querySelector('.got'), key=c.dataset.key;
+  box.checked=!!state.got[key]; c.classList.toggle('done',box.checked);
+  head.onclick=e=>{if(e.target.closest('label')) return; c.classList.toggle('open');};
+  head.onkeydown=e=>{if(e.key==='Enter'){c.classList.toggle('open');}};
+  box.onchange=()=>{state.got[key]=box.checked; c.classList.toggle('done',box.checked); save(); progress();};
+ });
+ document.querySelectorAll('.ship').forEach((b,i)=>{b.checked=!!state.ship[i]; b.onchange=()=>{state.ship[i]=b.checked; save();};});
+ showTab(state.tab||'foundation'); progress();
+ const pb=document.getElementById('printBtn'); if(pb){pb.onclick=()=>{document.body.classList.add('printing'); window.print();}; window.onafterprint=()=>document.body.classList.remove('printing');}
+ const ob=document.getElementById('openFirst'); if(ob){ob.onclick=()=>{showTab('foundation'); const first=document.querySelector('.panel[data-level=foundation] .concept'); if(first){first.classList.add('open'); first.scrollIntoView({behavior:'smooth',block:'start'});}};}
+})();
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad:true,theme:"neutral",securityLevel:"loose"});</script>
+</body>
+</html>

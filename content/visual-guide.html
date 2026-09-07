@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Formulaite Agent Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:light;
+  --surface:#faf9f5;--surface-2:#f2f0e9;--surface-3:#e8e6dc;--surface-ink:#141413;
+  --line:#d9d7cc;--line-soft:#e8e6dc;
+  --ink:#141413;--ink-2:#5c5b57;--ink-3:#6b6a65;--on-ink:#faf9f5;
+  --accent:#d97757;--accent-2:#6a9bcc;--accent-3:#788c5d;
+  --font-head:"Poppins",Arial,sans-serif;--font-body:"Lora",Georgia,serif;
+  --font-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--surface);color:var(--ink-2);font-family:var(--font-body);font-size:17px;line-height:1.7}
+main{max-width:980px;margin:0 auto;padding:40px 22px 80px}
+h1,h2,h3,h4{font-family:var(--font-head);color:var(--ink);line-height:1.2;margin:0 0 12px}
+h1{font-size:40px;letter-spacing:-.02em;font-weight:600}
+h2{font-size:26px;font-weight:600;margin-top:8px}
+h3{font-size:19px;font-weight:600}
+p{margin:0 0 14px;max-width:70ch}
+strong{color:var(--ink)}
+code,.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+code{font-size:.88em;background:var(--surface-3);padding:1px 5px;border-radius:5px;color:var(--ink)}
+pre{background:var(--surface-3);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-family:var(--font-mono);font-size:13px;line-height:1.65;color:var(--ink);overflow-x:auto;margin:10px 0 16px}
+pre .c{color:var(--ink-3)} pre b{color:var(--ink)}
+section{margin-top:56px}
+.num{font-family:var(--font-mono);color:var(--ink-3);font-size:13px;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px}
+.strip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0 10px}
+.strip div{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:15px}
+.strip b{display:block;font-family:var(--font-head);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
+.callout{border-left:3px solid var(--accent);background:var(--surface-2);border-radius:0 12px 12px 0;padding:14px 18px;margin:16px 0}
+.callout.blue{border-color:var(--accent-2)} .callout.green{border-color:var(--accent-3)}
+.callout ol{margin:6px 0 0 18px;padding:0} .callout li{margin:4px 0}
+.card{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:22px;margin:12px 0}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.cards .card{margin:0}
+.card h3{margin-bottom:6px}
+.card p{font-size:15.5px;margin-bottom:6px}
+/* destination line */
+.dest{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:18px 0}
+.dest .box{border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:8px 12px;font-family:var(--font-head);font-size:13.5px;color:var(--ink)}
+.dest .box.here{background:var(--accent);border-color:var(--accent)}
+.dest .arrow{color:var(--ink-3)}
+/* tiles */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:14px}
+.tile{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;transition:border-color .15s}
+.tile:hover{border-color:var(--accent)}
+.tile.on{background:var(--accent);border-color:var(--accent)}
+.tile b{display:block;font-family:var(--font-head);font-size:14px;color:var(--ink)}
+.tile span{font-size:14px;color:var(--ink-2)} .tile.on span{color:var(--ink)}
+.tile small{display:block;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-3);margin-top:4px} .tile.on small{color:var(--ink)}
+/* lab */
+.lab{background:var(--surface-ink);color:var(--on-ink);border-radius:16px;overflow:hidden;margin:18px 0}
+.lab .bar{background:var(--surface-3);color:var(--ink);font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:8px 16px;display:flex;justify-content:space-between;align-items:center}
+.lab .inner{padding:18px}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.controls .lbl{font-family:var(--font-mono);font-size:12px;color:#b0aea5;margin-right:4px}
+button{font-family:var(--font-head);font-size:13.5px;font-weight:600;border-radius:10px;border:1px solid #4a4944;background:#232320;color:var(--on-ink);padding:8px 14px;cursor:pointer;transition:border-color .15s,background .15s}
+button:hover{border-color:var(--accent)}
+button.on{background:var(--accent);border-color:var(--accent);color:#141413}
+button.go{background:var(--accent);border-color:var(--accent);color:#141413}
+button:disabled{opacity:.45;cursor:default}
+.split{display:grid;grid-template-columns:1.15fr 1fr;gap:16px}
+.split>*{min-width:0}
+@media(max-width:760px){.split{grid-template-columns:1fr}.strip{grid-template-columns:1fr}}
+.diagram svg{width:100%;height:auto;display:block}
+.node rect{fill:#232320;stroke:#4a4944;stroke-width:1.4;transition:all .25s}
+.node text{fill:var(--on-ink);font-family:var(--font-head);font-size:13px;font-weight:600}
+.node .sub{fill:#b0aea5;font-family:var(--font-mono);font-size:10.5px;font-weight:400}
+.node.lit rect{stroke:var(--accent);fill:#3a2a22;stroke-width:2.2}
+.node.pass rect{stroke:var(--accent-3);fill:#2a3322}
+.node.fail rect{stroke:var(--accent);fill:#3a2a22}
+.edge{stroke:#4a4944;stroke-width:1.6;fill:none;transition:all .25s;marker-end:url(#arr)}
+.edge.lit{stroke:var(--accent);stroke-width:2.6;marker-end:url(#arrlit)}
+.edge.lit2{stroke:var(--accent-2);stroke-width:2.6;marker-end:url(#arrblue)}
+.elabel{fill:#b0aea5;font-family:var(--font-mono);font-size:10.5px}
+.elabel.lit{fill:var(--on-ink)}
+.log{background:#0f0f0e;border:1px solid #2c2c29;border-radius:12px;padding:10px 12px;font-family:var(--font-mono);font-size:12.5px;line-height:1.55;height:250px;overflow:auto;margin-top:12px}
+.log .ln{padding:3px 6px;border-radius:6px;color:#b0aea5;white-space:pre-wrap}
+.log .ln.cur{background:#2a2a27;color:var(--on-ink)}
+.log .ln .k{color:var(--accent)} .log .ln .k.pass{color:var(--accent-3)} .log .ln .k.blue{color:var(--accent-2)}
+.explain{overflow-wrap:anywhere;background:#1c1c1a;border:1px solid #2c2c29;border-radius:12px;padding:14px 16px;font-size:15px;line-height:1.6;min-height:250px}
+.explain h4{color:var(--on-ink);font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin:0 0 6px;font-family:var(--font-mono);font-weight:500}
+.explain .why{color:#e8e6dc}
+.explain .what{color:var(--on-ink);font-family:var(--font-head);font-size:16px;margin-bottom:10px}
+.explain pre{background:#0f0f0e;border-color:#2c2c29;color:var(--on-ink);font-size:12px;margin:6px 0 0;white-space:pre-wrap}
+.explain pre .c{color:#b0aea5} .explain pre b{color:var(--accent)}
+.explain .tag{display:inline-block;background:#2a2a27;color:var(--accent-2);font-family:var(--font-mono);font-size:11px;border-radius:6px;padding:2px 7px;margin:8px 6px 0 0}
+.table{width:100%;border-collapse:collapse;font-size:14.5px;margin:10px 0 6px}
+.table th{font-family:var(--font-head);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+.table td{padding:7px 8px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+.table td.mono{font-family:var(--font-mono);font-size:13px;color:var(--ink)}
+.barrow{display:flex;align-items:center;gap:8px}
+.barrow i{display:block;height:9px;background:var(--accent);border-radius:0 4px 4px 0}
+.barrow i.b{background:var(--accent-2)} .barrow i.g{background:var(--accent-3)}
+/* cheat sheets */
+.cs-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.cs-tabs button{background:var(--surface-2);color:var(--ink);border-color:var(--line)}
+.cs-tabs button.on{background:var(--accent);border-color:var(--accent)}
+.cs{display:none;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:22px}
+.cs.on{display:block}
+.cs .pic{float:right;width:250px;margin:0 0 10px 18px}
+.cs .pic svg{width:100%;height:auto}
+.cs .pic text{font-family:var(--font-head);font-size:11px;fill:var(--ink)}
+.cs .pic .m{font-family:var(--font-mono);font-size:10px;fill:var(--ink-2)}
+.cs .read{font-style:italic}
+.cs .gotcha{border-left:3px solid var(--accent);padding-left:12px;margin-top:10px;font-size:15px}
+.cs::after{content:"";display:block;clear:both}
+details{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:12px 18px;margin-top:14px}
+summary{font-family:var(--font-head);font-weight:600;color:var(--ink);cursor:pointer}
+ul.plain{padding-left:20px;margin:6px 0 12px} ul.plain li{margin:4px 0}
+.small{font-size:14px;color:var(--ink-3)}
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <span class="num">Formulaite Agent Lab · Module A1</span>
+  <h1>How a request becomes a filled drawer</h1>
+  <p>Press a button, watch a real recorded run of the Formulaite ingredient-research agent travel through the loop, and see which Python construct fires at every step.</p>
+  <div class="strip">
+    <div><b>Goal</b>You can trace a request through model → tools → gate → drawer and say what each part decided and why.</div>
+    <div><b>Output</b>Four real runs, replayed step by step, plus a cheat sheet for every construct in the code (<code>*args</code>, <code>**kwargs</code>, classes, decorators, generators…).</div>
+    <div><b>Time</b>About 25 minutes. Two sittings is fine: the lab in one, the cheat sheets in another.</div>
+  </div>
+  <div class="callout">
+    <strong>How to drive this page.</strong>
+    <ol>
+      <li>Scroll to the dark panel in section 04 and click a scenario tile (start with <b>Glycerin — gate rejects, model repairs</b>).</li>
+      <li>Press <b>PLAY</b> to watch the run, or <b>STEP</b> to move one event at a time.</li>
+      <li>Read the right-hand box after each step: <em>what happened</em>, <em>why</em>, and the <em>Python construct</em> that did it.</li>
+    </ol>
+  </div>
+</header>
+
+<section id="s01">
+  <span class="num">01 · Where this is going</span>
+  <h2>The whole agent is one loop with four parts</h2>
+  <p>By the end of this track you have an agent that fills the Ingredient Drawer for any INCI name, refuses banned ones, admits unknown ones, and leaves a replayable record of every decision. Nothing later replaces this loop. Later modules only add things either side of it: a router in front, a persistent memory beside it, the real supplier-page reader behind the tools.</p>
+  <div class="dest">
+    <span class="box">Request</span><span class="arrow">→</span>
+    <span class="box here">Loop: model ↔ tools ↔ gate</span><span class="arrow">→</span>
+    <span class="box">Drawer</span><span class="arrow">+</span>
+    <span class="box">Glass Box trace</span><span class="arrow">→</span>
+    <span class="box">Router (next)</span><span class="arrow">→</span>
+    <span class="box">Real page reader (next)</span>
+  </div>
+  <p><strong>The rule every book agrees on:</strong> the model <em>proposes</em>, plain code <em>decides</em>. The model can only ask for tools from a menu; a gate written in ordinary Python has the last word.</p>
+</section>
+
+<section id="s02">
+  <span class="num">02 · The stops</span>
+  <h2>Nine files, read in this order</h2>
+  <p>Each file introduces the constructs it needs and nothing more. Click a tile to see what it adds to the machine.</p>
+  <div class="tiles" id="fileTiles"></div>
+  <div class="callout blue" id="fileNote">Click a file above.</div>
+</section>
+
+<section id="s03">
+  <span class="num">03 · The story so far</span>
+  <h2>You already built the pieces this loop stands on</h2>
+  <p>In the Python Constructs course (Phase 1.2) you built <code>log_assistant_event(kind, *tags, **meta)</code>, the <code>FormulaDraft</code> classes, and the CSV generators. This lab reuses those exact moves. The Glass Box below <em>is</em> <code>log_assistant_event</code> grown up: same <code>*tags</code>, same <code>**meta</code>, now stored in a class with a <code>replay()</code> generator. What those pieces could not do on their own was <strong>decide what to do next</strong>. That is the only thing this module adds.</p>
+</section>
+
+<section id="s04">
+  <span class="num">04 · Now do it</span>
+  <h2>Replay a real run</h2>
+  <p>Every line below comes from an actual run of <code>python3 -m agent_lab</code> on 7 September 2026, saved by the Glass Box. Nothing is simulated on this page. Pick a scenario.</p>
+
+  <div class="lab">
+    <div class="bar"><span>agent_lab · glass box replay</span><span id="runId">no run selected</span></div>
+    <div class="inner">
+      <div class="controls" id="scenarioTiles"><span class="lbl">SCENARIO</span></div>
+      <div class="controls">
+        <span class="lbl">DRIVE</span>
+        <button class="go" id="btnPlay">▶ PLAY</button>
+        <button id="btnStep">STEP →</button>
+        <button id="btnReset">RESET</button>
+        <span class="lbl" id="stepCount"></span>
+      </div>
+      <div class="split">
+        <div>
+          <div class="diagram">
+<svg viewBox="0 0 560 330" xmlns="http://www.w3.org/2000/svg" aria-label="Agent loop diagram">
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#4a4944"/></marker>
+    <marker id="arrlit" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#d97757"/></marker>
+    <marker id="arrblue" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#6a9bcc"/></marker>
+  </defs>
+  <!-- edges -->
+  <path id="e-user-agent" class="edge" d="M92,60 L188,60"/>
+  <text class="elabel" x="100" y="50" id="l-user-agent">request</text>
+  <path id="e-agent-model" class="edge" d="M330,50 L430,50"/>
+  <text class="elabel" x="338" y="42" id="l-agent-model">msgs + tools</text>
+  <path id="e-model-agent" class="edge" d="M430,78 L330,78"/>
+  <text class="elabel" x="338" y="98" id="l-model-agent">text / tool_use</text>
+  <path id="e-agent-tools" class="edge" d="M220,100 L140,180"/>
+  <text class="elabel" x="46" y="140" id="l-agent-tools">tool_use → run</text>
+  <path id="e-tools-agent" class="edge" d="M170,180 L250,100"/>
+  <text class="elabel" x="212" y="160" id="l-tools-agent">tool_result</text>
+  <path id="e-agent-gate" class="edge" d="M300,100 L380,180"/>
+  <text class="elabel" x="300" y="160" id="l-agent-gate">fill_drawer</text>
+  <path id="e-gate-model" class="edge" d="M440,180 L470,90"/>
+  <text class="elabel" x="452" y="140" id="l-gate-model">reasons</text>
+  <path id="e-gate-drawer" class="edge" d="M470,200 L520,200"/>
+  <path id="e-agent-user" class="edge" d="M188,72 L92,72"/>
+  <text class="elabel" x="100" y="92" id="l-agent-user">answer</text>
+  <!-- nodes -->
+  <g class="node" id="n-user"><rect x="12" y="38" width="80" height="44" rx="10"/><text x="52" y="56" text-anchor="middle">User</text><text class="sub" x="52" y="72" text-anchor="middle">Soma / app</text></g>
+  <g class="node" id="n-agent"><rect x="188" y="30" width="142" height="70" rx="10"/><text x="259" y="56" text-anchor="middle">Agent.run()</text><text class="sub" x="259" y="74" text-anchor="middle">the loop · max_steps=8</text><text class="sub" x="259" y="90" text-anchor="middle" id="agentStep"> </text></g>
+  <g class="node" id="n-model"><rect x="430" y="30" width="118" height="64" rx="10"/><text x="489" y="54" text-anchor="middle">Model</text><text class="sub" x="489" y="70" text-anchor="middle">Scripted / Claude</text><text class="sub" x="489" y="84" text-anchor="middle">thinks, proposes</text></g>
+  <g class="node" id="n-tools"><rect x="60" y="180" width="130" height="64" rx="10"/><text x="125" y="204" text-anchor="middle">ToolRegistry</text><text class="sub" x="125" y="220" text-anchor="middle">catalogue_lookup</text><text class="sub" x="125" y="234" text-anchor="middle">read_supplier_page</text></g>
+  <g class="node" id="n-gate"><rect x="360" y="180" width="110" height="64" rx="10"/><text x="415" y="204" text-anchor="middle">Gate</text><text class="sub" x="415" y="220" text-anchor="middle">6 checks · code</text><text class="sub" x="415" y="234" text-anchor="middle" id="gateVerdict">PASS / FAIL</text></g>
+  <g class="node" id="n-drawer"><rect x="520" y="178" width="34" height="68" rx="8"/><text x="537" y="200" text-anchor="middle" transform="rotate(90 537 212)">Drawer</text></g>
+  <g class="node" id="n-box"><rect x="60" y="280" width="410" height="36" rx="10"/><text x="265" y="303" text-anchor="middle">Glass Box · records every event · replay() is a generator</text></g>
+</svg>
+          </div>
+          <div class="log" id="log"></div>
+        </div>
+        <div class="explain" id="explain">
+          <h4>What happened</h4>
+          <div class="what">Pick a scenario, then press PLAY.</div>
+          <div class="why">The left column is the diagram; the box under it is the trace exactly as the Glass Box printed it. This box explains the current event.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3>The comparison table fills itself</h3>
+  <p>Every scenario you play adds a row. The bars are event counts from the real traces.</p>
+  <table class="table" id="cmp">
+    <thead><tr><th>Scenario</th><th>Events</th><th>Model calls</th><th>Tool calls</th><th>Gate</th><th>Outcome</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<section id="s05">
+  <span class="num">05 · So what did you just see?</span>
+  <h2>Four things the runs prove</h2>
+  <div class="cards">
+    <div class="card"><h3>The gate, not the model, decided</h3><p>In the repair run the model submitted a drawer at step 7 and the gate refused it: <em>“use_level_pct 50.0% is outside catalogue range 1.0-10.0%”</em>. The reasons went back as a <code>tool_result</code>, the model resubmitted, and the gate passed at step 9. Plain code had the last word.</p></div>
+    <div class="card"><h3>Retries are cheap when they are specific</h3><p>The repair cost exactly one extra model call: 4 calls and 10 events instead of 8 events on the happy path. That is Anthropic's evaluator-optimizer pattern in miniature.</p></div>
+    <div class="card"><h3>Saying “no” is a first-class outcome</h3><p>The banned run stopped after 6 events and the unknown-ingredient run after 6. Neither crashed, neither invented a drawer. The books call this making refusal a legal path.</p></div>
+    <div class="card"><h3>Every step is on the record</h3><p>All 9 drawer sections, every tool input and output, every verdict — one <code>log(kind, *tags, **meta)</code> call each. That single flexible signature is why <code>*args</code>/<code>**kwargs</code> exist.</p></div>
+  </div>
+</section>
+
+<section id="s06">
+  <span class="num">06 · Cheat sheets</span>
+  <h2>Every construct in the code, one card each</h2>
+  <p>Each card has a picture, the actual line from the lab, a plain reading of it, and the trap. Click a tab.</p>
+  <div class="cs-tabs" id="csTabs"></div>
+  <div id="csPanels"></div>
+</section>
+
+<section id="s07">
+  <span class="num">07 · You're done when…</span>
+  <div class="callout green">
+    <ol>
+      <li>You can play the repair run and, <em>before</em> step 7 appears, say which component will reject the drawer and what it will send back.</li>
+      <li>You can read <code>box.log("gate", inci, passed=False, reasons=[...])</code> aloud and say which part becomes the tuple and which the dict.</li>
+      <li>You can explain why <code>ClaudeModel</code> and <code>ScriptedModel</code> can be swapped without touching <code>agent.py</code> — and name the construct that makes it true.</li>
+    </ol>
+  </div>
+</section>
+
+<section id="s08">
+  <span class="num">08 · Next</span>
+  <p>Module A2 puts a <strong>router</strong> in front of the loop (Anthropic's routing pattern): an INCI already in the catalogue skips the model entirely; a new one gets the full agent. Same loop, one cheaper path added.</p>
+</section>
+
+<section id="s09">
+  <span class="num">09 · Where this comes from</span>
+  <h2>Sources and what was left out</h2>
+  <p><strong>Code:</strong> <code>Formulaite-Agent-Lab/agent_lab/</code> — the file tiles in section 02 name them in reading order. <strong>Traces:</strong> <code>traces/*.json</code>, produced by <code>python3 -m agent_lab … --save</code>.</p>
+  <p><strong>Books</strong> (converted to Markdown in <code>books-md/</code>, per-book notes in <code>docs/book-notes/</code>, synthesis in <code>docs/agent-infrastructure-notes.md</code>): <em>AI Agents with Python</em> ch. 1.2 “Understanding the Agent Loop”, ch. 4 “Function Calling and Tool Integration”; <em>Python AI Programming 2e</em> — the fifteen-line loop with <code>max_steps</code>; <em>AI Programming with Python for Developers</em> — “the model decides what it wants, Python decides what is allowed”; <em>Modern Loop Engineering</em> — observation, reasoning, action, evaluation cycles; <em>The 7 GenAI Architectures</em> — the Termination Test and the explicit give-up field; <em>Production AI Engineering</em> — “the model proposes, the policy layer decides, the executor acts”; <em>Building Autonomous AI Agents with Claude</em> ch. 2 — logging reasoning / action / observation per iteration; <em>Learn AI Agents by Building</em> ch. 9 — refusal as a first-class route; <em>AI Agents Playbook</em> — cost as an architecture property.</p>
+  <p><strong>Anthropic docs:</strong> Tool use overview (tools → <code>tool_use</code> → <code>tool_result</code> with <code>tool_use_id</code>), Tool Runner (<code>client.beta.messages.tool_runner</code>, <code>@beta_tool</code>), Structured outputs, and the “Building effective agents” essay (workflows vs agents; the five patterns).</p>
+  <p><strong>Deliberately left out:</strong> streaming, prompt caching, the real HTTP page reader, persistent memory, cost budgets beyond <code>max_steps</code>, and multi-agent orchestration. The notes file says which book chapter covers each.</p>
+  <details>
+    <summary>How you'd have built this yourself</summary>
+    <p>Prove the single move first: a ten-line script that sends one <code>catalogue_lookup</code> tool to a model and prints the <code>tool_use</code> block back. Only when that works, wrap it in a loop with a step budget. Then add the Glass Box (a list plus a <code>log</code> method), because the moment you have a loop you need to see it. Then the gate, because the moment the model produces a drawer you need to check it. Then swap in the scripted model, because you want to run the whole thing a hundred times without paying. Every file in the lab is one of those steps, in that order.</p>
+    <p>The bug you would probably have hit: an empty Glass Box is “falsy” because it defines <code>__len__</code>, so <code>glassbox or GlassBox()</code> silently throws away the box you passed in. The fix is <code>if glassbox is not None</code>. It is kept in <code>agent.py</code> with a comment.</p>
+  </details>
+  <p class="small" style="margin-top:14px">Catalogue percentages and supplier pages are teaching fixtures, not regulatory advice.</p>
+</section>
+
+</main>
+
+<script>
+const RUNS = {"glycerin": {"label": "Glycerin — happy path", "run_id": "glycerin-scripted", "events": [{"step": 1, "kind": "request", "tags": ["Glycerin"], "meta": {"text": "Research the ingredient: Glycerin", "tools": ["catalogue_lookup", "fill_drawer", "read_supplier_page"]}, "at": "2026-09-07T09:28:33+00:00"}, {"step": 2, "kind": "model_reply", "tags": ["Glycerin"], "meta": {"step": 1, "stop_reason": "tool_use", "text": "I'll start by looking up Glycerin in the catalogue.", "tool_calls": ["catalogue_lookup"]}, "at": "2026-09-07T09:28:33+00:00"}, {"step": 3, "kind": "tool_call", "tags": ["Glycerin"], "meta": {"tool": "catalogue_lookup", "input": {"inci": "Glycerin"}, "ok": true, "output": "{\n  \"inci\": \"Glycerin\",\n  \"function\": \"humectant\",\n  \"use_level_min\": 1.0,\n  \"use_level_max\": 10.0,\n  \"phase\": \"A (water phase)\",\n  \"solubility\": \"water-soluble\",\n  \"ph_range\": \"3.0-9.0\",\n  \"supplier_"}, "at": "2026-09-07T09:28:33+00:00"}, {"step": 4, "kind": "model_reply", "tags": ["Glycerin"], "meta": {"step": 2, "stop_reason": "tool_use", "text": "Now I'll read the supplier page for details.", "tool_calls": ["read_supplier_page"]}, "at": "2026-09-07T09:28:33+00:00"}, {"step": 5, "kind": "tool_call", "tags": ["Glycerin"], "meta": {"tool": "read_supplier_page", "input": {"url": "https://supplier.example/glycerin"}, "ok": true, "output": "SUPPLIER PAGE (teaching stub) — Glycerin\nINCI name: Glycerin\nFunction: Humectant. Draws water into the upper skin layers; improves slip and skin feel.\nTypical use level: 2-5% in leave-on products, up "}, "at": "2026-09-07T09:28:33+00:00"}, {"step": 6, "kind": "model_reply", "tags": ["Glycerin"], "meta": {"step": 3, "stop_reason": "tool_use", "text": "Submitting the drawer.", "tool_calls": ["fill_drawer"]}, "at": "2026-09-07T09:28:33+00:00"}, {"step": 7, "kind": "gate", "tags": ["Glycerin"], "meta": {"passed": true, "reasons": [], "drawer": {"inci_name": "Glycerin", "function": "Humectant. Draws water into the upper skin layers; improves slip and skin feel.", "typical_use_level": "2-5% in leave-on products, up to 10% in rinse-off products.", "use_level_pct": 5.5, "phase_and_solubility": "Water phase (Phase A). Fully water-soluble; add before heating.", "ph_range": "Stable across pH 3-9.", "compatibility": "Compatible with most surfactants, gums and preservatives. High levels (>10%) can feel tacky.", "safety_notes": "Widely used; low irritation potential at normal use levels.", "sources": ["catalogue_lookup", "read_supplier_page:https://supplier.example/glycerin"]}}, "at": "2026-09-07T09:28:33+00:00"}, {"step": 8, "kind": "run_end", "tags": ["Glycerin"], "meta": {"ok": true, "model_calls": 3}, "at": "2026-09-07T09:28:33+00:00"}]}, "fail_first": {"label": "Glycerin — gate rejects, model repairs", "run_id": "glycerin-scripted", "events": [{"step": 1, "kind": "request", "tags": ["Glycerin"], "meta": {"text": "Research the ingredient: Glycerin", "tools": ["catalogue_lookup", "fill_drawer", "read_supplier_page"]}, "at": "2026-09-07T09:28:33+00:00"}, {"step": 2, "kind": "model_reply", "tags": ["Glycerin"], "meta": {"step": 1, "stop_reason": "tool_use", "text": "I'll start by looking up Glycerin in the catalogue.", "tool_calls": ["catalogue_lookup"]}, "at": "2026-09-07T09:28:33+00:00"}, {"step": 3, "kind": "tool_call", "tags": ["Glycerin"], "meta": {"tool": "catalogue_lookup", "input": {"inci": "Glycerin"}, "ok": true, "output": "{\n  \"inci\": \"Glycerin\",\n  \"function\": \"humectant\",\n  \"use_level_min\": 1.0,\n  \"use_level_max\": 10.0,\n  \"phase\": \"A (water phase)\",\n  \"solubility\": \"water-soluble\",\n  \"ph_range\": \"3.0-9.0\",\n  \"supplier_"}, "at": "2026-09-07T09:28:33+00:00"}, {"step": 4, "kind": "model_reply", "tags": ["Glycerin"], "meta": {"step": 2, "stop_reason": "tool_use", "text": "Now I'll read the supplier page for details.", "tool_calls": ["read_supplier_page"]}, "at": "2026-09-07T09:28:33+00:00"}, {"step": 5, "kind": "tool_call", "tags": ["Glycerin"], "meta": {"tool": "read_supplier_page", "input": {"url": "https://supplier.example/glycerin"}, "ok": true, "output": "SUPPLIER PAGE (teaching stub) — Glycerin\nINCI name: Glycerin\nFunction: Humectant. Draws water into the upper skin layers; improves slip and skin feel.\nTypical use level: 2-5% in leave-on products, up "}, "at": "2026-09-07T09:28:33+00:00"}, {"step": 6, "kind": "model_reply", "tags": ["Glycerin"], "meta": {"step": 3, "stop_reason": "tool_use", "text": "Submitting the drawer.", "tool_calls": ["fill_drawer"]}, "at": "2026-09-07T09:28:33+00:00"}, {"step": 7, "kind": "gate", "tags": ["Glycerin"], "meta": {"passed": false, "reasons": ["use_level_pct 50.0% is outside catalogue range 1.0-10.0%"], "drawer": {"inci_name": "Glycerin", "function": "Humectant. Draws water into the upper skin layers; improves slip and skin feel.", "typical_use_level": "2-5% in leave-on products, up to 10% in rinse-off products.", "use_level_pct": 50.0, "phase_and_solubility": "Water phase (Phase A). Fully water-soluble; add before heating.", "ph_range": "Stable across pH 3-9.", "compatibility": "Compatible with most surfactants, gums and preservatives. High levels (>10%) can feel tacky.", "safety_notes": "Widely used; low irritation potential at normal use levels.", "sources": ["catalogue_lookup", "read_supplier_page:https://supplier.example/glycerin"]}}, "at": "2026-09-07T09:28:33+00:00"}, {"step": 8, "kind": "model_reply", "tags": ["Glycerin"], "meta": {"step": 4, "stop_reason": "tool_use", "text": "The gate rejected my drawer (REJECTED by gate:\n- use_level_pct 50.0% is outside catalogue…). Repairing and resubmitting.", "tool_calls": ["fill_drawer"]}, "at": "2026-09-07T09:28:33+00:00"}, {"step": 9, "kind": "gate", "tags": ["Glycerin"], "meta": {"passed": true, "reasons": [], "drawer": {"inci_name": "Glycerin", "function": "Humectant. Draws water into the upper skin layers; improves slip and skin feel.", "typical_use_level": "2-5% in leave-on products, up to 10% in rinse-off products.", "use_level_pct": 5.5, "phase_and_solubility": "Water phase (Phase A). Fully water-soluble; add before heating.", "ph_range": "Stable across pH 3-9.", "compatibility": "Compatible with most surfactants, gums and preservatives. High levels (>10%) can feel tacky.", "safety_notes": "Widely used; low irritation potential at normal use levels.", "sources": ["catalogue_lookup", "read_supplier_page:https://supplier.example/glycerin"]}}, "at": "2026-09-07T09:28:33+00:00"}, {"step": 10, "kind": "run_end", "tags": ["Glycerin"], "meta": {"ok": true, "model_calls": 4}, "at": "2026-09-07T09:28:33+00:00"}]}, "banned": {"label": "Methylisothiazolinone — banned, agent refuses", "run_id": "methylisothiazolinone-scripted", "events": [{"step": 1, "kind": "request", "tags": ["Methylisothiazolinone"], "meta": {"text": "Research the ingredient: Methylisothiazolinone", "tools": ["catalogue_lookup", "fill_drawer", "read_supplier_page"]}, "at": "2026-09-07T09:28:34+00:00"}, {"step": 2, "kind": "model_reply", "tags": ["Methylisothiazolinone"], "meta": {"step": 1, "stop_reason": "tool_use", "text": "I'll start by looking up Methylisothiazolinone in the catalogue.", "tool_calls": ["catalogue_lookup"]}, "at": "2026-09-07T09:28:34+00:00"}, {"step": 3, "kind": "tool_call", "tags": ["Methylisothiazolinone"], "meta": {"tool": "catalogue_lookup", "input": {"inci": "Methylisothiazolinone"}, "ok": true, "output": "{\n  \"inci\": \"Methylisothiazolinone\",\n  \"function\": \"preservative\",\n  \"use_level_min\": 0.0,\n  \"use_level_max\": 0.0,\n  \"phase\": \"C (cool-down)\",\n  \"solubility\": \"water-soluble\",\n  \"ph_range\": \"n/a\",\n  \""}, "at": "2026-09-07T09:28:34+00:00"}, {"step": 4, "kind": "model_reply", "tags": ["Methylisothiazolinone"], "meta": {"step": 2, "stop_reason": "end_turn", "text": "Methylisothiazolinone is banned in Formulaite; I will not fill a drawer for it.", "tool_calls": []}, "at": "2026-09-07T09:28:34+00:00"}, {"step": 5, "kind": "final_text", "tags": ["Methylisothiazolinone"], "meta": {"text": "Methylisothiazolinone is banned in Formulaite; I will not fill a drawer for it."}, "at": "2026-09-07T09:28:34+00:00"}, {"step": 6, "kind": "run_end", "tags": ["Methylisothiazolinone"], "meta": {"ok": false, "model_calls": 2}, "at": "2026-09-07T09:28:34+00:00"}]}, "unknown": {"label": "Unobtainium — not in catalogue, honest stop", "run_id": "unobtainium-scripted", "events": [{"step": 1, "kind": "request", "tags": ["Unobtainium"], "meta": {"text": "Research the ingredient: Unobtainium", "tools": ["catalogue_lookup", "fill_drawer", "read_supplier_page"]}, "at": "2026-09-07T09:28:33+00:00"}, {"step": 2, "kind": "model_reply", "tags": ["Unobtainium"], "meta": {"step": 1, "stop_reason": "tool_use", "text": "I'll start by looking up Unobtainium in the catalogue.", "tool_calls": ["catalogue_lookup"]}, "at": "2026-09-07T09:28:33+00:00"}, {"step": 3, "kind": "tool_call", "tags": ["Unobtainium"], "meta": {"tool": "catalogue_lookup", "input": {"inci": "Unobtainium"}, "ok": true, "output": "ERROR: 'Unobtainium' is not in the catalogue. Known: coco-glucoside, glycerin, methylisothiazolinone, phenoxyethanol, xanthan gum"}, "at": "2026-09-07T09:28:33+00:00"}, {"step": 4, "kind": "model_reply", "tags": ["Unobtainium"], "meta": {"step": 2, "stop_reason": "end_turn", "text": "The catalogue does not know 'Unobtainium'. I cannot fill the drawer: ERROR: 'Unobtainium' is not in the catalogue. Known: coco-glucoside, glycerin, methylisothiazolinone, phenoxyethanol, xanthan gum", "tool_calls": []}, "at": "2026-09-07T09:28:33+00:00"}, {"step": 5, "kind": "final_text", "tags": ["Unobtainium"], "meta": {"text": "The catalogue does not know 'Unobtainium'. I cannot fill the drawer: ERROR: 'Unobtainium' is not in the catalogue. Known: coco-glucoside, glycerin, methylisothiazolinone, phenoxyethanol, xanthan gum"}, "at": "2026-09-07T09:28:33+00:00"}, {"step": 6, "kind": "run_end", "tags": ["Unobtainium"], "meta": {"ok": false, "model_calls": 2}, "at": "2026-09-07T09:28:33+00:00"}]}};
+
+/* ---------- section 02: file tiles ---------- */
+const FILES = [
+  ["glassbox.py","Flight recorder","@dataclass · *tags/**meta · generator · @property","Records every event. Without it the loop is a black box; with it every run can be replayed."],
+  ["tools.py","The hands","class + __call__ · decorator · *args/**kwargs · lambda","Turns a Python function into something the model can ask for, and produces the exact API shape."],
+  ["drawer.py","The target","dataclass as schema · @classmethod · comprehensions","The fixed sections the agent must fill. Doubles as the JSON schema for the answer tool."],
+  ["gates.py","The judge","functions as values · frozen dataclass · keyword-only · walrus","Plain-Python checks. PASS or FAIL with reasons. Never guesses."],
+  ["formulaite_tools.py","The three tools","@registry.tool · @lru_cache","catalogue_lookup, read_supplier_page, and fill_drawer (the ‘I'm done’ tool)."],
+  ["memory.py","Working memory","a small wrapper class","The message list the model sees every call — that IS the agent's memory."],
+  ["models.py","The brain socket","Protocol · two implementations","One interface, two brains: ScriptedModel (offline) and ClaudeModel (anthropic SDK)."],
+  ["agent.py","The loop","composition · for/else","Think → act → gate → repeat, with a budget. Owns no clever logic; it coordinates."],
+  ["__main__.py","The runner","argparse · consuming a generator","python3 -m agent_lab Glycerin — prints the replay and the drawer."],
+];
+const ft = document.getElementById('fileTiles');
+FILES.forEach((f,i)=>{
+  const d=document.createElement('div'); d.className='tile';
+  d.innerHTML=`<b>${i+1}. ${f[0]}</b><span>${f[1]}</span><small>${f[2]}</small>`;
+  d.onclick=()=>{[...ft.children].forEach(c=>c.classList.remove('on')); d.classList.add('on');
+    document.getElementById('fileNote').innerHTML=`<strong>${f[0]}</strong> — ${f[3]}`;};
+  ft.appendChild(d);
+});
+
+/* ---------- section 04: replay ---------- */
+const EXPLAIN = {
+  request: e => ({
+    what: `The user asks for “${e.meta.text.split(': ')[1]}”.`,
+    why: `The agent writes the request into working memory and lists the tool menu it will offer the model: ${e.meta.tools.join(', ')}. The model can never do anything that is not on this menu.`,
+    code: `box.<b>log</b>("request", inci, text=request, tools=self.tools.names)\n<span class="c"># "request" → kind · inci → *tags · text=, tools= → **meta</span>`,
+    tags: ["*args / **kwargs","GlassBox.log"]
+  }),
+  model_reply: e => ({
+    what: e.meta.tool_calls.length ? `Model call ${e.meta.step}: it asks for <b>${e.meta.tool_calls.join(', ')}</b>.` : `Model call ${e.meta.step}: it answers in prose and stops.`,
+    why: e.meta.tool_calls.length
+      ? `The reply's stop_reason is <code>${e.meta.stop_reason}</code>. The model said: “${e.meta.text}”. It cannot run anything itself — it hands the agent a tool_use block and waits.`
+      : `stop_reason is <code>${e.meta.stop_reason}</code>: no tool requested, so the loop treats this as the final answer. “${e.meta.text}”`,
+    code: `reply = self.model.<b>complete</b>(system=…, messages=convo.as_api(), tools=self.tools.to_api())\nif not reply.<b>tool_uses</b>:   <span class="c"># @property: [b for b in content if isinstance(b, ToolUseBlock)]</span>\n    break`,
+    tags: ["Protocol (ModelClient)","@property","list comprehension"]
+  }),
+  tool_call: e => ({
+    what: `The agent runs <b>${e.meta.tool}</b> with ${JSON.stringify(e.meta.input)}.`,
+    why: `The model's JSON input is unpacked into keyword arguments with <code>**</code>. The result (${e.meta.ok ? 'ok' : 'ERROR'}) goes back to the model as a tool_result that echoes the tool_use id — that is the API contract. Output starts: “${e.meta.output.slice(0,90)}…”`,
+    code: `output = self.tools.<b>call</b>(call.name, <b>**</b>call.input)\n<span class="c"># ToolRegistry.call(name, *args, **kwargs) → self._tools[name](*args, **kwargs)</span>\n<span class="c"># the tool was registered with  @registry.tool(description=…)</span>`,
+    tags: ["** unpacking","decorator","class with __call__"]
+  }),
+  gate: e => ({
+    what: e.meta.passed ? `Gate <b>PASS</b> — the drawer is accepted.` : `Gate <b>FAIL</b> — “${e.meta.reasons.join('; ')}”.`,
+    why: e.meta.passed
+      ? `All six checks returned no reason. The agent sends “ACCEPTED” back as the tool_result and breaks out of the loop. use_level_pct is ${e.meta.drawer.use_level_pct}%, sources: ${e.meta.drawer.sources.length}.`
+      : `A check returned a reason, so the verdict is FAIL. The reasons go back to the model as an <code>is_error</code> tool_result and the loop continues. The model never sees the catalogue range directly — only this feedback.`,
+    code: `verdict = <b>run_gates</b>(drawer, <b>*</b>, catalogue_entry=entry)   <span class="c"># keyword-only after *</span>\nreasons = [r for check in checks if (<b>r :=</b> check(drawer, entry)) is not None]\nreturn GateVerdict(passed=not reasons, reasons=tuple(reasons))   <span class="c"># frozen dataclass</span>`,
+    tags: ["keyword-only params","walrus :=","frozen dataclass","functions as values"]
+  }),
+  final_text: e => ({
+    what: `The agent returns a sentence instead of a drawer.`,
+    why: `“${e.meta.text}” — refusal (banned) and honesty (unknown) are legal outcomes. The RunResult has drawer=None and ok=False, and the caller can tell the difference from the trace.`,
+    code: `if not reply.tool_uses:\n    final_text = reply.text\n    box.log("final_text", inci, text=final_text)\n    <b>break</b>`,
+    tags: ["early exit","honest failure"]
+  }),
+  budget_exhausted: e => ({
+    what: `Step budget hit (${e.meta.max_steps}).`,
+    why: `The for-loop finished without a break, so its <code>else</code> clause ran. A budget is a circuit breaker, not a design — but every loop needs one.`,
+    code: `for step in range(1, self.max_steps + 1):\n    …\n<b>else</b>:   <span class="c"># runs only if the loop was NOT broken out of</span>\n    box.log("budget_exhausted", inci, max_steps=self.max_steps)`,
+    tags: ["for / else"]
+  }),
+  run_end: e => ({
+    what: `Run over — ok=${e.meta.ok}, ${e.meta.model_calls} model call${e.meta.model_calls===1?'':'s'}.`,
+    why: `The agent hands back a RunResult (a dataclass) holding the drawer, the verdict and the Glass Box. Printing the trace is a for-loop over <code>box.replay()</code>, which yields one event at a time.`,
+    code: `return <b>RunResult</b>(request=…, drawer=drawer, verdict=verdict, glassbox=box)\n\nfor event in box.<b>replay</b>():      <span class="c"># generator: yield event</span>\n    print(event.as_line())`,
+    tags: ["dataclass","generator (yield)"]
+  }),
+};
+
+const NODES = {
+  request: {nodes:['n-user','n-agent'], edges:['e-user-agent']},
+  model_reply: {nodes:['n-agent','n-model'], edges:['e-agent-model','e-model-agent']},
+  tool_call: {nodes:['n-agent','n-tools'], edges:['e-agent-tools','e-tools-agent']},
+  gate: {nodes:['n-agent','n-gate'], edges:['e-agent-gate']},
+  final_text: {nodes:['n-agent','n-user'], edges:['e-agent-user']},
+  budget_exhausted: {nodes:['n-agent'], edges:[]},
+  run_end: {nodes:['n-agent'], edges:[]},
+};
+
+let cur = null, idx = 0, timer = null;
+const $ = id => document.getElementById(id);
+const played = new Set();
+
+function clearLights(){
+  document.querySelectorAll('.node').forEach(n=>n.classList.remove('lit','pass','fail'));
+  document.querySelectorAll('.edge').forEach(n=>n.classList.remove('lit','lit2'));
+  document.querySelectorAll('.elabel').forEach(n=>n.classList.remove('lit'));
+}
+function light(e){
+  clearLights();
+  const m = NODES[e.kind] || NODES.run_end;
+  m.nodes.forEach(n=>$(n).classList.add('lit'));
+  m.edges.forEach(x=>{$(x).classList.add('lit'); const l=$('l'+x.slice(1)); if(l) l.classList.add('lit');});
+  $('n-box').classList.add('lit');
+  if(e.kind==='gate'){
+    $('n-gate').classList.remove('lit'); $('n-gate').classList.add(e.meta.passed?'pass':'fail');
+    $('gateVerdict').textContent = e.meta.passed ? 'PASS' : 'FAIL ↩ reasons';
+    if(e.meta.passed){ $('e-gate-drawer').classList.add('lit'); $('n-drawer').classList.add('pass'); }
+    else { $('e-gate-model').classList.add('lit2'); $('l-gate-model').classList.add('lit'); }
+  } else { $('gateVerdict').textContent='PASS / FAIL'; }
+  if(e.kind==='run_end' && e.meta.ok){ $('n-drawer').classList.add('pass'); }
+  $('agentStep').textContent = e.kind==='model_reply' ? `model call ${e.meta.step}` : (e.kind==='run_end' ? 'done' : `event ${e.step}`);
+}
+function lineHTML(e){
+  const kcls = e.kind==='gate' ? (e.meta.passed?'k pass':'k') : (e.kind==='tool_call'?'k blue':'k');
+  const meta = Object.entries(e.meta).map(([k,v])=>{let s=typeof v==='string'?v:JSON.stringify(v); s=s.replace(/\s+/g,' '); if(s.length>64) s=s.slice(0,63)+'…'; return `${k}=${s}`;}).join(', ');
+  return `[${String(e.step).padStart(2,'0')}] <span class="${kcls}">${e.kind.padEnd(12)}</span> ${e.tags.map(t=>'#'+t).join(' ')} ${meta}`;
+}
+function render(){
+  const log=$('log'); log.innerHTML='';
+  cur.events.slice(0,idx).forEach((e,i)=>{const d=document.createElement('div'); d.className='ln'+(i===idx-1?' cur':''); d.innerHTML=lineHTML(e); log.appendChild(d);});
+  log.scrollTop=log.scrollHeight;
+  $('stepCount').textContent = `${idx} / ${cur.events.length} events`;
+  if(idx===0){ clearLights(); $('explain').innerHTML='<h4>What happened</h4><div class="what">Press PLAY or STEP.</div><div class="why">Each event lights the part of the diagram that produced it.</div>'; return; }
+  const e=cur.events[idx-1]; light(e);
+  const x=(EXPLAIN[e.kind]||EXPLAIN.run_end)(e);
+  $('explain').innerHTML=`<h4>What happened · event ${e.step} · ${e.kind}</h4><div class="what">${x.what}</div><h4>Why</h4><div class="why">${x.why}</div><h4>Python construct that did it</h4><pre>${x.code}</pre>${x.tags.map(t=>`<span class="tag">${t}</span>`).join('')}`;
+  if(idx===cur.events.length) addRow();
+}
+function step(){ if(!cur) return; if(idx<cur.events.length){ idx++; render(); } if(idx>=cur.events.length) stopPlay(); }
+function play(){ if(!cur) return; if(idx>=cur.events.length){ idx=0; } stopPlay(); timer=setInterval(step, 1500); $('btnPlay').textContent='❚❚ PAUSE'; $('btnPlay').onclick=stopPlay; }
+function stopPlay(){ if(timer){clearInterval(timer); timer=null;} $('btnPlay').textContent='▶ PLAY'; $('btnPlay').onclick=play; }
+function reset(){ stopPlay(); idx=0; if(cur) render(); }
+function select(key){
+  stopPlay(); cur=RUNS[key]; cur.key=key; idx=0;
+  [...$('scenarioTiles').querySelectorAll('button')].forEach(b=>b.classList.toggle('on', b.dataset.key===key));
+  $('runId').textContent = cur.run_id + '.json';
+  render();
+}
+function addRow(){
+  if(played.has(cur.key)) return; played.add(cur.key);
+  const ev=cur.events, mc=ev.filter(e=>e.kind==='model_reply').length, tc=ev.filter(e=>e.kind==='tool_call').length;
+  const gates=ev.filter(e=>e.kind==='gate').map(e=>e.meta.passed?'PASS':'FAIL').join(' → ')||'—';
+  const end=ev[ev.length-1]; const ok=end.meta.ok;
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td>${cur.label}</td><td class="mono"><div class="barrow"><i style="width:${ev.length*14}px"></i>${ev.length}</div></td><td class="mono"><div class="barrow"><i class="b" style="width:${mc*14}px"></i>${mc}</div></td><td class="mono"><div class="barrow"><i class="g" style="width:${tc*14}px"></i>${tc}</div></td><td class="mono">${gates}</td><td>${ok?'drawer accepted':'stopped honestly, no drawer'}</td>`;
+  $('cmp').querySelector('tbody').appendChild(tr);
+}
+Object.entries(RUNS).forEach(([k,r])=>{const b=document.createElement('button'); b.dataset.key=k; b.textContent=r.label; b.onclick=()=>select(k); $('scenarioTiles').appendChild(b);});
+$('btnPlay').onclick=play; $('btnStep').onclick=step; $('btnReset').onclick=reset;
+select('fail_first');
+
+/* ---------- section 06: cheat sheets ---------- */
+const CS = [
+ {name:"*args / **kwargs", pic:`<svg viewBox="0 0 250 150"><text x="8" y="16">log("gate", "glycerin", "retry", passed=False)</text>
+   <rect x="10" y="30" width="105" height="34" rx="8" fill="#d97757"/><text x="62" y="51" text-anchor="middle">"glycerin", "retry"</text>
+   <rect x="135" y="30" width="105" height="34" rx="8" fill="#6a9bcc"/><text x="187" y="51" text-anchor="middle">passed=False</text>
+   <path d="M62,64 L62,92" stroke="#141413" stroke-width="1.5"/><path d="M187,64 L187,92" stroke="#141413" stroke-width="1.5"/>
+   <rect x="10" y="95" width="105" height="40" rx="8" fill="#e8e6dc" stroke="#d9d7cc"/><text class="m" x="62" y="112" text-anchor="middle">*tags → tuple</text><text class="m" x="62" y="127" text-anchor="middle">("glycerin","retry")</text>
+   <rect x="135" y="95" width="105" height="40" rx="8" fill="#e8e6dc" stroke="#d9d7cc"/><text class="m" x="187" y="112" text-anchor="middle">**meta → dict</text><text class="m" x="187" y="127" text-anchor="middle">{"passed": False}</text></svg>`,
+  line:`def log(self, kind, <b>*tags</b>, <b>**meta</b>): ...\nbox.log("gate", "glycerin", "retry", passed=False)`,
+  read:"“kind is the first thing; then gather any loose extra values into a tuple called tags; then gather any name=value pairs into a dict called meta.”",
+  why:"A trace recorder cannot know in advance which fields an event needs. One flexible signature covers every event kind. The same trick — <code>fn(*args, **kwargs)</code> — lets a wrapper forward whatever it receives (see <code>Tool.__call__</code>).",
+  gotcha:"The names are convention. The stars do the work: one star collects positionals, two stars collect keywords. On the <em>calling</em> side the stars do the reverse — <code>call(**model_input)</code> unpacks a dict into keyword arguments."},
+ {name:"class & __init__", pic:`<svg viewBox="0 0 250 150"><rect x="10" y="10" width="110" height="60" rx="8" fill="#e8e6dc" stroke="#141413" stroke-dasharray="4 3"/><text x="65" y="32" text-anchor="middle">class GlassBox</text><text class="m" x="65" y="50" text-anchor="middle">blueprint: log, replay</text>
+   <path d="M120,40 L150,25 M120,40 L150,75" stroke="#141413" stroke-width="1.5"/>
+   <rect x="150" y="10" width="90" height="30" rx="8" fill="#d97757"/><text x="195" y="29" text-anchor="middle">box_a (3 events)</text>
+   <rect x="150" y="60" width="90" height="30" rx="8" fill="#d97757"/><text x="195" y="79" text-anchor="middle">box_b (10 events)</text>
+   <text class="m" x="10" y="115">GlassBox("run-1")  → calls __init__</text><text class="m" x="10" y="132">box.log(...)       → self = that box</text></svg>`,
+  line:`class GlassBox:\n    def __init__(self, run_id):\n        self.run_id = run_id\n        self._events = []\n    def log(self, kind, *tags, **meta): ...`,
+  read:"“A GlassBox is a thing that remembers its run_id and its events, and knows how to log and replay.” <code>self</code> is ‘this particular box’.",
+  why:"Classes bundle data with the functions that belong to it. The agent is built from four such objects (model, tools, glassbox, gate) — composition — so each can be swapped alone.",
+  gotcha:"Never share mutable defaults: <code>self._events = []</code> inside <code>__init__</code> gives each box its own list. A class-level <code>events = []</code> would be shared by every box."},
+ {name:"@dataclass", pic:`<svg viewBox="0 0 250 150"><text x="8" y="16">@dataclass class Event:</text>
+   <rect x="10" y="26" width="230" height="72" rx="8" fill="#e8e6dc" stroke="#d9d7cc"/>
+   <text class="m" x="20" y="45">step: int</text><text class="m" x="20" y="61">kind: str</text><text class="m" x="20" y="77">tags: tuple = ()</text><text class="m" x="20" y="93">meta: dict = field(default_factory=dict)</text>
+   <rect x="10" y="108" width="230" height="30" rx="8" fill="#788c5d"/><text x="125" y="127" text-anchor="middle" fill="#141413">Python writes __init__ __repr__ __eq__ for you</text></svg>`,
+  line:`@dataclass(frozen=True)\nclass GateVerdict:\n    passed: bool\n    reasons: tuple[str, ...] = ()`,
+  read:"“A GateVerdict is a record with a passed flag and reasons; make it, print it, compare it — and never let anyone change it.”",
+  why:"Records are everywhere in an agent: events, blocks, drawers, verdicts. A dataclass says ‘this is data’ in one line and removes the boilerplate that hides bugs.",
+  gotcha:"<code>meta: dict = {}</code> is wrong (shared by all instances). Use <code>field(default_factory=dict)</code>. And JSON has no tuples — <code>GlassBox.load</code> restores them by hand."},
+ {name:"decorator", pic:`<svg viewBox="0 0 250 150"><rect x="70" y="55" width="110" height="40" rx="8" fill="#e8e6dc" stroke="#d9d7cc"/><text x="125" y="79" text-anchor="middle">def catalogue_lookup</text>
+   <rect x="40" y="35" width="170" height="80" rx="12" fill="none" stroke="#d97757" stroke-width="3"/><text class="m" x="125" y="28" text-anchor="middle">@registry.tool(description=…)</text>
+   <text class="m" x="125" y="135" text-anchor="middle">→ wrapped in Tool, registered, returned</text></svg>`,
+  line:`@registry.tool(description="Look up an ingredient")\ndef catalogue_lookup(inci: str): ...\n<span class="c"># same as: catalogue_lookup = registry.tool(description=…)(catalogue_lookup)</span>`,
+  read:"“Define this function, then hand it to registry.tool, which gives back a Tool and keeps a copy in the menu.”",
+  why:"Registering tools at definition time keeps the menu next to the code. Anthropic's SDK uses the identical idea: <code>@beta_tool</code>. <code>@lru_cache</code> and <code>@property</code> are decorators too.",
+  gotcha:"<code>registry.tool(...)</code> with parentheses is a <em>factory</em> that returns the real decorator. Forget the parentheses and you decorate with the factory itself."},
+ {name:"generator (yield)", pic:`<svg viewBox="0 0 250 150"><rect x="10" y="60" width="230" height="14" rx="4" fill="#e8e6dc"/>
+   <rect x="20" y="40" width="34" height="34" rx="6" fill="#d97757"/><text x="37" y="61" text-anchor="middle">e1</text>
+   <rect x="64" y="40" width="34" height="34" rx="6" fill="#e8e6dc" stroke="#d9d7cc"/><text x="81" y="61" text-anchor="middle">e2</text>
+   <rect x="108" y="40" width="34" height="34" rx="6" fill="#e8e6dc" stroke="#d9d7cc"/><text x="125" y="61" text-anchor="middle">e3</text>
+   <text class="m" x="160" y="61">… one at a time</text>
+   <text class="m" x="10" y="105">for event in box.replay():</text><text class="m" x="10" y="122">    print(event)   # asks for the next one</text></svg>`,
+  line:`def replay(self):\n    for event in self._events:\n        <b>yield</b> event`,
+  read:"“Hand back one event, pause, and continue from here when asked for the next.”",
+  why:"Replaying a trace, streaming tokens, walking CSV rows: all ‘one at a time’ jobs. A generator never builds the whole list, and the consumer can stop early.",
+  gotcha:"Calling <code>box.replay()</code> does nothing until you iterate. And a generator is used up after one pass — call it again for a second loop."},
+ {name:"lambda & comprehensions", pic:`<svg viewBox="0 0 250 150"><text x="8" y="16">[b for b in content if isinstance(b, ToolUseBlock)]</text>
+   <rect x="10" y="30" width="40" height="26" rx="5" fill="#6a9bcc"/><text x="30" y="47" text-anchor="middle">text</text>
+   <rect x="58" y="30" width="40" height="26" rx="5" fill="#d97757"/><text x="78" y="47" text-anchor="middle">tool</text>
+   <rect x="106" y="30" width="40" height="26" rx="5" fill="#6a9bcc"/><text x="126" y="47" text-anchor="middle">text</text>
+   <rect x="154" y="30" width="40" height="26" rx="5" fill="#d97757"/><text x="174" y="47" text-anchor="middle">tool</text>
+   <path d="M20,70 L230,70" stroke="#141413" stroke-width="1.5" stroke-dasharray="3 3"/><text class="m" x="125" y="86" text-anchor="middle">sieve: keep only ToolUseBlocks</text>
+   <rect x="58" y="98" width="40" height="26" rx="5" fill="#d97757"/><text x="78" y="115" text-anchor="middle">tool</text>
+   <rect x="106" y="98" width="40" height="26" rx="5" fill="#d97757"/><text x="126" y="115" text-anchor="middle">tool</text>
+   <text class="m" x="8" y="143">sorted(tools, key=lambda t: t.name)  ← lambda = sticky-note function</text></svg>`,
+  line:`tool_uses = [b for b in reply.content if isinstance(b, ToolUseBlock)]\nsorted(self._tools.values(), key=<b>lambda</b> t: t.name)`,
+  read:"Comprehension: “make a list of each b in content, but only the ToolUseBlocks.” Lambda: “a tiny nameless function: given t, return t.name.”",
+  why:"Filtering blocks, collecting gate reasons, picking sort keys — small transformations that would otherwise need a four-line loop each.",
+  gotcha:"Read a comprehension left to right as English: <em>what</em> to keep, <em>from where</em>, <em>under what condition</em>. If it needs two ifs and a nested loop, write a normal loop instead."},
+ {name:"Protocol (interface)", pic:`<svg viewBox="0 0 250 150"><rect x="20" y="30" width="90" height="90" rx="10" fill="#e8e6dc" stroke="#141413"/><text x="65" y="55" text-anchor="middle">Agent</text><rect x="95" y="60" width="20" height="30" fill="#faf9f5" stroke="#141413"/><text class="m" x="65" y="105" text-anchor="middle">needs .complete()</text>
+   <rect x="150" y="20" width="85" height="40" rx="8" fill="#d97757"/><text x="192" y="44" text-anchor="middle">ScriptedModel</text>
+   <rect x="150" y="90" width="85" height="40" rx="8" fill="#6a9bcc"/><text x="192" y="114" text-anchor="middle">ClaudeModel</text>
+   <path d="M150,40 L118,70 M150,110 L118,80" stroke="#141413" stroke-width="1.5"/></svg>`,
+  line:`class ModelClient(<b>Protocol</b>):\n    def complete(self, *, system, messages, tools) -> ModelReply: ...`,
+  read:"“Anything with a complete() method shaped like this counts as a ModelClient.” No inheritance needed.",
+  why:"The agent depends on the socket, not the vendor. That is why one flag swaps a free scripted brain for real Claude without touching agent.py.",
+  gotcha:"A Protocol is a promise, not a check at runtime. The tests are what prove both brains keep it (the fake-client test in <code>tests/</code>)."},
+ {name:"keyword-only & walrus", pic:`<svg viewBox="0 0 250 150"><text x="8" y="16">run_gates(drawer, *, catalogue_entry=entry)</text>
+   <rect x="10" y="28" width="70" height="28" rx="6" fill="#e8e6dc" stroke="#d9d7cc"/><text x="45" y="46" text-anchor="middle">drawer</text>
+   <rect x="90" y="28" width="20" height="28" rx="6" fill="#d97757"/><text x="100" y="46" text-anchor="middle">*</text>
+   <rect x="120" y="28" width="120" height="28" rx="6" fill="#e8e6dc" stroke="#d9d7cc"/><text x="180" y="46" text-anchor="middle">catalogue_entry=…</text>
+   <text class="m" x="10" y="78">everything after * must be named</text>
+   <text x="8" y="105">if (reason := check(drawer, entry)) is not None:</text>
+   <text class="m" x="10" y="125">:= assigns AND tests in one breath</text><text class="m" x="10" y="141">(the check runs once, not twice)</text></svg>`,
+  line:`def run_gates(drawer, <b>*</b>, catalogue_entry=None, checks=DEFAULT_CHECKS): ...\nreasons = [r for check in checks if (<b>r :=</b> check(drawer, entry)) is not None]`,
+  read:"Star: “after this point, callers must write the name.” Walrus: “run the check, call its answer r, and keep r if it is not None.”",
+  why:"Keyword-only stops the classic ‘arguments in the wrong order’ bug in functions with several similar parameters. The walrus avoids calling each check twice.",
+  gotcha:"The walrus needs its own parentheses inside an <code>if</code>. If it makes a line hard to read, use a plain loop — readability wins."},
+];
+const tabs=$('csTabs'), panels=$('csPanels');
+CS.forEach((c,i)=>{
+  const b=document.createElement('button'); b.textContent=c.name; b.onclick=()=>show(i); tabs.appendChild(b);
+  const p=document.createElement('div'); p.className='cs';
+  p.innerHTML=`<div class="pic">${c.pic}</div><h3>${c.name}</h3><pre>${c.line}</pre><p class="read">${c.read}</p><p><strong>Why the lab uses it:</strong> ${c.why}</p><div class="gotcha"><strong>The trap:</strong> ${c.gotcha}</div>`;
+  panels.appendChild(p);
+});
+function show(i){ [...tabs.children].forEach((b,j)=>b.classList.toggle('on',i===j)); [...panels.children].forEach((p,j)=>p.classList.toggle('on',i===j)); }
+show(0);
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "agent-tech-desk",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-09-07",
+  "observability": { "enabled": true },
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page"
+  }
+  // After deploy, to use Cloudflare's own Llama instead of Groq, add:
+  //   "ai": { "binding": "AI" }
+  // The worker prefers GROQ_API_KEY, then AI, then the offline mock.
+}

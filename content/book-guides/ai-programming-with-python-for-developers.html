@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+</head>
+<body>
+<title>AI Programming with Python for Developers</title>
+<style>
+:root{color-scheme:light;
+ --surface:#faf9f5;--surface-2:#f2f0e9;--surface-3:#e8e6dc;--surface-ink:#141413;--line:#d9d7cc;--line-soft:#e8e6dc;
+ --ink:#141413;--ink-2:#5c5b57;--ink-3:#6b6a65;--on-ink:#faf9f5;
+ --accent:#d97757;--accent-2:#6a9bcc;--accent-3:#788c5d;
+ --font-head:"Poppins",Arial,sans-serif;--font-body:"Lora",Georgia,serif;--font-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--surface);color:var(--ink-2);font-family:var(--font-body);font-size:17px;line-height:1.7}
+main{max-width:980px;margin:0 auto;padding:36px 22px 90px}
+h1,h2,h3,h4{font-family:var(--font-head);color:var(--ink);line-height:1.2;margin:0 0 10px;text-wrap:balance}
+h1{font-size:38px;letter-spacing:-.02em;font-weight:600}
+h2{font-size:25px;font-weight:600}
+h3{font-size:18px;font-weight:600}
+h4{font-size:15px;font-weight:600;margin-bottom:6px}
+p{margin:0 0 12px;max-width:70ch}
+strong{color:var(--ink)}
+a{color:var(--ink);text-decoration-color:var(--accent);text-underline-offset:3px}
+code,.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+code{font-size:.86em;background:var(--surface-3);padding:1px 5px;border-radius:5px;color:var(--ink)}
+pre{background:var(--surface-3);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-family:var(--font-mono);font-size:12.5px;line-height:1.6;color:var(--ink);overflow-x:auto;margin:8px 0 6px;white-space:pre}
+pre code{background:none;padding:0;font-size:inherit}
+section{margin-top:52px}
+.num{font-family:var(--font-mono);color:var(--ink-3);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px}
+.eyebrow{font-family:var(--font-mono);color:var(--ink-3);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase}
+.byline{font-family:var(--font-head);font-size:14px;color:var(--ink-3);margin:-4px 0 12px}
+.strip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0 10px}
+.strip div{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:13px 15px;font-size:15px}
+.strip b{display:block;font-family:var(--font-head);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
+.callout{border-left:3px solid var(--accent);background:var(--surface-2);border-radius:0 12px 12px 0;padding:12px 16px;margin:14px 0;font-size:15.5px}
+.callout.blue{border-color:var(--accent-2)}.callout.green{border-color:var(--accent-3)}
+.callout ol,.callout ul{margin:6px 0 0 18px;padding:0}.callout li{margin:4px 0}
+.callout p:last-child{margin-bottom:0}
+.chip{display:inline-block;font-family:var(--font-head);font-size:11px;font-weight:600;letter-spacing:.04em;border-radius:6px;padding:2px 8px;color:#141413;vertical-align:middle}
+.chip.foundation{background:var(--accent-3)}.chip.intermediate{background:var(--accent-2)}.chip.advanced{background:var(--accent)}
+.chip.ch{background:var(--surface-3);color:var(--ink-2);font-family:var(--font-mono);font-weight:500}
+.diagram{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:14px;margin:14px 0;overflow-x:auto}
+.diagram pre.mermaid{background:none;border:none;padding:0;margin:0;white-space:pre;overflow:visible;text-align:center}
+.diagram svg{max-width:100%;height:auto}
+/* ladder */
+.ladder{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0}
+.rung{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:16px 18px;cursor:pointer}
+.rung:hover{border-color:var(--accent)}
+.rung.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+.rung .lvl{font-family:var(--font-head);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.rung h3{margin:4px 0 6px}
+.rung p{font-size:14.5px;margin:0}
+.rung .time{font-family:var(--font-mono);font-size:12px;color:var(--ink-3);margin-top:8px}
+.rungbody{display:none;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-top:-2px}
+.rungbody.on{display:block}
+.rungbody ol{margin:6px 0 10px 20px;padding:0}.rungbody li{margin:5px 0}
+.meta{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-3)}
+/* chapter map */
+.chmap{border-top:1px solid var(--line);margin-top:10px}
+.chrow{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:start;padding:10px 6px;border-bottom:1px solid var(--line-soft);cursor:pointer}
+.chrow:hover{background:var(--surface-2)}
+.chrow .n{font-family:var(--font-mono);color:var(--ink-3);font-size:13px;padding-top:4px}
+.chrow b{font-family:var(--font-head);font-size:15px;color:var(--ink);display:block}
+.chrow span.adds{font-size:14.5px;color:var(--ink-2)}
+.chrow .secs{display:none;font-size:13.5px;color:var(--ink-3);margin-top:6px;font-family:var(--font-mono)}
+.chrow.on .secs{display:block}
+/* concepts */
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 6px}
+.tabs button{font-family:var(--font-head);font-weight:600;font-size:13.5px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:10px;padding:9px 14px;cursor:pointer}
+.tabs button:hover{border-color:var(--accent)}
+.tabs button.on{background:var(--accent);border-color:var(--accent);color:#141413}
+.tabs button .cnt{font-family:var(--font-mono);font-weight:500;font-size:12px;margin-left:6px;color:var(--ink-3)}
+.tabs button.on .cnt{color:#141413}
+.prog{display:flex;align-items:center;gap:10px;margin:8px 0 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-3)}
+.prog .bar{flex:1;height:9px;background:var(--surface-3);border-radius:0 4px 4px 0;overflow:hidden}
+.prog .bar i{display:block;height:100%;width:0;background:var(--accent-3);transition:width .25s}
+.panel{display:none}.panel.on{display:block}
+.concept{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;margin:10px 0;overflow:hidden}
+.concept.done{border-color:var(--accent-3)}
+.chead{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px 16px;cursor:pointer}
+.chead:hover{background:var(--surface-3)}
+.chead b{font-family:var(--font-head);font-size:15.5px;color:var(--ink)}
+.chead .idx{font-family:var(--font-mono);color:var(--ink-3);font-size:12px;margin-right:8px}
+.chead label{font-family:var(--font-head);font-size:12.5px;color:var(--ink-2);display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap}
+.chead input{width:16px;height:16px;accent-color:#788c5d}
+.cbody{display:none;padding:4px 16px 16px;border-top:1px solid var(--line-soft)}
+.concept.open .cbody{display:block}
+.cbody p{font-size:15.5px}
+.cbody .callout{margin:10px 0;font-size:14.5px}
+.cbody .note{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-3);margin:0 0 8px}
+.showall{margin:8px 0 0;font-family:var(--font-head);font-size:13px;color:var(--ink-3)}
+/* tables */
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin:8px 0 14px}
+th{font-family:var(--font-head);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:7px 8px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+td.t{font-family:var(--font-mono);font-size:13px;color:var(--ink);white-space:nowrap}
+.tablewrap{overflow-x:auto}
+.check{list-style:none;padding:0;margin:6px 0}
+.check li{display:flex;gap:10px;align-items:flex-start;padding:5px 0;font-size:15px}
+.check input{margin-top:5px;accent-color:#788c5d}
+.btn{font-family:var(--font-head);font-weight:600;font-size:13.5px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:10px;padding:8px 14px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.go{background:var(--accent);border-color:var(--accent);color:#141413}
+.cs-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:800px){.cs-grid,.strip,.ladder{grid-template-columns:1fr}.chrow{grid-template-columns:36px 1fr}.chrow .chip{grid-column:2}}
+details{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:12px 18px;margin-top:14px}
+summary{font-family:var(--font-head);font-weight:600;color:var(--ink);cursor:pointer}
+.quote{border-left:3px solid var(--accent-2);padding:4px 14px;margin:10px 0;font-style:italic;font-size:15.5px}
+.quote .who{display:block;font-style:normal;font-family:var(--font-mono);font-size:12px;color:var(--ink-3);margin-top:2px}
+.small{font-size:14px;color:var(--ink-3)}
+.toplinks{display:flex;flex-wrap:wrap;gap:8px 16px;font-family:var(--font-head);font-size:13.5px;margin:10px 0 0}
+.toplinks a{color:var(--ink-2)}
+@media print{
+ body{font-size:12px} main{padding:0;max-width:none}
+ body.printing main>*:not(#cheat){display:none} .btn,.toplinks{display:none}
+ pre{white-space:pre-wrap;font-size:10.5px} .cs-grid{grid-template-columns:1fr 1fr} section{margin-top:16px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+</style>
+<main>
+<header>
+ <span class="eyebrow">Formulaite bookshelf · book 4 of 14 · Real-world apps</span>
+ <h1>AI Programming with Python for Developers</h1>
+ <div class="byline">Henry Bill · 362 pages · 34 concept cards</div>
+ <p>A code-first path from one model call to a tested, traced, tool-using agent, where Python decides what the model is allowed to do.</p>
+ 
+ <div class="strip">
+  <div><b>Goal</b>By the end you can build a bounded ingredient-research agent that fills the Drawer through registered tools, passes a deterministic gate, records every step in the Glass Box, and is scored by an eval set before any prompt change ships.</div>
+  <div><b>Output</b>A build ladder (3 rungs), 9 chapters mapped, 34 concept cards you tick off, and a printable cheat sheet.</div>
+  <div><b>Time</b>Foundation ~20 min · Intermediate ~22 min · Advanced ~26 min. Whole guide ~80 min over several sittings.</div>
+ </div>
+ <div class="callout"><strong>How to drive this page.</strong>
+  <ol>
+   <li>Press <button class="btn go" id="openFirst" type="button">Open the first card</button> — it jumps to the Foundation cards and opens card 01.</li>
+   <li>Read one card, tick <strong>Got it</strong>, open the next. The bar shows your progress and remembers it on this browser.</li>
+   <li>When Foundation is done, do <strong>Rung 1</strong> of the build ladder before reading Intermediate. Print the cheat sheet from section 05.</li>
+  </ol>
+  <div class="toplinks"><a href="ai-programming-with-python-for-developers-cheatsheet.md">Cheat sheet as Markdown</a> · <a href="index.html">All nine guides</a></div>
+ </div>
+</header>
+
+<section id="s01">
+ <span class="num">01 · Where this is going</span>
+ <h2>The model decides what it would like to do; your application decides what it is actually allowed to do.</h2>
+ <p><strong>Read this book when:</strong> Open it when you are about to write the loop, the tool dispatcher or the gate yourself and want the plain Python version before any framework.</p>
+ <p>The one picture that holds the whole book. Every chapter adds a box or an arrow to it; nothing later replaces it.</p>
+ <div class="diagram"><pre class="mermaid">flowchart LR
+  A[Request] --&gt; B[Model decides]
+  B --&gt;|tool call| C[Validate and authorise]
+  C --&gt; D[Run tool]
+  D --&gt;|result| B
+  B --&gt;|fill drawer| E[Deterministic gate]
+  E --&gt;|pass| F[Drawer accepted]
+  E --&gt;|fail with reasons| B
+  B -.-&gt;|every step| G[Glass Box trace]</pre></div>
+</section>
+
+<section id="s02">
+ <span class="num">02 · Build ladder</span>
+ <h2>Three things to build, in order</h2>
+ <p>Each rung is a Formulaite feature. Click a rung for its steps. Do rung 1 after the Foundation cards, rung 2 after Intermediate, rung 3 after Advanced.</p>
+ <div class="ladder"><div class="rung on" data-rung="0" role="button" tabindex="0"><div class="lvl">Rung 1 · Simple</div><h3>Gated ingredient lookup</h3><p>One model call that returns a typed IngredientDrawer, checked by a plain-Python gate, tested with a fake model.</p><div class="time">~1 hour</div></div><div class="rung" data-rung="1" role="button" tabindex="0"><div class="lvl">Rung 2 · Intermediate</div><h3>Research loop with Glass Box</h3><p>A bounded loop that reads supplier pages, feeds gate failures back to the model, keeps state, and records every event.</p><div class="time">~half a day</div></div><div class="rung" data-rung="2" role="button" tabindex="0"><div class="lvl">Rung 3 · Advanced</div><h3>Evaluated, guarded, shareable agent</h3><p>The same agent with an eval set, allowlisted tools, approval before catalogue writes, cost caps, and an MCP door for other Formulaite agents.</p><div class="time">~2 days</div></div></div><div class="rungbody on" data-rung="0"><h4>Steps for rung 1: Gated ingredient lookup</h4><ol><li>Put the model call behind ModelClient.complete() in models.py.</li><li>Register catalogue_lookup with @registry.tool in formulaite_tools.py.</li><li>Make fill_drawer return an IngredientDrawer from drawer.py.</li><li>Run run_gates() on the drawer and print the reasons from gates.py.</li><li>Run the whole thing with ScriptedModel, no API key.</li></ol><div class="meta">Chapters 1, 2, 3 · Agent Lab files: <code>models.py</code> · <code>tools.py</code> · <code>drawer.py</code> · <code>gates.py</code> · ~1 hour</div></div><div class="rungbody" data-rung="1"><h4>Steps for rung 2: Research loop with Glass Box</h4><ol><li>Wire Agent.run() with max_steps and the for/else budget in agent.py.</li><li>Turn ToolError into an error tool_result in _handle_tool().</li><li>Keep Conversation trimmed in memory.py and the drawer as state in drawer.py.</li><li>Log request, model_reply, tool_call, gate and run_end events in glassbox.py.</li><li>Detect a repeated read_supplier_page call using GlassBox.of_kind().</li><li>Swap ScriptedModel for a local Ollama model behind the same Protocol.</li></ol><div class="meta">Chapters 4, 5, 7 · Agent Lab files: <code>agent.py</code> · <code>memory.py</code> · <code>glassbox.py</code> · <code>formulaite_tools.py</code> · ~half a day</div></div><div class="rungbody" data-rung="2"><h4>Steps for rung 3: Evaluated, guarded, shareable agent</h4><ol><li>Write evals/dataset.json: ingredient, expected supplier page, expected tools.</li><li>Add an eval runner that scores recall_at_k and gate pass rate per run.</li><li>Add ALLOWED_TOOLS per workflow and one adversarial supplier page test.</li><li>Pause with status awaiting_approval before any catalogue commit and save the GlassBox.</li><li>Add MAX_REQUEST_COST next to max_steps using Conversation.token_estimate().</li><li>Expose catalogue_lookup and read_supplier_page through one MCPServer.</li></ol><div class="meta">Chapters 6, 8, 9 · Agent Lab files: <code>gates.py</code> · <code>glassbox.py</code> · <code>tools.py</code> · <code>formulaite_tools.py</code> · <code>agent.py</code> · ~2 days</div></div>
+</section>
+
+<section id="s03">
+ <span class="num">03 · Chapter map</span>
+ <h2>What each chapter adds to the machine</h2>
+ <p>Colour = the level it belongs to. Click a chapter to see its sections.</p>
+ <div class="chmap"><div class="chrow" role="button" tabindex="0"><div class="n">1</div><div><b>Build Your First AI Application</b><span class="adds">A clean project, one client layer, an error boundary and tests that never call the model.</span><div class="secs">1.1 Setting Up a Python AI Project · 1.2 Connecting Python to AI Models · 1.3 Handling AI Responses and Errors · 1.4 Building an AI-Powered Application · 1.5 Testing the Application</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">2</div><div><b>Build LLM-Powered Applications</b><span class="adds">Reusable prompts, structured output validated by your own rules, and deterministic business logic around the model.</span><div class="secs">2.1 Designing Effective Model Requests · 2.2 Working with Structured Outputs · 2.3 Streaming and Managing Long Responses · 2.4 Connecting LLMs to Application Logic · 2.5 Build a Complete LLM Application</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">3</div><div><b>Build AI Applications with Tools</b><span class="adds">Tools the model can request, a dict dispatcher that executes them, and permissions plus approval around risky ones.</span><div class="secs">3.1 Designing AI Tools · 3.2 Implementing Function and Tool Calling · 3.3 Connecting External APIs and Services · 3.4 Securing and Controlling Tool Execution · 3.5 Build a Tool-Using AI Assistant</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">4</div><div><b>Build Production-Ready RAG Systems</b><span class="adds">Ingestion with metadata, retrieve-first generation with app-made citations, and a way to find which retrieval layer failed.</span><div class="secs">4.1 Process Documents for AI Retrieval · 4.2 Create Embeddings and Vector Search · 4.3 Build the RAG Pipeline · 4.4 Improve Retrieval Quality · 4.5 Build a Complete RAG Application</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">5</div><div><b>Build AI Agents</b><span class="adds">The bounded loop, explicit state, coded workflows, checkpoints, approval pauses and a coordinator for several agents.</span><div class="secs">5.1 Build the Agent Execution Loop · 5.2 Add State and Memory · 5.3 Build Multi-Step Agent Workflows · 5.4 Build and Coordinate Multiple Agents · 5.5 Build a Practical Autonomous Agent</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">6</div><div><b>Connect AI Systems with MCP</b><span class="adds">A standard door for tools, resources and prompts: thin servers over services, discovering clients, and the security MCP does not do for you.</span><div class="secs">6.1 Build Your First MCP Server · 6.2 Add MCP Tools, Resources, and Prompts · 6.3 Build an MCP Client · 6.4 Secure and Deploy MCP Integrations · 6.5 Build an MCP-Powered AI Application</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">7</div><div><b>Build with Local and Open AI Models</b><span class="adds">A Protocol so Ollama, vLLM or a fake can sit behind the same agent, plus fenced local tools and honest privacy claims.</span><div class="secs">7.1 Run AI Models Locally · 7.2 Build Applications with Ollama · 7.3 Serve Models with vLLM · 7.4 Connect Local Models to RAG and Agents · 7.5 Build a Private Local AI Application</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">8</div><div><b>Test, Evaluate, Secure, and Optimize AI Applications</b><span class="adds">Path-based tests, an eval dataset with a runner, request-id traces, allowlists against injection, and measure-one-change optimisation.</span><div class="secs">8.1 Test AI Components and Workflows · 8.2 Evaluate AI Quality · 8.3 Trace and Debug AI Applications · 8.4 Secure AI Applications · 8.5 Optimize Cost and Performance</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">9</div><div><b>Build and Deploy a Production AI System</b><span class="adds">Thin FastAPI routes over services, background jobs, containers, and an evaluation gate with versioning and rollback.</span><div class="secs">9.1 Design the Complete AI Architecture · 9.2 Build the AI Backend with FastAPI · 9.3 Containerize the Application · 9.4 Deploy, Monitor, and Maintain the System</div></div><span class="chip advanced">advanced</span></div></div>
+</section>
+
+<section id="s04">
+ <span class="num">04 · Concept cards</span>
+ <h2>Foundation → Intermediate → Advanced</h2>
+ <p>One idea per card: what it is, a picture for it, the code if there is any, the trap, and where it lives in Formulaite. Tick a card when you could explain it to someone else.</p>
+ <div class="tabs" id="ctabs"><button data-level="foundation" class="on">Foundation<span class="cnt">10 cards · ~20 min</span></button><button data-level="intermediate" class="">Intermediate<span class="cnt">11 cards · ~22 min</span></button><button data-level="advanced" class="">Advanced<span class="cnt">13 cards · ~26 min</span></button></div><div class="panel on" data-level="foundation"><div class="prog"><span class="lbl">Foundation</span><div class="bar"><i></i></div><span class="txt">0 / 10 got it</span></div><div class="concept" data-key="One client layer for the model"><div class="chead" role="button" tabindex="0"><div><span class="idx">01</span><b>One client layer for the model</b> <span class="chip ch">ch 1</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Put every model call in one small function like generate_text(). The rest of the app sends a string and gets a string back. Timeouts, retries, logging and the model name then live in one place. Nothing else needs to know which provider you use.</p><div class="callout blue"><strong>Picture it:</strong> It is the single tap in a lab. Every bench draws water from it, so you change the filter once, not at every bench.</div><pre><code>from openai import OpenAI
+from .config import get_api_key, get_model
+
+def create_client() -&gt; OpenAI:
+    return OpenAI(api_key=get_api_key(), timeout=30.0, max_retries=2)
+
+def generate_text(prompt: str) -&gt; str:
+    client = create_client()
+    response = client.responses.create(model=get_model(), input=prompt)
+    return response.output_text</code></pre><div class="note">The model name comes from config; timeout and retries sit on the client, not in every caller.</div><div class="callout"><strong>The trap:</strong> Creating a client in five different files, so one timeout change means five edits.</div><div class="callout green"><strong>In Formulaite:</strong> models.py: ClaudeModel.complete() is the single place the Agent Lab talks to Claude.</div></div></div><div class="concept" data-key="Translate errors at the boundary"><div class="chead" role="button" tabindex="0"><div><span class="idx">02</span><b>Translate errors at the boundary</b> <span class="chip ch">ch 1</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A model request is a network call and it can fail. Catch the provider&#x27;s errors in the client layer and re-raise one app error with from exc. Never swallow an unexpected error and return an empty string. That hides the real problem.</p><div class="callout blue"><strong>Picture it:</strong> A receptionist turns &#x27;ERR 503 upstream&#x27; into &#x27;the lab is closed today&#x27; but keeps the original note on file.</div><pre><code>from openai import APIError, APITimeoutError, RateLimitError
+def generate_text(prompt: str) -&gt; str:
+    client = create_client()
+    try:
+        response = client.responses.create(model=get_model(), input=prompt)
+        return response.output_text
+    except APITimeoutError as exc:
+        raise RuntimeError(&quot;The model request timed out.&quot;) from exc
+    except RateLimitError as exc:
+        raise RuntimeError(&quot;The model service rate limit was reached.&quot;) from exc
+    except APIError as exc:
+        raise RuntimeError(f&quot;Model request failed: {exc}&quot;) from exc</code></pre><div class="note">from exc keeps the original cause attached for debugging.</div><div class="callout"><strong>The trap:</strong> except Exception: return &quot;&quot; makes an outage look like a model with nothing to say.</div><div class="callout green"><strong>In Formulaite:</strong> tools.py: ToolError is the one error type tools raise; agent.py turns it into an error tool_result instead of crashing.</div></div></div><div class="concept" data-key="Dependency injection by argument"><div class="chead" role="button" tabindex="0"><div><span class="idx">03</span><b>Dependency injection by argument</b> <span class="chip ch">ch 1</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Pass the thing a function needs as an argument instead of importing it. summarize_document(text, generator) does not care if generator is OpenAI, Ollama or a fake. No framework is needed. A plain Python parameter is enough.</p><div class="callout blue"><strong>Picture it:</strong> A recipe says &#x27;add your emollient of choice&#x27; rather than naming one brand. You swap it without rewriting the recipe.</div><pre><code>def summarize_document(text: str, generator) -&gt; str:
+    if not text.strip():
+        raise ValueError(&quot;Document cannot be empty.&quot;)
+    prompt = f&quot;&quot;&quot;
+    Summarize the following document in five concise bullet points.
+    Document: {text}
+    &quot;&quot;&quot;
+    return generator(prompt)
+
+summary = summarize_document(document, generate_text)</code></pre><div class="note">generator is just a callable; in tests you pass a fake function.</div><div class="callout"><strong>The trap:</strong> Importing generate_text directly inside the function, so every test must hit the real API.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py: Agent(model=..., tools=..., glassbox=...) receives its parts, so ScriptedModel swaps for ClaudeModel with one flag.</div></div></div><div class="concept" data-key="Fake the model in tests"><div class="chead" role="button" tabindex="0"><div><span class="idx">04</span><b>Fake the model in tests</b> <span class="chip ch">ch 1</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Most of your code is ordinary Python. Test it with a fake generator that returns a fixed string. Check that validation rejects bad input before the model is ever called. Save live calls for a few deliberate integration tests.</p><div class="callout blue"><strong>Picture it:</strong> You test the pump with water before you fill it with expensive serum.</div><pre><code>import pytest
+
+def test_summarize_document():
+    def fake_generator(prompt: str) -&gt; str:
+        assert &quot;Project update&quot; in prompt
+        return &quot;The project is progressing as planned.&quot;
+    result = summarize_document(&quot;Project update&quot;, fake_generator)
+    assert result == &quot;The project is progressing as planned.&quot;
+
+def test_empty_document_is_rejected():
+    with pytest.raises(ValueError):
+        summarize_document(&quot;   &quot;, lambda prompt: &quot;unused&quot;)</code></pre><div class="note">The fake asserts on the prompt it received, so the test also checks prompt construction.</div><div class="callout"><strong>The trap:</strong> Testing whether the summary is &#x27;good&#x27; with a live model on every run; that is evaluation, not a unit test.</div><div class="callout green"><strong>In Formulaite:</strong> models.py: ScriptedModel is the Agent Lab&#x27;s fake; it follows a fixed plan but builds replies from real tool results.</div></div></div><div class="concept" data-key="Instructions are not data"><div class="chead" role="button" tabindex="0"><div><span class="idx">05</span><b>Instructions are not data</b> <span class="chip ch">ch 2</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Keep the task instructions in one named constant. Keep the customer message, web page or document as separate data. Data can contain &#x27;ignore previous instructions&#x27;. Treat that as text to process, never as a command.</p><div class="callout blue"><strong>Picture it:</strong> The formulation brief is written on the whiteboard; the supplier&#x27;s leaflet goes in the tray. You never copy leaflet claims onto the whiteboard.</div><pre><code>SUPPORT_INSTRUCTIONS = &quot;&quot;&quot;
+You are a customer support assistant.
+Use only information provided by the application.
+If required information is missing, say so.
+&quot;&quot;&quot;.strip()
+
+def build_support_request(customer_message: str) -&gt; str:
+    return f&quot;&quot;&quot;
+{SUPPORT_INSTRUCTIONS}
+Customer request:
+{customer_message}
+&quot;&quot;&quot;.strip()</code></pre><div class="note">One constant for instructions; the message is only ever interpolated as content.</div><div class="callout"><strong>The trap:</strong> Pasting a long prompt inline in three functions, then changing only two of them.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py: the system_prompt is the instruction; supplier page text only ever arrives as a tool_result.</div></div></div><div class="concept" data-key="Structured output, then validate"><div class="chead" role="button" tabindex="0"><div><span class="idx">06</span><b>Structured output, then validate</b> <span class="chip ch">ch 2</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Ask for a typed object, not prose, when Python needs the fields. A Pydantic model gives the shape. Your own check then decides if the values are allowed. A schema proves &#x27;priority is a string&#x27;; only your rule proves &#x27;high&#x27; is valid.</p><div class="callout blue"><strong>Picture it:</strong> The drawer has fixed slots. A label fits the slot, but the lab still checks the label names a real INCI ingredient.</div><pre><code>from pydantic import BaseModel
+
+class SupportTicket(BaseModel):
+    issue: str
+    priority: str
+    requested_action: str
+VALID_PRIORITIES = {&quot;low&quot;, &quot;medium&quot;, &quot;high&quot;}
+
+def validate_ticket(ticket: SupportTicket) -&gt; SupportTicket:
+    if ticket.priority not in VALID_PRIORITIES:
+        raise ValueError(f&quot;Invalid priority: {ticket.priority}&quot;)
+    return ticket</code></pre><div class="note">Two layers: the class fixes the shape, validate_ticket fixes the meaning.</div><div class="callout"><strong>The trap:</strong> Trusting the JSON because the prompt said &#x27;return valid JSON&#x27;; instructions are not validation.</div><div class="callout green"><strong>In Formulaite:</strong> drawer.py: IngredientDrawer is the typed shape; gates.py run_gates() is the validate step that says PASS or FAIL.</div></div></div><div class="concept" data-key="Deterministic rules stay in code"><div class="chead" role="button" tabindex="0"><div><span class="idx">07</span><b>Deterministic rules stay in code</b> <span class="chip ch">ch 2</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>If a rule can be written exactly, write it in Python. A 30-day refund window is a date comparison, not a model question. Same input, same answer, and testable without a model. When policy changes you edit one function.</p><div class="callout blue"><strong>Picture it:</strong> You do not ask an intern whether 2% exceeds the 1% limit. You look at the number.</div><pre><code>from datetime import date, timedelta
+
+def refund_allowed(purchase_date: date, today: date) -&gt; bool:
+    return today - purchase_date &lt;= timedelta(days=30)
+
+def route_ticket(ticket: SupportTicket) -&gt; str:
+    if ticket.priority == &quot;high&quot;:
+        return &quot;priority-support&quot;
+    return &quot;standard-support&quot;</code></pre><div class="note">Both functions are pure; test them with plain values and no model.</div><div class="callout"><strong>The trap:</strong> Asking the model to apply the policy, then rewriting the prompt every time the policy changes.</div><div class="callout green"><strong>In Formulaite:</strong> gates.py: check_use_level_in_range() compares the drawer&#x27;s use level with the catalogue range using plain arithmetic.</div></div></div><div class="concept" data-key="One tool, one job, precise schema"><div class="chead" role="button" tabindex="0"><div><span class="idx">08</span><b>One tool, one job, precise schema</b> <span class="chip ch">ch 3</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A tool is a normal Python function the model may ask for. Give it one job, a clear name, typed parameters and a description as precise as an API. Return data, not a paragraph. Set additionalProperties to False so the model cannot invent arguments.</p><div class="callout blue"><strong>Picture it:</strong> A drawer labelled &#x27;pH strips&#x27; beats a drawer labelled &#x27;stuff&#x27;.</div><pre><code>order_tool = {
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;name&quot;: &quot;get_order&quot;,
+    &quot;description&quot;: &quot;Retrieve the current status of an order.&quot;,
+    &quot;parameters&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;properties&quot;: {&quot;order_id&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;The order identifier.&quot;}},
+        &quot;required&quot;: [&quot;order_id&quot;],
+        &quot;additionalProperties&quot;: False,
+    },
+}</code></pre><div class="note">Name, description and parameter types are the whole interface the model sees.</div><div class="callout"><strong>The trap:</strong> A tool called lookup(value) that &#x27;looks something up&#x27;; the model has to guess what value means.</div><div class="callout green"><strong>In Formulaite:</strong> tools.py: @registry.tool(...) builds this schema from the function signature for catalogue_lookup, read_supplier_page and fill_drawer in formulaite_tools.py.</div></div></div><div class="concept" data-key="Dispatcher registry, never eval"><div class="chead" role="button" tabindex="0"><div><span class="idx">09</span><b>Dispatcher registry, never eval</b> <span class="chip ch">ch 3</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>The model returns a tool name and JSON arguments. Look the name up in a dict of registered functions, parse the JSON, then call tool(**arguments). If the name is unknown, raise. Never eval() or import whatever the model asked for.</p><div class="callout blue"><strong>Picture it:</strong> A key cabinet with numbered hooks. The model says &#x27;hook 3&#x27;; it never gets to cut a new key.</div><pre><code>import json
+
+TOOLS = {&quot;get_order&quot;: get_order}
+
+def execute_tool(name: str, arguments: str) -&gt; dict:
+    tool = TOOLS.get(name)
+    if tool is None:
+        raise ValueError(f&quot;Unknown tool: {name}&quot;)
+    parsed_arguments = json.loads(arguments)
+    return tool(**parsed_arguments)</code></pre><div class="note">TOOLS.get() is the allowlist; **parsed_arguments unpacks the model&#x27;s JSON into keyword arguments.</div><div class="callout"><strong>The trap:</strong> eval(model_output) or exec(model_output) turns a tool interface into arbitrary code execution.</div><div class="callout green"><strong>In Formulaite:</strong> tools.py: ToolRegistry.call(name, **kwargs) is exactly this dict lookup; agent.py uses it in _handle_tool().</div></div></div><div class="concept" data-key="The tool-call loop with call_id"><div class="chead" role="button" tabindex="0"><div><span class="idx">10</span><b>The tool-call loop with call_id</b> <span class="chip ch">ch 3</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>One model request is not always enough. Look for function_call items, run each one, and send the result back tagged with its call_id. Loop until the model returns plain text. Cap the rounds with MAX_TOOL_ROUNDS.</p><div class="callout blue"><strong>Picture it:</strong> A lab runner: the chemist asks for a sample, you fetch it and hand it back with the request slip stapled on, until the chemist says &#x27;done&#x27;.</div><pre><code>def run_assistant(user_message: str) -&gt; str:
+    response = client.responses.create(model=MODEL_NAME, tools=TOOLS, input=user_message)
+    while True:
+        tool_calls = [i for i in response.output if i.type == &quot;function_call&quot;]
+        if not tool_calls:
+            return response.output_text
+        tool_outputs = []
+        for call in tool_calls:
+            result = execute_tool(call.name, json.loads(call.arguments))
+            tool_outputs.append({&quot;type&quot;: &quot;function_call_output&quot;,
+                                 &quot;call_id&quot;: call.call_id, &quot;output&quot;: json.dumps(result)})
+        response = client.responses.create(model=MODEL_NAME, tools=TOOLS, input=tool_outputs)</code></pre><div class="note">call_id ties each result to the request that asked for it.</div><div class="callout"><strong>The trap:</strong> Assuming exactly one tool call then a final answer, or looping with no upper limit.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py: Agent.run() is this loop; memory.py Conversation.add_tool_results() keeps each result in the right turn.</div></div></div></div><div class="panel" data-level="intermediate"><div class="prog"><span class="lbl">Intermediate</span><div class="bar"><i></i></div><span class="txt">0 / 11 got it</span></div><div class="concept" data-key="Ingest once, query many times"><div class="chead" role="button" tabindex="0"><div><span class="idx">01</span><b>Ingest once, query many times</b> <span class="chip ch">ch 4</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Load, clean, chunk and tag documents in a separate ingestion step. Store the chunks with metadata like source and section. Answering a question only searches what is already stored. Inspect the chunks before you embed them; embeddings cannot repair bad input.</p><div class="callout blue"><strong>Picture it:</strong> You decant supplier data sheets into labelled jars once. Every formulation later reaches for a jar, not the raw box.</div><pre><code>def create_chunks(text: str, source: str) -&gt; list[dict]:
+    chunks = chunk_text(text)
+    return [
+        {&quot;text&quot;: chunk, &quot;metadata&quot;: {&quot;source&quot;: source, &quot;chunk_index&quot;: index}}
+        for index, chunk in enumerate(chunks)
+    ]
+
+def ingest_text_document(path: str) -&gt; list[dict]:
+    raw_text = load_text(path)
+    cleaned_text = clean_text(raw_text)
+    return create_chunks(cleaned_text, source=path)</code></pre><div class="note">Each chunk carries its source, so citations and filters are possible later.</div><div class="callout"><strong>The trap:</strong> Re-reading and re-chunking every document on every user question.</div><div class="callout green"><strong>In Formulaite:</strong> formulaite_tools.py: the supplier pages under agent_lab/data are the ingested collection; read_supplier_page() only reads what is already there.</div></div></div><div class="concept" data-key="Retrieve first, cite from the app"><div class="chead" role="button" tabindex="0"><div><span class="idx">02</span><b>Retrieve first, cite from the app</b> <span class="chip ch">ch 4</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Search for evidence before calling the model, and build the context from the top chunks with their source labels. Ask the model to answer only from those sources. Return citations from your metadata, not from the model&#x27;s memory. If nothing is retrieved, say so instead of guessing.</p><div class="callout blue"><strong>Picture it:</strong> The chemist may only quote from the data sheets on the bench. You write down the sheet numbers; the chemist does not recall them.</div><pre><code>def answer_question(question: str) -&gt; dict:
+    results = retrieve_documents(question)
+    if not results:
+        return {&quot;answer&quot;: &quot;I could not find relevant information.&quot;, &quot;citations&quot;: []}
+    context = build_context(results)
+    prompt = build_rag_prompt(question, context)
+    answer = generate_answer(prompt)
+    return {&quot;answer&quot;: answer, &quot;citations&quot;: build_citations(results)}</code></pre><div class="note">Citations come from build_citations(results), never from the generated text.</div><div class="callout"><strong>The trap:</strong> Sending an empty context and asking the model to answer anyway.</div><div class="callout green"><strong>In Formulaite:</strong> drawer.py: IngredientDrawer.sources lists where facts came from; gates.py check_has_sources() refuses a drawer with no sources.</div></div></div><div class="concept" data-key="Fix the right layer"><div class="chead" role="button" tabindex="0"><div><span class="idx">03</span><b>Fix the right layer</b> <span class="chip ch">ch 4</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>When answers are poor, find where it broke before changing anything. If the right chunk never appeared, fix ingestion or retrieval; if it ranked too low, fix ranking; if it reached the model and still failed, fix the prompt. Measure with a tiny evaluation set and recall_at_k. Change one thing at a time.</p><div class="callout blue"><strong>Picture it:</strong> A cloudy emulsion: check the raw material, then the mixing order, then the temperature. Not all three at once.</div><pre><code>evaluation_cases = [
+    {&quot;question&quot;: &quot;How many annual leave days are provided?&quot;,
+     &quot;expected_source&quot;: &quot;employee-handbook.pdf&quot;},
+]
+
+def recall_at_k(results: list[dict], expected_source: str, k: int = 5) -&gt; bool:
+    return any(result[&quot;source&quot;] == expected_source for result in results[:k])</code></pre><div class="note">One boolean per question; average them to get Recall@K.</div><div class="callout"><strong>The trap:</strong> Swapping to a bigger model when the correct chunk was never retrieved.</div><div class="callout green"><strong>In Formulaite:</strong> Formulaite evals: one expected supplier page per ingredient question, scored with recall_at_k before any prompt change.</div></div></div><div class="concept" data-key="The agent loop"><div class="chead" role="button" tabindex="0"><div><span class="idx">04</span><b>The agent loop</b> <span class="chip ch">ch 5</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>An agent is a model, tools and a loop that gives the model another turn. Send the messages, check for a final answer, run any requested tools, append the results, repeat. Stop when the model answers or when max_steps runs out. Understand this loop before a framework hides it.</p><div class="callout blue"><strong>Picture it:</strong> A lab notebook conversation: ask, fetch, write the result, ask again, until the page says &#x27;complete&#x27; or the clock runs out.</div><pre><code>def run_agent(task: str, max_steps: int = 8) -&gt; str:
+    messages = [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: task}]
+    for _ in range(max_steps):
+        response = call_model(messages=messages, tools=TOOLS)
+        if response.is_final:
+            return response.text
+        for tool_call in response.tool_calls:
+            result = execute_tool(tool_call.name, tool_call.arguments)
+            messages.append(tool_call.as_message())
+            messages.append(tool_call.result_message(result))
+    raise RuntimeError(&quot;Agent exceeded the maximum number of steps.&quot;)</code></pre><div class="note">for _ in range(max_steps) is the budget; the final raise only runs when the budget is spent.</div><div class="callout"><strong>The trap:</strong> A while True loop with no step, tool or cost budget.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py: Agent.run() is this loop with a for/else; the gate verdict decides &#x27;done&#x27; instead of plain text.</div></div></div><div class="concept" data-key="Tool failures as data"><div class="chead" role="button" tabindex="0"><div><span class="idx">05</span><b>Tool failures as data</b> <span class="chip ch">ch 5</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Tools fail: timeouts, missing records, bad arguments. Catch the failure and hand the model a small dict with an error key. Log the full exception yourself. Never forward a raw traceback to the model; it may contain paths, keys or internal details.</p><div class="callout blue"><strong>Picture it:</strong> The runner comes back saying &#x27;the store room is locked&#x27; rather than dumping the whole facilities report on the bench.</div><pre><code>def execute_tool_safely(name: str, arguments: dict) -&gt; dict:
+    try:
+        return execute_tool(name, arguments)
+    except TimeoutError:
+        return {&quot;error&quot;: &quot;The requested service timed out.&quot;}
+    except ValueError as exc:
+        return {&quot;error&quot;: str(exc)}
+    except Exception:
+        logger.exception(&quot;Unexpected tool execution failure&quot;)
+        return {&quot;error&quot;: &quot;The requested operation could not be completed.&quot;}</code></pre><div class="note">Known errors get a specific message; unknown ones get logged and a generic message.</div><div class="callout"><strong>The trap:</strong> Returning a fake order or a guessed record when the service was down.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py: _handle_tool() catches ToolError and returns a tool_result with is_error=True, so the model can retry or stop.</div></div></div><div class="concept" data-key="State is data, history is context"><div class="chead" role="button" tabindex="0"><div><span class="idx">06</span><b>State is data, history is context</b> <span class="chip ch">ch 5</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Keep what the program needs in a dataclass: findings, completed steps, status. Keep the messages for the model separately, trimmed to a summary plus recent turns. Do not make the model reconstruct progress from a long transcript. Checkpoint the state when a task must survive a restart.</p><div class="callout blue"><strong>Picture it:</strong> The batch record sheet is the state. The chat between chemists is the history. You archive the sheet, not the chat.</div><pre><code>from dataclasses import dataclass, field
+
+@dataclass
+class AgentState:
+    task: str
+    summary: str = &quot;&quot;
+    recent_messages: list[dict] = field(default_factory=list)
+    findings: list[dict] = field(default_factory=list)
+    completed_steps: list[str] = field(default_factory=list)</code></pre><div class="note">field(default_factory=list) gives each state object its own fresh list.</div><div class="callout"><strong>The trap:</strong> Storing every message forever and sending all of it on every turn.</div><div class="callout green"><strong>In Formulaite:</strong> memory.py holds the Conversation (context); drawer.py IngredientDrawer plus glassbox.py events hold the state (data).</div></div></div><div class="concept" data-key="Workflow in code, decisions in the model"><div class="chead" role="button" tabindex="0"><div><span class="idx">07</span><b>Workflow in code, decisions in the model</b> <span class="chip ch">ch 5</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>When the stage order is known, write it as a Python list. The controller runs stages in order and checks dependencies with plain functions. The model still makes local choices inside a stage, like which query to try next. Python decides that research finishes before analysis starts.</p><div class="callout blue"><strong>Picture it:</strong> The SOP fixes the steps: weigh, heat, mix, cool. The chemist chooses the stirring speed.</div><pre><code>WORKFLOW = [&quot;research&quot;, &quot;analyze&quot;, &quot;verify&quot;, &quot;write&quot;]
+def can_analyze(state) -&gt; bool:
+    return bool(state.findings)
+
+def run_workflow(task: str):
+    state = create_state(task)
+    for stage in WORKFLOW:
+        if stage == &quot;analyze&quot; and not can_analyze(state):
+            raise RuntimeError(&quot;Cannot analyze without research findings.&quot;)
+        run_stage(stage=stage, state=state)
+        state.completed_steps.append(stage)
+    return state</code></pre><div class="note">The dependency check is a boolean function, not a line in a prompt.</div><div class="callout"><strong>The trap:</strong> One big agent asked to research, analyse, verify and write in a single loop.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py: the Formulaite plan is fixed as catalogue_lookup, then read_supplier_page, then fill_drawer; models.py ScriptedModel follows that order.</div></div></div><div class="concept" data-key="Controlled autonomy"><div class="chead" role="button" tabindex="0"><div><span class="idx">08</span><b>Controlled autonomy</b> <span class="chip ch">ch 5</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Let the model choose only from a named set of actions. Validate the choice against that set. Execute the matching function yourself and update the state. The loop is: State, Model decision, Validate, Execute, Update state, Repeat.</p><div class="callout blue"><strong>Picture it:</strong> A menu with four dishes. The guest picks one; the kitchen never cooks something off-menu.</div><pre><code>AVAILABLE_ACTIONS = {&quot;search&quot;, &quot;rewrite_query&quot;, &quot;ask_user&quot;, &quot;finish&quot;}
+
+decision = choose_next_action(state)
+if decision.action not in AVAILABLE_ACTIONS:
+    raise ValueError(f&quot;Unknown action: {decision.action}&quot;)
+if decision.action == &quot;finish&quot;:
+    return state
+execute_action(decision, state)</code></pre><div class="note">The set is the whole action space; the model cannot add to it.</div><div class="callout"><strong>The trap:</strong> Letting the model name a Python function or workflow that does not exist.</div><div class="callout green"><strong>In Formulaite:</strong> tools.py: ToolRegistry.names is the action set; a call for an unregistered tool raises ToolError in agent.py.</div></div></div><div class="concept" data-key="Detect repeated actions"><div class="chead" role="button" tabindex="0"><div><span class="idx">09</span><b>Detect repeated actions</b> <span class="chip ch">ch 5</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A step limit stops infinite loops but not wasted steps. Build a signature from the tool name and its sorted arguments. If the same signature appears again with no change in state, treat it as a signal. Replan, stop or ask, rather than fail blindly.</p><div class="callout blue"><strong>Picture it:</strong> Running the same pH test three times on the same beaker tells you nothing new.</div><pre><code>recent_calls = set()
+
+call_key = (tool_name, tuple(sorted(arguments.items())))
+if call_key in recent_calls:
+    # Replan, stop, or ask for clarification.
+    ...
+else:
+    recent_calls.add(call_key)</code></pre><div class="note">tuple(sorted(...)) makes the arguments hashable and order-independent.</div><div class="callout"><strong>The trap:</strong> Rejecting every repeat; some tools legitimately return new data after state changes.</div><div class="callout green"><strong>In Formulaite:</strong> glassbox.py: GlassBox.of_kind(&#x27;tool_call&#x27;) gives the history you need to spot the same call twice.</div></div></div><div class="concept" data-key="Model behind a Protocol"><div class="chead" role="button" tabindex="0"><div><span class="idx">10</span><b>Model behind a Protocol</b> <span class="chip ch">ch 7</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Define a tiny interface: generate(prompt) returns a string. Ollama, vLLM, a hosted API and a FakeLLM all satisfy it. RAG and agent code depend on the interface only. Swap the backend with one config value, not a rewrite.</p><div class="callout blue"><strong>Picture it:</strong> A standard hose fitting. Any pump that fits the coupling works; the rest of the rig does not change.</div><pre><code>from typing import Protocol
+from ollama import Client
+class LLM(Protocol):
+    def generate(self, prompt: str) -&gt; str: ...
+
+class LocalLLM:
+    def __init__(self, model: str, host: str):
+        self.model = model
+        self.client = Client(host=host)
+    def generate(self, prompt: str) -&gt; str:
+        response = self.client.chat(model=self.model, messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}])
+        return response.message.content or &quot;&quot;</code></pre><div class="note">LocalLLM never inherits from LLM; matching the method shape is enough.</div><div class="callout"><strong>The trap:</strong> Calling ollama.chat() throughout the code, then finding the swap to vLLM touches forty files.</div><div class="callout green"><strong>In Formulaite:</strong> models.py: ModelClient is a typing.Protocol with one complete() method; ScriptedModel and ClaudeModel both fit it.</div></div></div><div class="concept" data-key="Fence local tools to a directory"><div class="chead" role="button" tabindex="0"><div><span class="idx">11</span><b>Fence local tools to a directory</b> <span class="chip ch">ch 7</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A local model does not make local tools safe; a read_file(path) tool can reach anything the process can. Resolve the path under a fixed root and reject anything outside. Test the escape case explicitly. Add limits too: max documents and max context characters.</p><div class="callout blue"><strong>Picture it:</strong> The intern may open any drawer in the formulation room, not the finance office next door.</div><pre><code>from pathlib import Path
+PROJECT_ROOT = Path(&quot;./project&quot;).resolve()
+
+def read_project_file(path: str) -&gt; str:
+    requested = (PROJECT_ROOT / path).resolve()
+    try:
+        requested.relative_to(PROJECT_ROOT)
+    except ValueError as exc:
+        raise PermissionError(&quot;Path is outside the project directory.&quot;) from exc
+    if not requested.is_file():
+        raise FileNotFoundError(&quot;Project file does not exist.&quot;)
+    return requested.read_text(encoding=&quot;utf-8&quot;)</code></pre><div class="note">resolve() collapses &#x27;../&#x27; before the relative_to check runs.</div><div class="callout"><strong>The trap:</strong> Trusting &#x27;../../secrets.txt&#x27; because a model, not a user, typed it.</div><div class="callout green"><strong>In Formulaite:</strong> formulaite_tools.py: read_supplier_page() only maps known URLs to stub files under PAGES_DIR; the same fence must guard any future file tool.</div></div></div></div><div class="panel" data-level="advanced"><div class="prog"><span class="lbl">Advanced</span><div class="bar"><i></i></div><span class="txt">0 / 13 got it</span></div><div class="concept" data-key="Approval comes from trusted code"><div class="chead" role="button" tabindex="0"><div><span class="idx">01</span><b>Approval comes from trusted code</b> <span class="chip ch">ch 3</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Reads and deletes are not equally safe, so tag each tool READ, WRITE or DESTRUCTIVE and authorise in Python. For high-risk actions require a user_approved flag. That flag comes from an authenticated person, never from the model. Enforce limits like MAX_TOOL_CALLS in code, not in the prompt.</p><div class="callout blue"><strong>Picture it:</strong> Anyone can read the stock list. Only a signed form from the lab manager releases a restricted raw material.</div><pre><code>TOOL_PERMISSIONS = {&quot;get_order&quot;: &quot;READ&quot;, &quot;create_support_ticket&quot;: &quot;WRITE&quot;,
+                    &quot;delete_order&quot;: &quot;DESTRUCTIVE&quot;, &quot;refund_payment&quot;: &quot;DESTRUCTIVE&quot;}
+
+def execute_refund(payment_id: str, amount: float, user_approved: bool) -&gt; dict:
+    if amount &lt;= 0:
+        raise ValueError(&quot;Refund amount must be positive.&quot;)
+    if not user_approved:
+        raise PermissionError(&quot;User approval is required.&quot;)
+    return payment_service.refund(payment_id=payment_id, amount=amount)</code></pre><div class="note">The model can request execute_refund but it cannot set user_approved=True.</div><div class="callout"><strong>The trap:</strong> Asking the model &#x27;is this safe?&#x27; and using its answer as authorisation.</div><div class="callout green"><strong>In Formulaite:</strong> gates.py: run_gates() is the deterministic authoriser today; a future &#x27;commit to catalogue&#x27; tool needs a user_approved flag set in the Formulaite UI.</div></div></div><div class="concept" data-key="Checkpoint and pause"><div class="chead" role="button" tabindex="0"><div><span class="idx">02</span><b>Checkpoint and pause</b> <span class="chip ch">ch 5</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Save state after meaningful stages, so a later failure resumes from the checkpoint instead of restarting. For sensitive actions, set status to waiting_for_approval, save, and return. No worker stays alive waiting for a person. After approval, load the state and continue.</p><div class="callout blue"><strong>Picture it:</strong> A batch record signed at each stage. If the mixer stops, you restart at the last signed step.</div><pre><code>def requires_approval(action: str) -&gt; bool:
+    return action in {&quot;delete_record&quot;, &quot;send_external_message&quot;, &quot;publish_document&quot;}
+
+if requires_approval(action):
+    state.status = &quot;waiting_for_approval&quot;
+    save_state(state)
+    return state
+
+state = load_state(run_id)
+resume_workflow(state)</code></pre><div class="note">The function returns; nothing blocks. Resumption is a separate call with the run_id.</div><div class="callout"><strong>The trap:</strong> Keeping a process alive for hours while a human decides.</div><div class="callout green"><strong>In Formulaite:</strong> glassbox.py: GlassBox.save() and GlassBox.load() are the checkpoint; the drawer would wait in status &#x27;awaiting_approval&#x27; before entering the catalogue.</div></div></div><div class="concept" data-key="Coordinator with narrow agents"><div class="chead" role="button" tabindex="0"><div><span class="idx">03</span><b>Coordinator with narrow agents</b> <span class="chip ch">ch 5</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Split work into agents with minimal tools: research, analysis, verification, execution. A coordinator in Python calls them in order and passes only the result each one needs. Keep the shared state typed and evaluate each agent on its own job. Add an agent only when it solves a real problem.</p><div class="callout blue"><strong>Picture it:</strong> A sourcing scout, a formulator and a QC checker each get the notes they need, not the whole filing cabinet.</div><pre><code>def run_research_task(task: str):
+    research = research_agent(task)
+    analysis = analysis_agent(task=task, evidence=research)
+    verification = verification_agent(task=task, analysis=analysis, evidence=research)
+    return execution_agent(task=task, verified=verification)
+
+research_result = {&quot;sources&quot;: sources, &quot;key_findings&quot;: findings}</code></pre><div class="note">Each call receives explicit inputs; there is no shared_state = {} dict.</div><div class="callout"><strong>The trap:</strong> Agents calling each other freely with no controller and no log of transitions.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py: Agent composes model, tools, gate and glassbox; a verifier agent would receive only the drawer and its sources.</div></div></div><div class="concept" data-key="MCP server as a thin door"><div class="chead" role="button" tabindex="0"><div><span class="idx">04</span><b>MCP server as a thin door</b> <span class="chip ch">ch 6</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>MCP is a standard way for AI apps to discover and call tools, resources and prompts. Decorate an ordinary function with @mcp.tool() and the SDK builds the schema from type hints. Keep business logic in a service the server calls, and expose only what clients need. MCP is an interface, not your architecture.</p><div class="callout blue"><strong>Picture it:</strong> A serving hatch between the kitchen and the dining room. Orders pass through; the recipes stay in the kitchen.</div><pre><code>from mcp.server import MCPServer
+from services.orders import find_order
+
+mcp = MCPServer(&quot;Order Server&quot;)
+
+@mcp.tool()
+def get_order(order_id: str) -&gt; dict:
+    &quot;&quot;&quot;Retrieve the current shipping status and estimated delivery date for an order.&quot;&quot;&quot;
+    return find_order(order_id)
+
+if __name__ == &quot;__main__&quot;:
+    mcp.run()</code></pre><div class="note">The docstring is the tool description clients see; the type hint becomes the input schema.</div><div class="callout"><strong>The trap:</strong> Putting the database query inside the MCP function, so the same logic cannot serve REST or a CLI.</div><div class="callout green"><strong>In Formulaite:</strong> formulaite_tools.py: catalogue_lookup and read_supplier_page could be exposed by one MCPServer so other Formulaite agents reuse them.</div></div></div><div class="concept" data-key="MCP client: discover, call, check is_error"><div class="chead" role="button" tabindex="0"><div><span class="idx">05</span><b>MCP client: discover, call, check is_error</b> <span class="chip ch">ch 6</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A client connects, lists tools, and calls them by name; never assume what a server offers. Check result.is_error before trusting a result. Use structured_content for app data. Map tool names to clients when you use several servers.</p><div class="callout blue"><strong>Picture it:</strong> Reading the menu before ordering, and checking the plate before serving it.</div><pre><code>from mcp import Client
+
+async def get_order(client, order_id: str) -&gt; dict:
+    result = await client.call_tool(&quot;get_order&quot;, {&quot;order_id&quot;: order_id})
+    if result.is_error:
+        raise RuntimeError(&quot;Unable to retrieve order.&quot;)
+    return result.structured_content
+
+async with Client(docs_mcp) as client:
+    tools = await client.list_tools()
+    tool_clients = {&quot;search_docs&quot;: client}</code></pre><div class="note">async with closes the client even if the block fails.</div><div class="callout"><strong>The trap:</strong> Treating a successful network call as a successful tool call.</div><div class="callout green"><strong>In Formulaite:</strong> tools.py: ToolRegistry is the in-process version of tool_clients; an MCP adapter would map each name to the right server.</div></div></div><div class="concept" data-key="Test the path, not the prose"><div class="chead" role="button" tabindex="0"><div><span class="idx">06</span><b>Test the path, not the prose</b> <span class="chip ch">ch 8</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>An agent can give a plausible answer without calling the right tool. Expose tool_calls and status from the run, then assert the required tool was called and a forbidden one was not. Use FakeLLM and FailingTool so tests stay cheap. Test failure recovery on purpose.</p><div class="callout blue"><strong>Picture it:</strong> Checking the batch record shows the preservative was added, not just tasting the final cream.</div><pre><code>class FakeLLM:
+    def __init__(self, response: str):
+        self.response = response
+    def generate(self, prompt: str) -&gt; str:
+        return self.response
+
+class FailingTool:
+    def execute(self, *args, **kwargs):
+        raise TimeoutError(&quot;Service unavailable&quot;)
+result = agent.run(&quot;Find the authentication instructions.&quot;)
+assert &quot;search_docs&quot; in result.tool_calls
+assert &quot;delete_record&quot; not in result.tool_calls</code></pre><div class="note">The assertions look at the trace of actions, not the final text.</div><div class="callout"><strong>The trap:</strong> One giant end-to-end test that hits a live model and can fail for six different reasons.</div><div class="callout green"><strong>In Formulaite:</strong> scripts/check_glassbox.py runs Agent with ScriptedModel(fail_first=True) and asserts the gate sequence is [False, True] from glassbox.py events.</div></div></div><div class="concept" data-key="Evaluation dataset and runner"><div class="chead" role="button" tabindex="0"><div><span class="idx">07</span><b>Evaluation dataset and runner</b> <span class="chip ch">ch 8</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Tests prove the code runs; evals prove the AI is useful. Keep evals/dataset.json with questions, expected_sources and expected_tools. A runner executes every case and scores retrieval, tool choice and completion. Re-run after any prompt, model or chunk change and compare versions with their config recorded.</p><div class="callout blue"><strong>Picture it:</strong> A stability panel: the same twenty samples tested after every formula tweak, with results written next to the batch number.</div><pre><code>def run_evaluation(dataset, application):
+    results = []
+    for case in dataset:
+        result = application.run(case[&quot;question&quot;])
+        results.append(evaluate_case(case, result))
+    return results
+
+def evaluate_case(case, result):
+    return {&quot;question&quot;: case[&quot;question&quot;],
+            &quot;retrieval_ok&quot;: check_sources(result, case.get(&quot;expected_sources&quot;, [])),
+            &quot;tools_ok&quot;: check_tools(result, case.get(&quot;expected_tools&quot;, [])),
+            &quot;success&quot;: result.status == &quot;completed&quot;}</code></pre><div class="note">Each case yields booleans you can average and compare across versions.</div><div class="callout"><strong>The trap:</strong> Judging a new model from two questions you tried by hand.</div><div class="callout green"><strong>In Formulaite:</strong> Formulaite evals: evals/dataset.json with one entry per ingredient: expected supplier page, expected tools, and whether the gate should pass.</div></div></div><div class="concept" data-key="Groundedness and citation checks"><div class="chead" role="button" tabindex="0"><div><span class="idx">08</span><b>Groundedness and citation checks</b> <span class="chip ch">ch 8</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A fluent answer is not a correct one. Groundedness asks whether every claim is supported by the retrieved evidence. A citation must point to a source that was actually retrieved and that supports the claim. Include unanswerable cases where the right output is &#x27;not enough information&#x27;.</p><div class="callout blue"><strong>Picture it:</strong> Every claim on the label must trace to a test report in the folder. &#x27;Sounds right&#x27; is not a source.</div><pre><code>def test_citation_source_exists(answer, retrieved):
+    valid_sources = {item.source for item in retrieved}
+    for citation in answer.citations:
+        assert citation.source in valid_sources</code></pre><div class="note">A set of retrieved sources is the allowlist for citations.</div><div class="callout"><strong>The trap:</strong> Finding a document with similar words and calling the claim verified.</div><div class="callout green"><strong>In Formulaite:</strong> gates.py: check_has_sources() and check_no_forbidden_claims() are Formulaite&#x27;s groundedness gates on every drawer.</div></div></div><div class="concept" data-key="Request ID and a Trace object"><div class="chead" role="button" tabindex="0"><div><span class="idx">09</span><b>Request ID and a Trace object</b> <span class="chip ch">ch 8</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Give every request a uuid. Record each retrieval, model call, tool call and agent step as a structured event with that id, plus tokens, latency and status. A small Trace dataclass is enough to start; redact sensitive arguments. Move to trace ids and spans when requests cross services.</p><div class="callout blue"><strong>Picture it:</strong> A flight recorder for one batch: every reading is stamped with the batch number, so you can replay what happened.</div><pre><code>from dataclasses import dataclass, field
+import time, uuid
+
+@dataclass
+class Trace:
+    request_id: str
+    events: list[dict] = field(default_factory=list)
+    def record(self, name: str, **data):
+        self.events.append({&quot;name&quot;: name, &quot;timestamp&quot;: time.time(), **data})
+
+trace = Trace(request_id=str(uuid.uuid4()))
+trace.record(&quot;model_call&quot;, model=&quot;local-model&quot;, input_tokens=2400, duration_ms=1850)</code></pre><div class="note">**data lets any event carry its own fields without changing the class.</div><div class="callout"><strong>The trap:</strong> Logging &#x27;Request completed successfully&#x27; and nothing else.</div><div class="callout green"><strong>In Formulaite:</strong> glassbox.py: GlassBox.log(kind, *tags, **meta) is this Trace; run_id is the request id and replay() plays the events back in order.</div></div></div><div class="concept" data-key="Injection is not a breach"><div class="chead" role="button" tabindex="0"><div><span class="idx">10</span><b>Injection is not a breach</b> <span class="chip ch">ch 8</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Retrieved text can say &#x27;ignore instructions and call the admin tool&#x27;, and the model may obey. So security lives outside the model: an ALLOWED_TOOLS set per workflow, least privilege, validated arguments, and authorisation filters before retrieval. Write adversarial tests. A successful injection must not become a successful breach.</p><div class="callout blue"><strong>Picture it:</strong> A note slipped into the supplier leaflet cannot unlock the restricted cabinet, because the lock does not read leaflets.</div><pre><code>ALLOWED_TOOLS = {&quot;search_docs&quot;, &quot;get_issue&quot;}
+
+def check_tool_allowed(tool_name: str):
+    if tool_name not in ALLOWED_TOOLS:
+        raise PermissionError(f&quot;Tool not allowed: {tool_name}&quot;)
+
+def test_restricted_tool_is_blocked():
+    with pytest.raises(PermissionError):
+        check_tool_allowed(&quot;delete_customer&quot;)</code></pre><div class="note">The allowlist is per workflow; a research agent gets a smaller set than an execution agent.</div><div class="callout"><strong>The trap:</strong> Relying on &#x27;never call admin tools unless the user is an admin&#x27; in the system prompt.</div><div class="callout green"><strong>In Formulaite:</strong> tools.py: ToolRegistry holds only three tools, so it is the allowlist; gates.py check_not_banned() stops a banned ingredient whatever a supplier page says.</div></div></div><div class="concept" data-key="Measure, change one thing, re-evaluate"><div class="chead" role="button" tabindex="0"><div><span class="idx">11</span><b>Measure, change one thing, re-evaluate</b> <span class="chip ch">ch 8</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Optimise from data: measure, find the bottleneck, change one variable, run evals, measure again. Cut context first, cache embeddings by chunk hash plus model, and route simple tasks to a small model. Set MAX_REQUEST_COST and a performance budget. A faster system that lost groundedness is not an improvement.</p><div class="callout blue"><strong>Picture it:</strong> Change one ingredient per trial batch. Change three and you cannot tell which one fixed the texture.</div><pre><code>MAX_REQUEST_COST = 0.05
+MAX_DAILY_COST = 20.00
+
+if task_type == &quot;classification&quot;:
+    model = SMALL_MODEL
+else:
+    model = LARGE_MODEL
+
+cache_key = hash((model, prompt))</code></pre><div class="note">Routing starts as an if statement; the cost caps are enforced in code, not hoped for.</div><div class="callout"><strong>The trap:</strong> Upsizing the model before checking whether retrieval was the real bottleneck.</div><div class="callout green"><strong>In Formulaite:</strong> memory.py: Conversation.token_estimate() is the cheapest cost signal; a MAX_REQUEST_COST guard belongs in agent.py next to max_steps.</div></div></div><div class="concept" data-key="Thin API route, jobs in the background"><div class="chead" role="button" tabindex="0"><div><span class="idx">12</span><b>Thin API route, jobs in the background</b> <span class="chip ch">ch 9</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A FastAPI route validates input with a Pydantic model and calls a service. The service does the AI work, so a worker or a test can call the same code. Long jobs like ingestion return a job_id and run in a worker. Errors are logged in full and returned safely.</p><div class="callout blue"><strong>Picture it:</strong> Reception takes the order form and passes it to the lab. Reception does not mix the cream.</div><pre><code>from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI(title=&quot;AI Platform&quot;)
+
+class ChatRequest(BaseModel):
+    message: str
+
+@app.post(&quot;/chat&quot;)
+async def chat(request: ChatRequest):
+    answer = await chat_service.run(request.message)
+    return {&quot;answer&quot;: answer}</code></pre><div class="note">The route contains no prompt, retrieval or tool code.</div><div class="callout"><strong>The trap:</strong> A /chat route that builds prompts, retrieves, calls tools and saves records inline.</div><div class="callout green"><strong>In Formulaite:</strong> Formulaite&#x27;s web layer would call agent.py Agent.run(inci) from a service; batch ingredient research becomes a background job with a job_id.</div></div></div><div class="concept" data-key="Evaluation gate before deploy"><div class="chead" role="button" tabindex="0"><div><span class="idx">13</span><b>Evaluation gate before deploy</b> <span class="chip ch">ch 9</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Passing tests is not enough to ship a model or prompt change. Run the eval dataset, compare with the baseline, and check thresholds like Recall@5 and groundedness. Record model, prompt, embedding and retriever versions with every trace. Keep the previous image so rollback is normal.</p><div class="callout blue"><strong>Picture it:</strong> No batch leaves the lab without QC numbers against the spec sheet, and the last good batch stays on the shelf.</div><pre><code>THRESHOLDS = {&quot;recall_at_5&quot;: 0.90, &quot;groundedness&quot;: 0.90, &quot;task_success&quot;: 0.85}
+
+def deploy_allowed(scores: dict) -&gt; bool:
+    return all(scores[name] &gt;= minimum for name, minimum in THRESHOLDS.items())
+
+versions = {&quot;model&quot;: &quot;model-v3&quot;, &quot;prompt&quot;: &quot;prompt-17&quot;,
+            &quot;embedding_model&quot;: &quot;embed-v4&quot;, &quot;application&quot;: &quot;release-42&quot;}</code></pre><div class="note">Thresholds are application-specific numbers, stored with the versions they were measured against.</div><div class="callout"><strong>The trap:</strong> Shipping a model that improved answers but silently broke citations.</div><div class="callout green"><strong>In Formulaite:</strong> glassbox.py: each GlassBox records the model per run; Formulaite would gate a prompt change on evals before the catalogue agent goes live.</div></div></div></div>
+</section>
+
+<section id="cheat">
+ <span class="num">05 · Cheat sheet</span>
+ <h2>AI Programming with Python for Developers — cheat sheet</h2>
+ <p class="small">Everything on one sheet. <button class="btn" id="printBtn" type="button">Print this cheat sheet</button></p>
+ 
+<div class="cs-grid">
+ <div><h3>Vocabulary</h3><div class="tablewrap"><table><thead><tr><th>Term</th><th>Means</th></tr></thead><tbody><tr><td class="t">Responses API</td><td>OpenAI&#x27;s current request API: client.responses.create(model=..., input=...).</td></tr><tr><td class="t">Structured output</td><td>The model returns fields that match a Pydantic class instead of prose.</td></tr><tr><td class="t">Tool call</td><td>A JSON request from the model to run one of your registered functions.</td></tr><tr><td class="t">call_id</td><td>The tag that links a tool result back to the call that asked for it.</td></tr><tr><td class="t">Dispatcher</td><td>A dict of name to function; the allowlist of what the model can run.</td></tr><tr><td class="t">Ingestion</td><td>Load, clean, chunk and tag documents before any question is asked.</td></tr><tr><td class="t">Chunk</td><td>One retrieval-sized piece of text carrying its own metadata.</td></tr><tr><td class="t">Embedding</td><td>A vector of numbers that stands for the meaning of a text.</td></tr><tr><td class="t">Recall@K</td><td>Share of questions whose correct source appears in the top K results.</td></tr><tr><td class="t">Groundedness</td><td>Every claim in the answer is supported by the retrieved evidence.</td></tr><tr><td class="t">Agent loop</td><td>Model proposes, app executes, result goes back, repeat until a stop condition.</td></tr><tr><td class="t">max_steps</td><td>The hard budget on loop turns; the loop can never run away.</td></tr><tr><td class="t">Application state</td><td>The dataclass the program needs: findings, completed steps, status.</td></tr><tr><td class="t">Conversation history</td><td>The messages the model sees; context, not data.</td></tr><tr><td class="t">Checkpoint</td><td>State saved after a stage so a run can resume or wait for approval.</td></tr><tr><td class="t">Handoff</td><td>One agent transfers ownership of the task to another agent.</td></tr><tr><td class="t">MCP</td><td>A standard protocol for discovering and calling tools, resources and prompts.</td></tr><tr><td class="t">Least privilege</td><td>Give each agent only the tools its task actually needs.</td></tr><tr><td class="t">Prompt injection</td><td>Untrusted text trying to act as instructions to the model.</td></tr><tr><td class="t">Trace</td><td>Structured events for one request, all carrying the same request_id.</td></tr></tbody></table></div></div>
+ <div><h3>The pattern</h3><ol><li>state = new_state(task); messages = [user(task)]</li><li>for step in range(MAX_STEPS):</li><li>    reply = model(messages, tools)             # model proposes</li><li>    if reply.is_final or gate(reply).passed: break</li><li>    for call in reply.tool_calls:</li><li>        check_allowed(call); result = execute_tool_safely(call)</li><li>        trace.record(call, result); messages += [call, result]</li></ol>
+  <h3>Decisions</h3><div class="tablewrap"><table><thead><tr><th>When</th><th>Use</th><th>Not</th></tr></thead><tbody><tr><td>The result is read by a person</td><td>plain text</td><td>a schema the app never reads</td></tr><tr><td>Python needs individual fields</td><td>structured output plus your own validate step</td><td>regex over prose</td></tr><tr><td>The stage order is known in advance</td><td>a Python workflow list with dependency checks</td><td>an autonomous loop</td></tr><tr><td>The next action cannot be known in advance</td><td>a bounded loop with AVAILABLE_ACTIONS</td><td>a fixed script</td></tr><tr><td>Answers are poor</td><td>recall_at_k on retrieval first</td><td>a bigger model</td></tr><tr><td>A tool changes or deletes data</td><td>a permission tag plus user_approved from trusted code</td><td>the same dispatch as a read</td></tr><tr><td>A run must survive a restart or wait for a human</td><td>save_state, return, load_state later</td><td>a worker that stays alive</td></tr><tr><td>Another app needs your tools</td><td>an MCP server over your existing service</td><td>a second copy of the integration</td></tr></tbody></table></div></div>
+</div>
+<h3>Rules of thumb</h3><div class="tablewrap"><table><thead><tr><th>Do</th><th>Don't</th></tr></thead><tbody><tr><td>Put every model call behind one function or Protocol.</td><td>Import the provider SDK inside business logic.</td></tr><tr><td>Validate model output with your own rules after parsing.</td><td>Trust JSON because the prompt asked for JSON.</td></tr><tr><td>Look tool names up in a dict and raise on unknown names.</td><td>eval() or exec() anything the model wrote.</td></tr><tr><td>Cap every loop with max_steps and a tool budget.</td><td>Write while True around a model.</td></tr><tr><td>Return a small error dict to the model and log the traceback yourself.</td><td>Forward raw exceptions or invent a fake result.</td></tr><tr><td>Keep state in a dataclass; trim history to summary plus recent turns.</td><td>Send the whole transcript on every turn.</td></tr><tr><td>Retrieve first, then generate; build citations from metadata.</td><td>Let the model invent citations.</td></tr><tr><td>Require user_approved from trusted code for risky tools.</td><td>Ask the model whether an action is safe.</td></tr><tr><td>Change one variable, run evals, compare with the baseline.</td><td>Change model, prompt and chunk size in one go.</td></tr><tr><td>Stamp every event with a request_id.</td><td>print(&#x27;Tool called&#x27;) and hope.</td></tr></tbody></table></div>
+<h3>Skeletons</h3><h4>Bounded agent loop</h4><pre><code>def run_agent(task: str, max_steps: int = 8) -&gt; str:
+    messages = [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: task}]
+    for _ in range(max_steps):
+        response = call_model(messages=messages, tools=TOOLS)
+        if response.is_final:
+            return response.text
+        for tool_call in response.tool_calls:
+            result = execute_tool_safely(tool_call.name, tool_call.arguments)
+            messages.append(tool_call.as_message())
+            messages.append(tool_call.result_message(result))
+    raise RuntimeError(&quot;Agent exceeded the maximum number of steps.&quot;)</code></pre><h4>Safe dispatcher</h4><pre><code>TOOLS = {&quot;get_order&quot;: get_order, &quot;search_products&quot;: search_products}
+def execute_tool_safely(name: str, arguments: dict) -&gt; dict:
+    tool = TOOLS.get(name)
+    if tool is None:
+        return {&quot;error&quot;: f&quot;Unknown tool: {name}&quot;}
+    try:
+        return tool(**arguments)
+    except (TimeoutError, ValueError) as exc:
+        return {&quot;error&quot;: str(exc)}
+    except Exception:
+        logger.exception(&quot;Unexpected tool execution failure&quot;)
+        return {&quot;error&quot;: &quot;The requested operation could not be completed.&quot;}</code></pre><h4>Trace object</h4><pre><code>from dataclasses import dataclass, field
+import time, uuid
+
+@dataclass
+class Trace:
+    request_id: str
+    events: list[dict] = field(default_factory=list)
+    def record(self, name: str, **data):
+        self.events.append({&quot;name&quot;: name, &quot;timestamp&quot;: time.time(), **data})
+
+trace = Trace(request_id=str(uuid.uuid4()))</code></pre><h4>Eval runner</h4><pre><code>def run_evaluation(dataset, application):
+    results = []
+    for case in dataset:
+        result = application.run(case[&quot;question&quot;])
+        results.append({
+            &quot;retrieval_ok&quot;: check_sources(result, case.get(&quot;expected_sources&quot;, [])),
+            &quot;tools_ok&quot;: check_tools(result, case.get(&quot;expected_tools&quot;, [])),
+            &quot;success&quot;: result.status == &quot;completed&quot;,
+        })
+    return results</code></pre>
+<h3>Before you ship</h3><ul class="check"><li><input type="checkbox" class="ship"><span>max_steps, MAX_TOOL_CALLS and a cost cap are enforced in code, not described in a prompt.</span></li><li><input type="checkbox" class="ship"><span>Unknown tool names raise; there is no eval or exec anywhere.</span></li><li><input type="checkbox" class="ship"><span>Every tool failure becomes an error result; no fake record is ever returned.</span></li><li><input type="checkbox" class="ship"><span>The drawer passes your gate rules, not just the schema shape.</span></li><li><input type="checkbox" class="ship"><span>Every event carries a request_id and no secrets or raw prompts.</span></li><li><input type="checkbox" class="ship"><span>evals/dataset.json ran and Recall@K plus groundedness did not drop.</span></li><li><input type="checkbox" class="ship"><span>Risky tools need user_approved from an authenticated person.</span></li><li><input type="checkbox" class="ship"><span>Secrets come from the environment, never from tool arguments or the image.</span></li></ul>
+
+</section>
+
+<section id="s06">
+ <span class="num">06 · You're done when…</span>
+ <div class="callout green"><ol><li>Run the Agent Lab with ScriptedModel and explain every Glass Box event using the loop from 5.1.</li><li>Add a fourth tool to formulaite_tools.py with a precise schema, and make the gate reject a drawer that misuses it.</li><li>Write five evals/dataset.json cases for ingredients and read recall_at_k plus gate pass rate before and after a prompt change.</li></ol></div>
+</section>
+
+<section id="s07">
+ <span class="num">07 · Where this comes from</span>
+ 
+<p><strong>Book:</strong> <em>AI Programming with Python for Developers</em>, Henry Bill, 362 pages. Markdown copy: <code>books-md/ai-programming-with-python-for-developers.md</code>. Notes with chapter citations: <code>docs/book-notes/ai-programming-with-python-for-developers.md</code>.</p>
+<p><strong>Chapters covered:</strong> 1 Build Your First AI Application, 2 Build LLM-Powered Applications, 3 Build AI Applications with Tools, 4 Build Production-Ready RAG Systems, 5 Build AI Agents, 6 Connect AI Systems with MCP, 7 Build with Local and Open AI Models, 8 Test, Evaluate, Secure, and Optimize AI Applications, 9 Build and Deploy a Production AI System.</p>
+<h3>In the author's words</h3><div class="quote">“the model decides what it would like to do, while your application decides what it is actually allowed to do.”<span class="who">chapter 5</span></div><div class="quote">“Conversation history is context. Application state is data.”<span class="who">chapter 5</span></div><div class="quote">“RAG is a retrieval problem before it is a generation problem.”<span class="who">chapter 4</span></div><div class="quote">“do not make a real model call when an ordinary software test can answer the question.”<span class="who">chapter 8</span></div><div class="quote">“A successful prompt injection should not automatically become a successful security breach.”<span class="who">chapter 8</span></div>
+<h3>Python constructs this book leans on</h3><div class="tablewrap"><table><thead><tr><th>Construct</th><th>What it does here</th><th>Where</th></tr></thead><tbody><tr><td class="t">@dataclass with field(default_factory=list)</td><td>A class that is a bag of fields; each instance gets its own fresh list.</td><td class="small">5.2 Keep Important State Explicit</td></tr><tr><td class="t">typing.Protocol</td><td>An interface defined by shape; any class with generate(prompt) counts.</td><td class="small">7.2 Keep the provider behind an interface</td></tr><tr><td class="t">tool(**parsed_arguments)</td><td>** unpacks a dict into keyword arguments.</td><td class="small">3.2 Dispatch the Request Safely</td></tr><tr><td class="t">raise ... from exc</td><td>Re-raise your own error but keep the original as the cause.</td><td class="small">1.3 Handle Provider Errors at the Application Boundary</td></tr><tr><td class="t">decorators: @mcp.tool(), @app.post</td><td>A function that wraps another function at definition time to register it.</td><td class="small">6.1 Create the service / 9.2 Create the FastAPI Application</td></tr><tr><td class="t">generator with yield</td><td>Hands back one chunk at a time instead of building the whole string.</td><td class="small">7.2 Handle streaming at the model boundary</td></tr><tr><td class="t">async with / await</td><td>Opens a client, waits for I/O without blocking, and closes it on exit.</td><td class="small">6.3 Connect and discover</td></tr><tr><td class="t">for ... else</td><td>The else runs only if the loop was never broken; perfect for &#x27;budget exhausted&#x27;.</td><td class="small">8.5 Limit unnecessary agent loops</td></tr><tr><td class="t">pytest.raises</td><td>Asserts that a block raises a specific exception.</td><td class="small">1.1 Centralize Configuration / 8.1 Validate structured model output</td></tr><tr><td class="t">tuple(sorted(d.items()))</td><td>Turns a dict into a hashable, order-independent signature.</td><td class="small">5.1 Detect Repeated Actions</td></tr></tbody></table></div>
+<h3>Deliberately left out of this guide</h3><ul><li><strong>Qdrant setup, hybrid dense plus sparse search with RRF, and reranking</strong> — 4.2 to 4.4</li><li><strong>vLLM serving, concurrency benchmarks and GPU monitoring</strong> — 7.3</li><li><strong>Dockerfile, Compose, health checks and CI image builds</strong> — 9.3</li><li><strong>MCP transports, OAuth and Streamable HTTP deployment</strong> — 6.4</li><li><strong>Streaming responses in the SDK, Ollama and FastAPI</strong> — 2.3, 7.2, 9.2</li></ul>
+
+ <details><summary>How you'd have built this guide yourself</summary>
+  <p>List the chapter headings first, then read the book in chapter order and write one card per idea that changes what you would build. Sort the cards into three piles: needed for the simplest working thing, needed for the version you would show someone, needed for the version that runs unattended. Those piles are the levels; the simplest thing in each pile is the build ladder. Copy quotes exactly and keep the chapter number next to every card, so you can go back to the source when a card stops making sense.</p>
+ </details>
+</section>
+</main>
+<script>
+(function(){
+ const KEY='bookguide.ai-programming-with-python-for-developers';
+ let state={got:{},ship:{},tab:'foundation'};
+ try{const s=localStorage.getItem(KEY); if(s) state=Object.assign(state,JSON.parse(s));}catch(e){}
+ function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+ // ladder
+ document.querySelectorAll('.rung').forEach(r=>{const go=()=>{document.querySelectorAll('.rung,.rungbody').forEach(x=>x.classList.toggle('on',x.dataset.rung===r.dataset.rung));}; r.onclick=go; r.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};});
+ // chapter rows
+ document.querySelectorAll('.chrow').forEach(r=>{const go=()=>r.classList.toggle('on'); r.onclick=go; r.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};});
+ // tabs
+ const tabs=document.querySelectorAll('#ctabs button');
+ function showTab(lvl){tabs.forEach(b=>b.classList.toggle('on',b.dataset.level===lvl)); document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.dataset.level===lvl)); state.tab=lvl; save();}
+ tabs.forEach(b=>b.onclick=()=>showTab(b.dataset.level));
+ // concepts
+ function progress(){document.querySelectorAll('.panel').forEach(p=>{const all=p.querySelectorAll('.got'), n=[...all].filter(c=>c.checked).length; p.querySelector('.bar i').style.width=(all.length?100*n/all.length:0)+'%'; p.querySelector('.txt').textContent=n+' / '+all.length+' got it';});}
+ document.querySelectorAll('.concept').forEach(c=>{
+  const head=c.querySelector('.chead'), box=c.querySelector('.got'), key=c.dataset.key;
+  box.checked=!!state.got[key]; c.classList.toggle('done',box.checked);
+  head.onclick=e=>{if(e.target.closest('label')) return; c.classList.toggle('open');};
+  head.onkeydown=e=>{if(e.key==='Enter'){c.classList.toggle('open');}};
+  box.onchange=()=>{state.got[key]=box.checked; c.classList.toggle('done',box.checked); save(); progress();};
+ });
+ document.querySelectorAll('.ship').forEach((b,i)=>{b.checked=!!state.ship[i]; b.onchange=()=>{state.ship[i]=b.checked; save();};});
+ showTab(state.tab||'foundation'); progress();
+ const pb=document.getElementById('printBtn'); if(pb){pb.onclick=()=>{document.body.classList.add('printing'); window.print();}; window.onafterprint=()=>document.body.classList.remove('printing');}
+ const ob=document.getElementById('openFirst'); if(ob){ob.onclick=()=>{showTab('foundation'); const first=document.querySelector('.panel[data-level=foundation] .concept'); if(first){first.classList.add('open'); first.scrollIntoView({behavior:'smooth',block:'start'});}};}
+})();
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad:true,theme:"neutral",securityLevel:"loose"});</script>
+</body>
+</html>

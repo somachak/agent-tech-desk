@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+</head>
+<body>
+<title>Claude Certified Architect Foundations Playbook</title>
+<style>
+:root{color-scheme:light;
+ --surface:#faf9f5;--surface-2:#f2f0e9;--surface-3:#e8e6dc;--surface-ink:#141413;--line:#d9d7cc;--line-soft:#e8e6dc;
+ --ink:#141413;--ink-2:#5c5b57;--ink-3:#6b6a65;--on-ink:#faf9f5;
+ --accent:#d97757;--accent-2:#6a9bcc;--accent-3:#788c5d;
+ --font-head:"Poppins",Arial,sans-serif;--font-body:"Lora",Georgia,serif;--font-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--surface);color:var(--ink-2);font-family:var(--font-body);font-size:17px;line-height:1.7}
+main{max-width:980px;margin:0 auto;padding:36px 22px 90px}
+h1,h2,h3,h4{font-family:var(--font-head);color:var(--ink);line-height:1.2;margin:0 0 10px;text-wrap:balance}
+h1{font-size:38px;letter-spacing:-.02em;font-weight:600}
+h2{font-size:25px;font-weight:600}
+h3{font-size:18px;font-weight:600}
+h4{font-size:15px;font-weight:600;margin-bottom:6px}
+p{margin:0 0 12px;max-width:70ch}
+strong{color:var(--ink)}
+a{color:var(--ink);text-decoration-color:var(--accent);text-underline-offset:3px}
+code,.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+code{font-size:.86em;background:var(--surface-3);padding:1px 5px;border-radius:5px;color:var(--ink)}
+pre{background:var(--surface-3);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-family:var(--font-mono);font-size:12.5px;line-height:1.6;color:var(--ink);overflow-x:auto;margin:8px 0 6px;white-space:pre}
+pre code{background:none;padding:0;font-size:inherit}
+section{margin-top:52px}
+.num{font-family:var(--font-mono);color:var(--ink-3);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px}
+.eyebrow{font-family:var(--font-mono);color:var(--ink-3);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase}
+.byline{font-family:var(--font-head);font-size:14px;color:var(--ink-3);margin:-4px 0 12px}
+.strip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0 10px}
+.strip div{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:13px 15px;font-size:15px}
+.strip b{display:block;font-family:var(--font-head);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
+.callout{border-left:3px solid var(--accent);background:var(--surface-2);border-radius:0 12px 12px 0;padding:12px 16px;margin:14px 0;font-size:15.5px}
+.callout.blue{border-color:var(--accent-2)}.callout.green{border-color:var(--accent-3)}
+.callout ol,.callout ul{margin:6px 0 0 18px;padding:0}.callout li{margin:4px 0}
+.callout p:last-child{margin-bottom:0}
+.chip{display:inline-block;font-family:var(--font-head);font-size:11px;font-weight:600;letter-spacing:.04em;border-radius:6px;padding:2px 8px;color:#141413;vertical-align:middle}
+.chip.foundation{background:var(--accent-3)}.chip.intermediate{background:var(--accent-2)}.chip.advanced{background:var(--accent)}
+.chip.ch{background:var(--surface-3);color:var(--ink-2);font-family:var(--font-mono);font-weight:500}
+.diagram{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:14px;margin:14px 0;overflow-x:auto}
+.diagram pre.mermaid{background:none;border:none;padding:0;margin:0;white-space:pre;overflow:visible;text-align:center}
+.diagram svg{max-width:100%;height:auto}
+/* ladder */
+.ladder{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0}
+.rung{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:16px 18px;cursor:pointer}
+.rung:hover{border-color:var(--accent)}
+.rung.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+.rung .lvl{font-family:var(--font-head);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.rung h3{margin:4px 0 6px}
+.rung p{font-size:14.5px;margin:0}
+.rung .time{font-family:var(--font-mono);font-size:12px;color:var(--ink-3);margin-top:8px}
+.rungbody{display:none;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-top:-2px}
+.rungbody.on{display:block}
+.rungbody ol{margin:6px 0 10px 20px;padding:0}.rungbody li{margin:5px 0}
+.meta{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-3)}
+/* chapter map */
+.chmap{border-top:1px solid var(--line);margin-top:10px}
+.chrow{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:start;padding:10px 6px;border-bottom:1px solid var(--line-soft);cursor:pointer}
+.chrow:hover{background:var(--surface-2)}
+.chrow .n{font-family:var(--font-mono);color:var(--ink-3);font-size:13px;padding-top:4px}
+.chrow b{font-family:var(--font-head);font-size:15px;color:var(--ink);display:block}
+.chrow span.adds{font-size:14.5px;color:var(--ink-2)}
+.chrow .secs{display:none;font-size:13.5px;color:var(--ink-3);margin-top:6px;font-family:var(--font-mono)}
+.chrow.on .secs{display:block}
+/* concepts */
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 6px}
+.tabs button{font-family:var(--font-head);font-weight:600;font-size:13.5px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:10px;padding:9px 14px;cursor:pointer}
+.tabs button:hover{border-color:var(--accent)}
+.tabs button.on{background:var(--accent);border-color:var(--accent);color:#141413}
+.tabs button .cnt{font-family:var(--font-mono);font-weight:500;font-size:12px;margin-left:6px;color:var(--ink-3)}
+.tabs button.on .cnt{color:#141413}
+.prog{display:flex;align-items:center;gap:10px;margin:8px 0 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-3)}
+.prog .bar{flex:1;height:9px;background:var(--surface-3);border-radius:0 4px 4px 0;overflow:hidden}
+.prog .bar i{display:block;height:100%;width:0;background:var(--accent-3);transition:width .25s}
+.panel{display:none}.panel.on{display:block}
+.concept{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;margin:10px 0;overflow:hidden}
+.concept.done{border-color:var(--accent-3)}
+.chead{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px 16px;cursor:pointer}
+.chead:hover{background:var(--surface-3)}
+.chead b{font-family:var(--font-head);font-size:15.5px;color:var(--ink)}
+.chead .idx{font-family:var(--font-mono);color:var(--ink-3);font-size:12px;margin-right:8px}
+.chead label{font-family:var(--font-head);font-size:12.5px;color:var(--ink-2);display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap}
+.chead input{width:16px;height:16px;accent-color:#788c5d}
+.cbody{display:none;padding:4px 16px 16px;border-top:1px solid var(--line-soft)}
+.concept.open .cbody{display:block}
+.cbody p{font-size:15.5px}
+.cbody .callout{margin:10px 0;font-size:14.5px}
+.cbody .note{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-3);margin:0 0 8px}
+.showall{margin:8px 0 0;font-family:var(--font-head);font-size:13px;color:var(--ink-3)}
+/* tables */
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin:8px 0 14px}
+th{font-family:var(--font-head);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:7px 8px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+td.t{font-family:var(--font-mono);font-size:13px;color:var(--ink);white-space:nowrap}
+.tablewrap{overflow-x:auto}
+.check{list-style:none;padding:0;margin:6px 0}
+.check li{display:flex;gap:10px;align-items:flex-start;padding:5px 0;font-size:15px}
+.check input{margin-top:5px;accent-color:#788c5d}
+.btn{font-family:var(--font-head);font-weight:600;font-size:13.5px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:10px;padding:8px 14px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.go{background:var(--accent);border-color:var(--accent);color:#141413}
+.cs-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:800px){.cs-grid,.strip,.ladder{grid-template-columns:1fr}.chrow{grid-template-columns:36px 1fr}.chrow .chip{grid-column:2}}
+details{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:12px 18px;margin-top:14px}
+summary{font-family:var(--font-head);font-weight:600;color:var(--ink);cursor:pointer}
+.quote{border-left:3px solid var(--accent-2);padding:4px 14px;margin:10px 0;font-style:italic;font-size:15.5px}
+.quote .who{display:block;font-style:normal;font-family:var(--font-mono);font-size:12px;color:var(--ink-3);margin-top:2px}
+.small{font-size:14px;color:var(--ink-3)}
+.toplinks{display:flex;flex-wrap:wrap;gap:8px 16px;font-family:var(--font-head);font-size:13.5px;margin:10px 0 0}
+.toplinks a{color:var(--ink-2)}
+@media print{
+ body{font-size:12px} main{padding:0;max-width:none}
+ body.printing main>*:not(#cheat){display:none} .btn,.toplinks{display:none}
+ pre{white-space:pre-wrap;font-size:10.5px} .cs-grid{grid-template-columns:1fr 1fr} section{margin-top:16px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+</style>
+<main>
+<header>
+ <span class="eyebrow">Formulaite bookshelf · book 6 of 14 · Claude exam prep</span>
+ <h1>Claude Certified Architect Foundations Playbook</h1>
+ <div class="byline">J Cook · 148 pages · 34 concept cards</div>
+ <p>A thirty-day study path for the CCA-F exam that teaches the five Claude architecture domains through scenario drills and eight small build projects.</p>
+ 
+ <div class="strip">
+  <div><b>Goal</b>By the end you can turn the Formulaite research agent into a coordinator with a read-only researcher, a schema-bound drawer, a fallback loop, an injection screen, a golden set and a judge, and explain each layer in exam language.</div>
+  <div><b>Output</b>A build ladder (3 rungs), 13 chapters mapped, 34 concept cards you tick off, and a printable cheat sheet.</div>
+  <div><b>Time</b>Foundation ~36 min · Intermediate ~16 min · Advanced ~16 min. Whole guide ~80 min over several sittings.</div>
+ </div>
+ <div class="callout"><strong>How to drive this page.</strong>
+  <ol>
+   <li>Press <button class="btn go" id="openFirst" type="button">Open the first card</button> — it jumps to the Foundation cards and opens card 01.</li>
+   <li>Read one card, tick <strong>Got it</strong>, open the next. The bar shows your progress and remembers it on this browser.</li>
+   <li>When Foundation is done, do <strong>Rung 1</strong> of the build ladder before reading Intermediate. Print the cheat sheet from section 05.</li>
+  </ol>
+  <div class="toplinks"><a href="claude-certified-architect-foundations-playbook-cheatsheet.md">Cheat sheet as Markdown</a> · <a href="index.html">All nine guides</a></div>
+ </div>
+</header>
+
+<section id="s01">
+ <span class="num">01 · Where this is going</span>
+ <h2>The exam grades architecture, not prompts: every scenario is fixed by naming the layer that changes the system&#x27;s shape, never by turning a knob.</h2>
+ <p><strong>Read this book when:</strong> Open it when you are studying for the CCA-F, or when a Formulaite scenario reads like an exam stem: hallucinating answers, a tool that works on one laptop only, a cost spike, a quiet wrong answer.</p>
+ <p>The one picture that holds the whole book. Every chapter adds a box or an arrow to it; nothing later replaces it.</p>
+ <div class="diagram"><pre class="mermaid">flowchart LR
+  U[User question] --&gt; S[Harmlessness screen on Haiku]
+  S --&gt;|harmful| X[Logged refusal]
+  S --&gt;|safe| C[Coordinator with Agent tool]
+  C --&gt; R[Researcher subagent, read-only tools]
+  R --&gt;|low confidence| X
+  R --&gt;|citations schema| V[Validator for business rules]
+  V --&gt; Y[Synthesizer subagent, Read only]
+  Y --&gt; J[LLM-as-judge on Haiku]
+  J --&gt;|low judge confidence| F[Flag for review]
+  J --&gt;|ok| A[Cited answer]
+  C --&gt; L[Audit log]</pre></div>
+</section>
+
+<section id="s02">
+ <span class="num">02 · Build ladder</span>
+ <h2>Three things to build, in order</h2>
+ <p>Each rung is a Formulaite feature. Click a rung for its steps. Do rung 1 after the Foundation cards, rung 2 after Intermediate, rung 3 after Advanced.</p>
+ <div class="ladder"><div class="rung on" data-rung="0" role="button" tabindex="0"><div class="lvl">Rung 1 · Simple</div><h3>Domain 1 and 4 milestone: the Formulaite research coordinator with a typed drawer and a fallback loop</h3><p>The ingredient-research loop rebuilt as hub-and-spoke: a coordinator, a read-only researcher (catalogue and supplier page), a drawer-filler that can only cite, and a retry wrapper around every model call.</p><div class="time">~2 hours</div></div><div class="rung" data-rung="1" role="button" tabindex="0"><div class="lvl">Rung 2 · Intermediate</div><h3>Domain 2, 3 and safety milestone: a portable supplier-page MCP server with an injection screen and an operator policy</h3><p>The Formulaite tools served over MCP so a teammate&#x27;s clone works first time, an input screen that refuses injection before the loop starts, and a frozen operator allow-list.</p><div class="time">~half a day</div></div><div class="rung" data-rung="2" role="button" tabindex="0"><div class="lvl">Rung 3 · Advanced</div><h3>Domain 5 and mock-exam milestone: a silent-failure detector, golden set and judge for the drawer</h3><p>A detector that flags drawers which pass the gate but are quietly wrong, a pinned golden set that runs in CI, a batched nightly judge, and your own sixty-question mock score by domain.</p><div class="time">~2 days</div></div></div><div class="rungbody on" data-rung="0"><h4>Steps for rung 1: Domain 1 and 4 milestone: the Formulaite research coordinator with a typed drawer and a fallback loop</h4><ol><li>Run `python -m agent_lab` offline on Glycerin and read the Glass Box replay; mark which events are the coordinator, the researcher tools and the fill_drawer answer.</li><li>Write two AgentDefinition blocks at the top of agent.py: researcher with catalogue_lookup and read_supplier_page only, synthesizer with fill_drawer only.</li><li>Add `confidence` (low, medium, high) and `refusal_reason` to IngredientDrawer and to as_tool_schema so the drawer is the researcher&#x27;s citations schema.</li><li>Wrap ClaudeModel.complete in with_fallback: three attempts, one, two and four second backoff, rate-limit and timeout errors only.</li><li>Break it on purpose: remove fill_drawer from the registry and watch the loop hit max_steps; that is the missing-Agent exam stem.</li></ol><div class="meta">Chapters 4, 5, 8 · Agent Lab files: <code>agent.py</code> · <code>models.py</code> · <code>drawer.py</code> · <code>formulaite_tools.py</code> · ~2 hours</div></div><div class="rungbody" data-rung="1"><h4>Steps for rung 2: Domain 2, 3 and safety milestone: a portable supplier-page MCP server with an injection screen and an operator policy</h4><ol><li>Move catalogue_lookup and read_supplier_page into a FastMCP `formulaite_server.py`; register it in `.mcp.json` at the project root with a relative path.</li><li>Commit `.env.example` naming every variable, add a sibling `git worktree`, run `claude` there and confirm mcp__formulaite__* tools all appear.</li><li>Send three routing queries (look up, read page, fill drawer) and tighten each tool docstring until the routing is three for three.</li><li>Add screen_input on Haiku in front of Agent.run and log every refusal to the Glass Box as a `refusal` event with the reason.</li><li>Write `operator_policy.yaml` with read-only mcp__formulaite__* tools, load it into allowed_tools at construction, and put style rules in ./CLAUDE.md instead.</li></ol><div class="meta">Chapters 6, 7, 10 · Agent Lab files: <code>formulaite_tools.py</code> · <code>tools.py</code> · <code>agent.py</code> · <code>glassbox.py</code> · ~half a day</div></div><div class="rungbody" data-rung="2"><h4>Steps for rung 3: Domain 5 and mock-exam milestone: a silent-failure detector, golden set and judge for the drawer</h4><ol><li>Pin ten ingredients with known-correct drawers in `samples/golden_set.json` and write golden_set_regression over Agent.run.</li><li>Add assertion checks to gates.py that the schema cannot express: the supplier URL appears in `sources`, the use level sits inside the catalogue range.</li><li>Write judge(question, drawer) on Haiku returning JudgeVerdict; flag below 0.7, refuse below 0.5, and log the verdict to the Glass Box.</li><li>Run the golden set in CI on every push and route the nightly judge over all drawers through the Batch API at half price.</li><li>Sit the sixty-question mock in Chapter 12, score each domain, and redo the rung that matches your weakest domain before booking.</li></ol><div class="meta">Chapters 9, 12, 13 · Agent Lab files: <code>gates.py</code> · <code>glassbox.py</code> · <code>drawer.py</code> · <code>agent.py</code> · ~2 days</div></div>
+</section>
+
+<section id="s03">
+ <span class="num">03 · Chapter map</span>
+ <h2>What each chapter adds to the machine</h2>
+ <p>Colour = the level it belongs to. Click a chapter to see its sections.</p>
+ <div class="chmap"><div class="chrow" role="button" tabindex="0"><div class="n">1</div><div><b>Chapter 1: What the CCA-F Actually Tests</b><span class="adds">The frame: sixty scenario questions, and a five-question diagnostic whose answers are all the architectural fix, never the knob-turn.</span><div class="secs">This Book Is For You If · The 30-Day Map · The Diagnostic — Five Questions, One Per Domain · Why This Week, Not Next Quarter</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">2</div><div><b>Chapter 2: How the Exam Actually Works</b><span class="adds">The blueprint: five weighted domains, 720 of 1000 to pass, the partner gate, and the Python literacy bar of reading a query() block.</span><div class="secs">The Verified Blueprint · The Five Domains, Weighted · The Partner-Gate, Demystified · The &quot;Foundation = Easy&quot; Trap · The Python Prerequisite Reality · Access Path Worksheet</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">3</div><div><b>Chapter 3: The 5 Judgment Patterns the Exam Actually Tests</b><span class="adds">The recognition drill: scale failure, wrong-tool routing, silent failure, cross-machine portability and trust-boundary edge case, each with stem cues and an answer template.</span><div class="secs">Why Patterns Beat Trivia · Pattern 1: Scale Failure · Pattern 2: Wrong-Tool Routing · Pattern 3: Silent Failure · Pattern 4: Cross-Machine Portability · Pattern 5: Trust-Boundary Edge Case · BUILD STEP — Classify Five Stems</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">4</div><div><b>Chapter 4: Domain 1 Part 1 — Agentic Architecture</b><span class="adds">The hub-and-spoke coordinator in Agent SDK code: AgentDefinition, the Agent allow-list gotcha, structured context passing, and the four multi-agent failure modes.</span><div class="secs">Hub-and-Spoke, the Canonical Reference Architecture · The Agent SDK Subagent Pattern, Line by Line · The Four Multi-Agent Failure Modes · The Architectural Answer to F1 · Structured Context Passing · BUILD STEP — Coordinator Plus Two Subagents</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">5</div><div><b>Chapter 5: Domain 1 Part 2 — Orchestration</b><span class="adds">The three cost and reliability levers: Batch API at fifty percent off, prompt caching at ninety percent off reads, schema-guaranteed output, and the fallback loop.</span><div class="secs">Batch API: Fifty Percent Off, the Verified Math · When to Batch, When to Stay Synchronous, When to Cache · Prompt Caching: The Compounding Discount · JSON Schemas: The Structured-Output Guarantee · Fallback Loops: What Fails, How to Recover · BUILD STEP — Wrap the Coordinator with Batch, Schema, Fallback</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">6</div><div><b>Chapter 6: Domain 2 — Tool Design and MCP Integration</b><span class="adds">MCP as scoping: three transports, the mcp__server__tool name, five portability gotchas, the four-layer injection defence and the permissionMode trap.</span><div class="secs">MCP, the Ninety-Second Canonical · The Five MCP Portability Gotchas · Wrong-Tool Routing: Fix the Tool Surface, Not the Prompt · Prompt-Injection Defense as Architecture · Allow-listing versus permissionMode: The Trap the Exam Loves · Validating Portability in CI · BUILD STEP — Ship a Three-Tool MCP Server That Survives the Teammate Clone</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">7</div><div><b>Chapter 7: Domain 3 — Claude Code Configuration and Workflows</b><span class="adds">The corrected CLAUDE.md hierarchy of four scopes, more than thirty tools, hooks, slash commands versus skills, and path-scoped rules.</span><div class="secs">CLAUDE.md: The Four-Scope Hierarchy, Corrected · The Eight Tools You Reach For Daily, Reframed · Slash Commands, Plan Mode, Hooks, Skills · The Configuration Files Beyond CLAUDE.md · The Teammate Clone Test, Applied to CLAUDE.md</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">8</div><div><b>Chapter 8: Domain 4 — Prompt Engineering and Structured Output</b><span class="adds">The four-layer enforcement stack (prompt, schema, validator, repair loop), which schema features work, tool use versus structured outputs, and provenance.</span><div class="secs">The Structured-Output Enforcement Stack · JSON Schema Features That Work, and the Ones That Do Not · The Anti-Hallucination Architecture: The Chatbot Rebuild · Fallback Loops Versus Schema Enforcement · Tool Use Versus Structured Outputs · Citations and Provenance: The Architectural Anti-Hallucination Discipline</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">9</div><div><b>Chapter 9: Domain 5 — Context Management and Reliability</b><span class="adds">Silent failures, valid and wrong, caught by assertions, a golden set and an LLM judge; plus caching, re-injection and logging for long sessions.</span><div class="secs">The Four-Question Margin Lives Here · What a Silent Failure Actually Is · The Three Architectural Detection Mechanisms · The Chatbot, With Silent-Failure Detection · Long-Context Reliability · BUILD STEP — Silent-Failure Detector for the Coordinator</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">10</div><div><b>Chapter 10: Safety, Trust Hierarchy, and Responsible Deployment</b><span class="adds">The operator, user and system tiers, the least-privilege database answer, hardcoded versus softcoded rules, and audit logging as architecture.</span><div class="secs">The Operator/User/System Trust Hierarchy, Framed Honestly · What Can a User Override That an Operator Set? · The Database Access Question, in Detail · Hardcoded Versus Softcoded Behaviors · Audit Logging Is Architecture, Not Operations · BUILD STEP — Trust-Enforcement Middleware on the MCP Server</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">11</div><div><b>Chapter 11: The Money Chapter</b><span class="adds">The honest ROI: the badge opens the conversation, the eight public build projects win the offer, and no renewal policy exists yet.</span><div class="secs">The Verified Cost · The Validity-Period Reality · The Salary-Lift Question, Framed Honestly · The Renewal Math: What to Budget For · What the Cert Will Not Do For You</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">12</div><div><b>Chapter 12: The Launchpad</b><span class="adds">A sixty-question mock weighted like the real exam, an answer key that names the chapter for each fix, and the book-or-wait decision rule.</span><div class="secs">Mock Exam Blueprint · Domain 1: Agentic Architecture and Orchestration (16 Questions) · Domain 5: Context Management and Reliability (9 Questions) · Answer Key · Scoring and the Decision · What to Do If You Fail by Four Questions</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">13</div><div><b>Appendix A: Resources, Glossary, Domain Cheat Sheets, and the Open Repo</b><span class="adds">The five domain cheat sheets, the glossary, the eight starter projects with the harmlessness screen and circuit-breaking wrapper in full, and the TypeScript crosswalk.</span><div class="secs">The Five Domain Cheat Sheets · Glossary · The Eight Build-Step Starter Projects · Anthropic Academy Course Crosswalk · TypeScript Crosswalk</div></div><span class="chip advanced">advanced</span></div></div>
+</section>
+
+<section id="s04">
+ <span class="num">04 · Concept cards</span>
+ <h2>Foundation → Intermediate → Advanced</h2>
+ <p>One idea per card: what it is, a picture for it, the code if there is any, the trap, and where it lives in Formulaite. Tick a card when you could explain it to someone else.</p>
+ <div class="tabs" id="ctabs"><button data-level="foundation" class="on">Foundation<span class="cnt">18 cards · ~36 min</span></button><button data-level="intermediate" class="">Intermediate<span class="cnt">8 cards · ~16 min</span></button><button data-level="advanced" class="">Advanced<span class="cnt">8 cards · ~16 min</span></button></div><div class="panel on" data-level="foundation"><div class="prog"><span class="lbl">Foundation</span><div class="bar"><i></i></div><span class="txt">0 / 18 got it</span></div><div class="concept" data-key="Hub-and-Spoke coordinator"><div class="chead" role="button" tabindex="0"><div><span class="idx">01</span><b>Hub-and-Spoke coordinator</b> <span class="chip ch">ch 4</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>One coordinator takes the user&#x27;s question and routes it. Subagents do the work, each with its own narrow tool list. The researcher can read but not write. The synthesizer can only read what the researcher found, so it cannot invent.</p><div class="callout blue"><strong>Picture it:</strong> A head formulator does not run the lab bench. She sends the raw-material check to one assistant and the write-up to another, and signs off on the result.</div><pre><code>from claude_agent_sdk import query, ClaudeAgentOptions, AgentDefinition
+options = ClaudeAgentOptions(
+    allowed_tools=[&quot;Read&quot;, &quot;Glob&quot;, &quot;Grep&quot;, &quot;Agent&quot;],
+    agents={
+        &quot;researcher&quot;: AgentDefinition(
+            description=&quot;Searches the codebase and returns structured citations.&quot;,
+            prompt=&quot;Find evidence relevant to the user&#x27;s question.&quot;,
+            tools=[&quot;Read&quot;, &quot;Glob&quot;, &quot;Grep&quot;]),
+        &quot;synthesizer&quot;: AgentDefinition(
+            description=&quot;Composes a final answer that cites only material the researcher returned.&quot;,
+            prompt=&quot;If a claim cannot be cited, refuse with a logged reason.&quot;,
+            tools=[&quot;Read&quot;])})</code></pre><div class="note">Two subagents, two tool lists; the synthesizer&#x27;s list is narrower than the researcher&#x27;s.</div><div class="callout"><strong>The trap:</strong> Answering the hallucinating-chatbot stem with &#x27;a better prompt&#x27; or &#x27;a bigger model&#x27; instead of naming the layers.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py is today a single loop; the researcher role is catalogue_lookup plus read_supplier_page, the synthesizer role is fill_drawer.</div></div></div><div class="concept" data-key="The Agent allow-list gotcha"><div class="chead" role="button" tabindex="0"><div><span class="idx">02</span><b>The Agent allow-list gotcha</b> <span class="chip ch">ch 4</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>The coordinator can only delegate if &quot;Agent&quot; is in its own allowed_tools. If it is missing, every subagent definition is silently ignored. The exam shows you the broken block and asks why the system fails. The fix is one line.</p><div class="callout blue"><strong>Picture it:</strong> A manager who is not allowed to hand out work will do everything herself, however many assistants sit in the room.</div><pre><code>options = ClaudeAgentOptions(
+    allowed_tools=[&quot;Read&quot;, &quot;Glob&quot;, &quot;Grep&quot;],   # MISSING &quot;Agent&quot; — broken
+    agents={
+        &quot;researcher&quot;: AgentDefinition(
+            description=&quot;Searches the codebase.&quot;,
+            prompt=&quot;Find evidence.&quot;,
+            tools=[&quot;Read&quot;, &quot;Glob&quot;, &quot;Grep&quot;],
+        ),
+    },
+)</code></pre><div class="note">The subagent is fine; the coordinator&#x27;s list is wrong.</div><div class="callout"><strong>The trap:</strong> Blaming the subagent definition when the coordinator&#x27;s allow-list is the bug.</div><div class="callout green"><strong>In Formulaite:</strong> In agent.py the equivalent is the ToolRegistry passed to Agent: leave fill_drawer out of build_registry() and the loop can never finish.</div></div></div><div class="concept" data-key="Structured context passing"><div class="chead" role="button" tabindex="0"><div><span class="idx">03</span><b>Structured context passing</b> <span class="chip ch">ch 4</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>The coordinator does not forward the user&#x27;s raw question. It hands the subagent a task-shaped payload: objective, scope, limits, and the user text as context only. The subagent now has a contract, not a conversation. That makes it reusable and stops it wandering.</p><div class="callout blue"><strong>Picture it:</strong> You do not hand the lab a customer email. You hand it a job sheet: ingredient, what to check, how many sources, by when.</div><pre><code>researcher_task = {
+    &quot;objective&quot;: &quot;Find evidence about deployment in the project files.&quot;,
+    &quot;search_scope&quot;: [&quot;README.md&quot;, &quot;docs/**/*.md&quot;, &quot;.github/workflows/*.yml&quot;],
+    &quot;must_cite&quot;: True,
+    &quot;max_citations&quot;: 6,
+    &quot;user_query_for_context_only&quot;: &quot;What does our README say about deployment?&quot;,
+}</code></pre><div class="note">The user&#x27;s words are the last field, marked context only.</div><div class="callout"><strong>The trap:</strong> Sending the full conversation history to the subagent because it &#x27;sounds thorough&#x27;; it pollutes context and costs tokens.</div><div class="callout green"><strong>In Formulaite:</strong> memory.py&#x27;s Conversation is the coordinator&#x27;s context; a per-ingredient task dict (inci, required sections, max pages) is what a Formulaite subagent should receive.</div></div></div><div class="concept" data-key="Four multi-agent failure modes"><div class="chead" role="button" tabindex="0"><div><span class="idx">04</span><b>Four multi-agent failure modes</b> <span class="chip ch">ch 4</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Multi-agent systems break in four shapes. Deadlock is a subagent that never returns; hallucinated handoff is a subagent that claims work it never did. Silent retry storm is retries without backoff burning the budget. Budget blow-out is subagents spawning subagents with no depth cap.</p><div class="callout blue"><strong>Picture it:</strong> A kitchen with no timers, no tasting, unlimited re-dos and cooks hiring more cooks: four ways to lose the evening.</div><div class="callout"><strong>The trap:</strong> Fixing the symptom you see (raise the timeout) instead of the cause (set max_turns and a tool timeout).</div><div class="callout green"><strong>In Formulaite:</strong> agent.py&#x27;s max_steps is the budget guard; the Glass Box shows a retry storm as repeated identical tool events.</div></div></div><div class="concept" data-key="Batch API at fifty percent off"><div class="chead" role="button" tabindex="0"><div><span class="idx">05</span><b>Batch API at fifty percent off</b> <span class="chip ch">ch 5</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>The Message Batches API runs calls that do not need an answer now. It costs fifty percent less on input and output tokens, on every model. It has separate rate limits. Most batches finish inside an hour; the window is twenty-four hours.</p><div class="callout blue"><strong>Picture it:</strong> Overnight stability testing on a rack of samples is cheaper per sample than a rush test on one jar.</div><pre><code>import anthropic
+from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
+from anthropic.types.messages.batch_create_params import Request
+client = anthropic.Anthropic()
+batch = client.messages.batches.create(
+    requests=[
+        Request(
+            custom_id=f&quot;q-{i:03d}&quot;,
+            params=MessageCreateParamsNonStreaming(
+                model=&quot;claude-opus-4-7&quot;, max_tokens=2048,
+                messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: q}]))
+        for i, q in enumerate(queries)])  # then poll batch.id</code></pre><div class="note">custom_id is how you match answers back to questions; max_tokens must be at least one.</div><div class="callout"><strong>The trap:</strong> Remembering the discount as thirty percent, or picking &#x27;switch to Haiku&#x27; when the stem is about rate limits.</div><div class="callout green"><strong>In Formulaite:</strong> A nightly re-research of every catalogue ingredient in formulaite_tools.py belongs in a batch, not in the live drawer flow.</div></div></div><div class="concept" data-key="Prompt caching, the compounding discount"><div class="chead" role="button" tabindex="0"><div><span class="idx">06</span><b>Prompt caching, the compounding discount</b> <span class="chip ch">ch 5</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Mark a long, stable block with cache_control and it is written once, then read at ninety percent off. Writes cost fifty percent extra, so it pays back after two reads. The default TTL is five minutes; one hour is available. Minimum size is 4,096 tokens on Opus 4.7 and Haiku 4.5.</p><div class="callout blue"><strong>Picture it:</strong> Print the standard safety preamble once and staple it to every batch sheet, instead of retyping it each time.</div><pre><code>response = client.messages.create(
+    model=&quot;claude-opus-4-7&quot;,
+    max_tokens=2048,
+    system=[
+        {
+            &quot;type&quot;: &quot;text&quot;,
+            &quot;text&quot;: LONG_SYSTEM_PROMPT,  # 5,000+ tokens
+            &quot;cache_control&quot;: {&quot;type&quot;: &quot;ephemeral&quot;},
+        }
+    ],
+    messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: user_query}],
+)</code></pre><div class="note">One extra field on the system block; add &quot;ttl&quot;: &quot;1h&quot; for long sessions.</div><div class="callout"><strong>The trap:</strong> Trying to cache a short system prompt that sits under the minimum size, then wondering why nothing is cached.</div><div class="callout green"><strong>In Formulaite:</strong> models.py ClaudeModel sends SYSTEM_PROMPT from agent.py on every call; that block plus the catalogue preamble is the cache candidate.</div></div></div><div class="concept" data-key="Structured outputs are a guarantee"><div class="chead" role="button" tabindex="0"><div><span class="idx">07</span><b>Structured outputs are a guarantee</b> <span class="chip ch">ch 5</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Set output_config.format with a JSON schema, or call messages.parse with a Pydantic model, and the API guarantees schema-valid JSON. Sampling is constrained at decode time, so invalid tokens cannot be produced. Shape is solved by construction, not by hope.</p><div class="callout blue"><strong>Picture it:</strong> A mould that only lets the right shape come out; you never inspect for a missing corner.</div><pre><code>from pydantic import BaseModel
+import anthropic
+class ContactInfo(BaseModel):
+    name: str
+    email: str
+client = anthropic.Anthropic()
+response = client.messages.parse(
+    model=&quot;claude-opus-4-7&quot;,
+    max_tokens=1024,
+    messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Extract the customer&#x27;s name and email.&quot;}],
+    output_format=ContactInfo)
+print(response.parsed_output)</code></pre><div class="note">parsed_output is a typed ContactInfo, not a string you must json.loads.</div><div class="callout"><strong>The trap:</strong> Answering the ninety-three-percent-valid stem with &#x27;lower the temperature&#x27; or &#x27;regex the bad ones&#x27;.</div><div class="callout green"><strong>In Formulaite:</strong> drawer.py&#x27;s as_tool_schema is the Formulaite schema; the ClaudeModel call in models.py is where output_config.format would pin it.</div></div></div><div class="concept" data-key="Fallback loop with exponential backoff"><div class="chead" role="button" tabindex="0"><div><span class="idx">08</span><b>Fallback loop with exponential backoff</b> <span class="chip ch">ch 5</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>The schema makes bad JSON impossible, so the fallback loop is for other failures. Rate limits, timeouts, flaky tools and refusals. Retry a few times, sleeping one, two, then four seconds. Then give up and raise the real error.</p><div class="callout blue"><strong>Picture it:</strong> If the supplier line is busy, wait a minute, then two, then four, then log the failed call; do not redial fifty times.</div><pre><code>import asyncio
+import anthropic
+async def with_fallback(call, max_attempts=3, base_delay=1.0):
+    last_exc = None
+    for attempt in range(max_attempts):
+        try:
+            return await call()
+        except (anthropic.RateLimitError, anthropic.APITimeoutError) as exc:
+            last_exc = exc
+            await asyncio.sleep(base_delay * (2 ** attempt))
+    raise last_exc</code></pre><div class="note">Only two transient error types are caught; the sleep doubles each attempt.</div><div class="callout"><strong>The trap:</strong> Using a fallback loop to fix malformed JSON, or a schema to fix a timeout; two problems, two layers.</div><div class="callout green"><strong>In Formulaite:</strong> models.py ClaudeModel.complete is the call to wrap; tools.py ToolError is what read_supplier_page raises when a page is missing.</div></div></div><div class="concept" data-key="MCP transports and the mcp__server__tool name"><div class="chead" role="button" tabindex="0"><div><span class="idx">09</span><b>MCP transports and the mcp__server__tool name</b> <span class="chip ch">ch 6</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>MCP connects an agent to outside tools. Three transports: stdio (a local subprocess), HTTP (remote, streaming) and SSE (the older remote form). Every tool is named mcp__&lt;server&gt;__&lt;tool&gt; with double underscores. Allow one with its full name or a whole server with mcp__github__*.</p><div class="callout blue"><strong>Picture it:</strong> A supplier&#x27;s catalogue code is always company, dash, product; write it any other way and the order bounces.</div><pre><code>from claude_agent_sdk import ClaudeAgentOptions
+import os
+options = ClaudeAgentOptions(
+    mcp_servers={
+        &quot;github&quot;: {
+            &quot;command&quot;: &quot;npx&quot;,
+            &quot;args&quot;: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-github&quot;],
+            &quot;env&quot;: {&quot;GITHUB_TOKEN&quot;: os.environ[&quot;GITHUB_TOKEN&quot;]},
+        }
+    },
+    allowed_tools=[&quot;mcp__github__list_issues&quot;],
+)</code></pre><div class="note">The server is registered by name; the allow-list uses that name with double underscores.</div><div class="callout"><strong>The trap:</strong> Writing mcp.github.list_issues with dots; the convention does not accept dot separators.</div><div class="callout green"><strong>In Formulaite:</strong> A Formulaite supplier-page server would expose mcp__formulaite__read_supplier_page, the MCP twin of the tool in formulaite_tools.py.</div></div></div><div class="concept" data-key="Five MCP portability gotchas"><div class="chead" role="button" tabindex="0"><div><span class="idx">10</span><b>Five MCP portability gotchas</b> <span class="chip ch">ch 6</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A teammate clones the repo and the tools are gone. The cause is one of five: an absolute path in args, an env var only you have, .mcp.json in .claude/ instead of the project root, settingSources without &quot;project&quot;, or no node on their PATH. Fix the scope, not the code.</p><div class="callout blue"><strong>Picture it:</strong> A recipe that says &#x27;the jar on my left shelf&#x27; works in one kitchen only. Write &#x27;the 2 percent glycerin jar&#x27; and it travels.</div><pre><code>{
+  &quot;mcpServers&quot;: {
+    &quot;filesystem&quot;: {
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-filesystem@1.4.0&quot;, &quot;.&quot;],
+      &quot;type&quot;: &quot;stdio&quot;},
+    &quot;github&quot;: {
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-github&quot;],
+      &quot;env&quot;: { &quot;GITHUB_TOKEN&quot;: &quot;${GITHUB_TOKEN}&quot; }}
+  }
+}</code></pre><div class="note">A relative &quot;.&quot; for the path, a pinned version, and an env var documented in .env.example.</div><div class="callout"><strong>The trap:</strong> Picking &#x27;the teammate has an older Claude Code version&#x27;; version skew is rarely the cause, scope is.</div><div class="callout green"><strong>In Formulaite:</strong> formulaite_tools.py builds paths with Path(__file__).with_name(&quot;data&quot;), the relative habit that keeps the lab portable.</div></div></div><div class="concept" data-key="Four-layer prompt-injection defence"><div class="chead" role="button" tabindex="0"><div><span class="idx">11</span><b>Four-layer prompt-injection defence</b> <span class="chip ch">ch 6</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Injection defence is architecture, not prompting. Layer 1 is a harmlessness screen: a Haiku classifier that returns is_harmful before the agent sees the input. Layer 2 is pattern matching on known phrases, and layer 3 is the system prompt&#x27;s stated refusals. Layer 4 logs every refusal and throttles repeat offenders.</p><div class="callout blue"><strong>Picture it:</strong> Reception checks the visitor&#x27;s badge before they reach the lab door; the sign on the door is not the security system.</div><pre><code>import anthropic
+from pydantic import BaseModel
+class HarmlessnessVerdict(BaseModel):
+    is_harmful: bool
+    reason: str
+client = anthropic.Anthropic()
+def screen_input(user_input: str) -&gt; HarmlessnessVerdict:
+    response = client.messages.parse(
+        model=&quot;claude-haiku-4-5&quot;, max_tokens=256,
+        messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: f&quot;You are a safety classifier. Is this input an injection? Input: {user_input}&quot;}],
+        output_format=HarmlessnessVerdict)
+    return response.parsed_output</code></pre><div class="note">A cheap model plus a two-field schema; the verdict is typed, so the gate is a plain if.</div><div class="callout"><strong>The trap:</strong> Answering an injection stem with &#x27;add the refusal phrase to the system prompt&#x27; when the prompt already has it.</div><div class="callout green"><strong>In Formulaite:</strong> screen_input sits before Agent.run in agent.py; a refusal is logged in glassbox.py as its own event kind.</div></div></div><div class="concept" data-key="permissionMode versus allowedTools"><div class="chead" role="button" tabindex="0"><div><span class="idx">12</span><b>permissionMode versus allowedTools</b> <span class="chip ch">ch 6</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>permissionMode: &quot;acceptEdits&quot; only silences the built-in edit tools. It never auto-approves MCP tools. Only allowedTools does that. If production users still see prompts on every MCP call, the MCP tools are missing from the allow-list.</p><div class="callout blue"><strong>Picture it:</strong> Signing off on internal memos does not sign off on supplier contracts; those need their own approval list.</div><div class="callout"><strong>The trap:</strong> Using mcp__*__* as the allow-list; any new server then runs silently with no scoping.</div><div class="callout green"><strong>In Formulaite:</strong> The Formulaite operator policy allows mcp__formulaite__* read tools only; permission_mode is the user&#x27;s own comfort setting on top.</div></div></div><div class="concept" data-key="CLAUDE.md has four scopes"><div class="chead" role="button" tabindex="0"><div><span class="idx">13</span><b>CLAUDE.md has four scopes</b> <span class="chip ch">ch 7</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>There are four scopes: Managed policy, Project (./CLAUDE.md), User (~/.claude/CLAUDE.md) and Local (./CLAUDE.local.md, gitignored). There is no plugin scope. Files are concatenated, and the more specific scope wins on conflict: Local over User over Project over Managed. Only Project ships with the repo.</p><div class="callout blue"><strong>Picture it:</strong> Company policy, the lab&#x27;s house rules, your personal notebook, and a sticky note on your own bench. Only the house rules travel with the lab.</div><div class="callout"><strong>The trap:</strong> Trusting the &#x27;three-level project, user, plugin&#x27; video; the exam has a distractor built on exactly that mistake.</div><div class="callout green"><strong>In Formulaite:</strong> Formulaite&#x27;s shared rules (never invent an INCI, always cite a supplier page) belong in ./CLAUDE.md so every teammate&#x27;s agent sees them.</div></div></div><div class="concept" data-key="Hooks, slash commands, skills and path-scoped rules"><div class="chead" role="button" tabindex="0"><div><span class="idx">14</span><b>Hooks, slash commands, skills and path-scoped rules</b> <span class="chip ch">ch 7</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A hook is a shell command that runs on an event such as PostToolUse; it cannot ask the user anything. A slash command is a markdown prompt the human types. A skill is a behaviour the agent chooses to use. Path-scoped rules in .claude/rules/ apply only to files matching a paths: glob.</p><div class="callout blue"><strong>Picture it:</strong> A timer that rings after the mixer stops is a hook; &#x27;Do the stability check&#x27; said by you is a command; the assistant deciding to double-check pH is a skill.</div><pre><code>{
+  &quot;hooks&quot;: {
+    &quot;PostToolUse&quot;: [
+      {
+        &quot;match&quot;: {&quot;tool&quot;: &quot;Bash&quot;, &quot;command_pattern&quot;: &quot;git commit.*&quot;},
+        &quot;command&quot;: &quot;ruff check . --fix --silent&quot;,
+        &quot;blocking&quot;: false
+      }
+    ]
+  }
+}</code></pre><div class="note">The match block narrows the hook to one tool and one command pattern.</div><div class="callout"><strong>The trap:</strong> Reaching for a skill when the human should decide, or a hook when you need an interactive question.</div><div class="callout green"><strong>In Formulaite:</strong> A PostToolUse hook could run scripts/check_book_guides.py after every commit; a /drawer command could print the last Glass Box replay.</div></div></div><div class="concept" data-key="Schema for shape, validator for business rules"><div class="chead" role="button" tabindex="0"><div><span class="idx">15</span><b>Schema for shape, validator for business rules</b> <span class="chip ch">ch 8</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>The schema can enforce types, enums, required fields and formats. It cannot enforce minimum, maximum, string length or recursion, and additionalProperties must be false. Business rules live in a Pydantic validator that runs after the schema. Two layers, two jobs.</p><div class="callout blue"><strong>Picture it:</strong> The label template guarantees every field is present. Only a formulator checks that the preservative percentage is legal.</div><pre><code>from pydantic import BaseModel, Field, field_validator
+from datetime import date
+class ContractInfo(BaseModel):
+    parties: list[str] = Field(min_length=2)
+    effective_date: date
+    termination_clause: str
+    payment_terms: str
+    governing_law: str
+    @field_validator(&quot;termination_clause&quot;)
+    def must_mention_duration(cls, v):
+        assert any(u in v.lower() for u in [&quot;day&quot;, &quot;month&quot;, &quot;year&quot;]), &quot;needs a duration unit&quot;
+        return v</code></pre><div class="note">The validator catches what the schema cannot say; the assert message becomes the failure reason.</div><div class="callout"><strong>The trap:</strong> Adding minimum: 0 to the schema for a price field; numerical constraints are not supported and the schema is rejected.</div><div class="callout green"><strong>In Formulaite:</strong> drawer.py is the shape; gates.py functions like check_use_level_in_range are the validators, returning a reason string instead of raising.</div></div></div><div class="concept" data-key="Silent failure and the three detection mechanisms"><div class="chead" role="button" tabindex="0"><div><span class="idx">16</span><b>Silent failure and the three detection mechanisms</b> <span class="chip ch">ch 9</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A silent failure is output that is valid and wrong. No exception, no red log line, the schema passes. Three mechanisms catch it: assertions on business rules, a golden set of pinned correct outputs diffed in CI, and an LLM-as-judge that scores the answer against the question. Below 0.7 flag; below 0.5 refuse.</p><div class="callout blue"><strong>Picture it:</strong> A batch that looks perfect, passes QC on colour and pH, and has the two actives swapped. Only a reference sample or a second chemist catches it.</div><pre><code>class JudgeVerdict(BaseModel):
+    quality: Literal[&quot;good&quot;, &quot;questionable&quot;, &quot;bad&quot;]
+    reason: str
+    confidence: float
+def judge(question: str, answer: str) -&gt; JudgeVerdict:
+    response = client.messages.parse(
+        model=&quot;claude-haiku-4-5&quot;,
+        max_tokens=512,
+        messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: f&quot;You are an output critic. Question: {question}\nAnswer: {answer}\nRate quality and explain.&quot;}],
+        output_format=JudgeVerdict,
+    )
+    return response.parsed_output</code></pre><div class="note">A second, cheaper model returns a typed verdict; the threshold is your decision, not the model&#x27;s.</div><div class="callout"><strong>The trap:</strong> Answering a silent-failure stem with &#x27;increase log verbosity&#x27; or &#x27;lower the temperature&#x27;; neither detects anything.</div><div class="callout green"><strong>In Formulaite:</strong> gates.py is mechanism one; a golden set of drawers in agent_lab/data plus a judge event in glassbox.py would add two and three.</div></div></div><div class="concept" data-key="Trust hierarchy: operator, user, system"><div class="chead" role="button" tabindex="0"><div><span class="idx">17</span><b>Trust hierarchy: operator, user, system</b> <span class="chip ch">ch 10</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>System rules are baked in and nobody overrides them. Operator rules are set by the deploying company and the user cannot raise them. User rules are preferences inside the operator&#x27;s ceiling. The SDK enforces this at construction, by scoping allowed_tools before the first request.</p><div class="callout blue"><strong>Picture it:</strong> The regulator sets what may be sold, the brand owner sets what the lab may touch, the formulator picks the order of work within that.</div><pre><code>import yaml
+from claude_agent_sdk import ClaudeAgentOptions
+def build_options(user_permission_mode=&quot;default&quot;) -&gt; ClaudeAgentOptions:
+    policy = yaml.safe_load(open(&quot;operator_policy.yaml&quot;).read())
+    return ClaudeAgentOptions(
+        allowed_tools=policy[&quot;allowed_tools&quot;],  # operator ceiling, frozen
+        permission_mode=user_permission_mode,    # user preference, bounded
+    )</code></pre><div class="note">The policy file is read once; the user&#x27;s setting can only move inside it.</div><div class="callout"><strong>The trap:</strong> Saying &#x27;users can override anything not explicitly forbidden&#x27;; the model is allow-list, not deny-list.</div><div class="callout green"><strong>In Formulaite:</strong> build_registry() in formulaite_tools.py is the operator ceiling for Formulaite: a tool not registered there cannot be called, whatever the user types.</div></div></div><div class="concept" data-key="Least-privilege database access"><div class="chead" role="button" tabindex="0"><div><span class="idx">18</span><b>Least-privilege database access</b> <span class="chip ch">ch 10</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Never give the agent full read-write on production. The answer names blast radius first. Then four layers: an MCP server exposing only the needed operations, whitelisted parameterised queries, a read-only database role, and an audit log on every call. A jailbroken agent can then only leak what it could already read.</p><div class="callout blue"><strong>Picture it:</strong> You do not hand a new assistant the keys to every cabinet. They get the one drawer their job needs, and the drawer logs who opened it.</div><div class="callout"><strong>The trap:</strong> Answering &#x27;the terms of service prohibit it&#x27;; the exam grades architecture, not policy.</div><div class="callout green"><strong>In Formulaite:</strong> catalogue_lookup in formulaite_tools.py is already a scoped read tool; a write to the catalogue would need its own gated tool, never raw SQL.</div></div></div></div><div class="panel" data-level="intermediate"><div class="prog"><span class="lbl">Intermediate</span><div class="bar"><i></i></div><span class="txt">0 / 8 got it</span></div><div class="concept" data-key="Architectural fix beats knob-turn"><div class="chead" role="button" tabindex="0"><div><span class="idx">01</span><b>Architectural fix beats knob-turn</b> <span class="chip ch">ch 1</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Every stem offers four answers that all sound sensible. Three are knob-turns: change model, tweak the prompt, lower the temperature. One changes the shape of the system: a coordinator, a schema, a scoped server, a detector. Pick the one that adds a layer.</p><div class="callout blue"><strong>Picture it:</strong> When a cream separates you do not stir harder; you change the emulsifier system.</div><div class="callout"><strong>The trap:</strong> Choosing the answer that would &#x27;help a bit&#x27; over the one that removes the failure class.</div><div class="callout green"><strong>In Formulaite:</strong> In Formulaite, &#x27;tell the model to be careful&#x27; is a knob-turn; adding check_no_forbidden_claims to gates.py is the architectural fix.</div></div></div><div class="concept" data-key="The Python literacy bar"><div class="chead" role="button" tabindex="0"><div><span class="idx">02</span><b>The Python literacy bar</b> <span class="chip ch">ch 2</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>You will not write code in the exam. You will read a short block and say what it does. If you can read this query() call and say &#x27;starts an agent, asks it to fix auth.py, limits it to three tools, streams the messages&#x27;, you have the bar.</p><div class="callout blue"><strong>Picture it:</strong> You do not need to write the recipe; you need to read one and say what it will make.</div><pre><code>import asyncio
+from claude_agent_sdk import query, ClaudeAgentOptions
+async def main():
+    async for message in query(
+        prompt=&quot;Find and fix the bug in auth.py&quot;,
+        options=ClaudeAgentOptions(allowed_tools=[&quot;Read&quot;, &quot;Edit&quot;, &quot;Bash&quot;]),
+    ):
+        print(message)
+asyncio.run(main())</code></pre><div class="note">allowed_tools is the fence; async for is the stream.</div><div class="callout"><strong>The trap:</strong> Studying pandas, Django or deep async patterns; none are on the test.</div><div class="callout green"><strong>In Formulaite:</strong> Reading agent.py&#x27;s run() loop out loud, one line per sentence, is the same exercise on Formulaite code.</div></div></div><div class="concept" data-key="Pattern 1: scale failure"><div class="chead" role="button" tabindex="0"><div><span class="idx">03</span><b>Pattern 1: scale failure</b> <span class="chip ch">ch 3</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Cues: at scale, peak, p95, rate limit, cost spike, timeout. The system worked in development and breaks under traffic. The template has three moves in order: batch what can wait, cache the shared prompt, and wrap the rest in a backoff loop. Model choice is separate.</p><div class="callout blue"><strong>Picture it:</strong> Black Friday orders pile up; you do not buy a faster kettle, you move the bulk work to the overnight shift.</div><div class="callout"><strong>The trap:</strong> Picking &#x27;switch to Haiku&#x27; because it is cheaper per token; the Batch discount applies to every model.</div><div class="callout green"><strong>In Formulaite:</strong> The nightly catalogue refresh is the batch; SYSTEM_PROMPT in agent.py is the cache; with_fallback around ClaudeModel is the loop.</div></div></div><div class="concept" data-key="Pattern 2: wrong-tool routing"><div class="chead" role="button" tabindex="0"><div><span class="idx">04</span><b>Pattern 2: wrong-tool routing</b> <span class="chip ch">ch 3</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Cues: calls the wrong tool, fires create when the user said update, research query lands in ticket-filing. Two moves: tighten the tool descriptions so they no longer overlap, and scope each subagent&#x27;s tools list so the wrong tool is not even in reach. Then keep a small routing test.</p><div class="callout blue"><strong>Picture it:</strong> Two drawers both labelled &#x27;actives&#x27; get mixed up. Relabel them, and keep the retinol in a cabinet the intern cannot open.</div><pre><code>options = ClaudeAgentOptions(
+    allowed_tools=[&quot;Read&quot;, &quot;Glob&quot;, &quot;Grep&quot;, &quot;Agent&quot;],
+    agents={
+        &quot;search&quot;: AgentDefinition(
+            description=&quot;Searches the customer support knowledge base.&quot;,
+            prompt=&quot;Find relevant documentation for the user&#x27;s question.&quot;,
+            tools=[&quot;Read&quot;, &quot;Glob&quot;, &quot;Grep&quot;]),
+        &quot;ticketer&quot;: AgentDefinition(
+            description=&quot;Files customer support tickets.&quot;,
+            prompt=&quot;File a ticket with the supplied fields.&quot;,
+            tools=[&quot;Bash&quot;]),
+    })</code></pre><div class="note">The search subagent has no Bash, so it cannot file a ticket even if misrouted.</div><div class="callout"><strong>The trap:</strong> Nudging the system prompt toward the right tool; that is a knob-turn, not a fence.</div><div class="callout green"><strong>In Formulaite:</strong> tools.py descriptions for catalogue_lookup and read_supplier_page must not overlap; the routing test is three queries against build_registry().</div></div></div><div class="concept" data-key="Pattern 3: silent failure cue"><div class="chead" role="button" tabindex="0"><div><span class="idx">05</span><b>Pattern 3: silent failure cue</b> <span class="chip ch">ch 3</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Cues: no exception thrown, output passes validation, user complains days later, the agent returns confidently. Everything looks fine until the punchline. The answer is the detection stack: assertions, golden set, judge. Not more logging, not a bigger model.</p><div class="callout blue"><strong>Picture it:</strong> The batch record says pass; the customer says the cream stings. Nothing in the paperwork was wrong.</div><div class="callout"><strong>The trap:</strong> Reading &#x27;no errors in the logs&#x27; as good news instead of as the cue.</div><div class="callout green"><strong>In Formulaite:</strong> A drawer that passes run_gates but names the wrong supplier is this stem; the Glass Box alone will not flag it.</div></div></div><div class="concept" data-key="Pattern 4: cross-machine portability"><div class="chead" role="button" tabindex="0"><div><span class="idx">06</span><b>Pattern 4: cross-machine portability</b> <span class="chip ch">ch 3</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Cues: works on my machine, teammate clones the repo, CI cannot find the tools, new hire&#x27;s session ignores half the rules. Portability stems are always scope: a file in the wrong place, a path or variable that lives on one laptop. The fix moves the config to the scope that matches its intent.</p><div class="callout blue"><strong>Picture it:</strong> A recipe pinned to your own fridge is not the recipe the second kitchen follows.</div><div class="callout"><strong>The trap:</strong> Guessing version skew; the root cause is almost always scope.</div><div class="callout green"><strong>In Formulaite:</strong> Ask of every Formulaite rule and tool: if a teammate cloned agent_lab and ran it, would this still be in effect?</div></div></div><div class="concept" data-key="Pattern 5: trust-boundary edge case"><div class="chead" role="button" tabindex="0"><div><span class="idx">07</span><b>Pattern 5: trust-boundary edge case</b> <span class="chip ch">ch 3</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Cues: user asks for an override, ignore prior instructions, the agent has elevated permissions, manager wants full database access. Whose rules win? Name the three tiers, then the primitives: least-privilege MCP scope, operator rules the user cannot flip, audit logging, and a harmlessness screen at the input.</p><div class="callout blue"><strong>Picture it:</strong> A customer asks the lab to skip the preservative &#x27;just this once&#x27;. The answer is not a preference; it is the rule the lab cannot break.</div><div class="callout"><strong>The trap:</strong> Choosing &#x27;the terms of service prohibit it&#x27;; even if true, the architectural answer is still the architectural answer.</div><div class="callout green"><strong>In Formulaite:</strong> gates.py FORBIDDEN_CLAIMS is an operator rule in Formulaite; no user prompt can talk the gate into accepting &#x27;clinically proven&#x27;.</div></div></div><div class="concept" data-key="Mock score decides the date"><div class="chead" role="button" tabindex="0"><div><span class="idx">08</span><b>Mock score decides the date</b> <span class="chip ch">ch 12</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Sixty questions weighted like the real exam: sixteen, eleven, twelve, twelve, nine. Score each domain, then apply the rule. Eighty percent or more means book this week; seventy to seventy-nine means one more week on the bottom two domains and their build steps. Under seventy means redo Chapters 4 to 9 in full.</p><div class="callout blue"><strong>Picture it:</strong> A stability test at week four tells you whether to launch, reformulate one phase, or start again.</div><div class="callout"><strong>The trap:</strong> Skimming Domain 5 because it is only fifteen percent; that is where close fails happen.</div><div class="callout green"><strong>In Formulaite:</strong> Treat the Formulaite golden set the same way: a per-domain pass rate that decides whether the agent ships or goes back to the bench.</div></div></div></div><div class="panel" data-level="advanced"><div class="prog"><span class="lbl">Advanced</span><div class="bar"><i></i></div><span class="txt">0 / 8 got it</span></div><div class="concept" data-key="Provenance inside the schema"><div class="chead" role="button" tabindex="0"><div><span class="idx">01</span><b>Provenance inside the schema</b> <span class="chip ch">ch 8</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Every fact field gets a partner field naming its source. A model validator then rejects any output whose source key is not in the citations. The model cannot return a finding without evidence. Provenance is a schema primitive, not a logging afterthought.</p><div class="callout blue"><strong>Picture it:</strong> Every claim on the label points to a test report number, and the file is refused if the number does not exist.</div><pre><code>class ResearchSummary(BaseModel):
+    finding: str
+    finding_source: str  # citation key, must match an entry in citations
+    citations: dict[str, Citation]  # keyed by citation key
+    confidence: Literal[&quot;low&quot;, &quot;medium&quot;, &quot;high&quot;]
+    @model_validator(mode=&quot;after&quot;)
+    def finding_source_must_be_in_citations(self):
+        assert self.finding_source in self.citations, \
+            &quot;finding_source must reference a key in citations&quot;
+        return self</code></pre><div class="note">A model-level validator can compare two fields; a field validator cannot.</div><div class="callout"><strong>The trap:</strong> Logging sources after the fact and calling that provenance.</div><div class="callout green"><strong>In Formulaite:</strong> drawer.py&#x27;s sources list plus gates.py check_has_sources is half of this; a per-section source key would finish it.</div></div></div><div class="concept" data-key="Golden-set regression in CI"><div class="chead" role="button" tabindex="0"><div><span class="idx">02</span><b>Golden-set regression in CI</b> <span class="chip ch">ch 9</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Pin a set of inputs with known-correct outputs in the repo. Every prompt, model or tool change runs the agent over the set and diffs the result. A non-empty diff means the change broke something that used to work. It grows each time production finds a new failure.</p><div class="callout blue"><strong>Picture it:</strong> A reference sample from the approved batch, kept in the fridge, compared side by side against every new batch.</div><pre><code>import json
+from pathlib import Path
+def golden_set_regression(agent, samples_path: Path, expected_path: Path):
+    samples = json.loads(samples_path.read_text())
+    expected = json.loads(expected_path.read_text())
+    failures = []
+    for sample_id, sample_input in samples.items():
+        actual = agent.run(sample_input)
+        if actual != expected[sample_id]:
+            failures.append({&quot;id&quot;: sample_id, &quot;expected&quot;: expected[sample_id], &quot;actual&quot;: actual})
+    return failures</code></pre><div class="note">Plain equality on the pinned answer; the failures list is the CI report.</div><div class="callout"><strong>The trap:</strong> Running the golden set only on your laptop; if a teammate cannot run it, it is not regression testing.</div><div class="callout green"><strong>In Formulaite:</strong> agent_lab/data holds the catalogue; a samples/golden_set.json of ten drawers run through Agent.run is the Formulaite version.</div></div></div><div class="concept" data-key="Silent-failure detector as a drop-in"><div class="chead" role="button" tabindex="0"><div><span class="idx">03</span><b>Silent-failure detector as a drop-in</b> <span class="chip ch">ch 9</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Stitch the three mechanisms into one class that wraps any agent. check() runs the assertions and the judge on a single answer. regression() runs the golden set. The coordinator calls check() after the synthesizer and flags or refuses on a low score.</p><div class="callout blue"><strong>Picture it:</strong> One QC station at the end of the line that does the spec check, the reference comparison and the second-chemist review.</div><pre><code>class SilentFailureDetector:
+    def __init__(self, agent, samples_path, expected_path, judge_threshold=0.7):
+        self.agent, self.judge_threshold = agent, judge_threshold
+        self.samples_path, self.expected_path = samples_path, expected_path
+    def check(self, question: str, answer):
+        validated = answer  # Mechanism 1: Pydantic raises on validator failure
+        verdict = judge(question, str(answer))  # Mechanism 3
+        if verdict.confidence &lt; self.judge_threshold:
+            return {&quot;flag&quot;: True, &quot;reason&quot;: verdict.reason, &quot;confidence&quot;: verdict.confidence}
+        return {&quot;flag&quot;: False}
+    def regression(self):  # Mechanism 2
+        return golden_set_regression(self.agent, self.samples_path, self.expected_path)</code></pre><div class="note">Two methods: one per answer, one per commit. Expect four of five planted failures to be caught.</div><div class="callout"><strong>The trap:</strong> Stopping at one mechanism; each catches a different gap and the exam grades all three.</div><div class="callout green"><strong>In Formulaite:</strong> It wraps Agent.run in agent.py; its flag becomes a Glass Box event so the replay shows why a drawer was held back.</div></div></div><div class="concept" data-key="Long-context reliability"><div class="chead" role="button" tabindex="0"><div><span class="idx">04</span><b>Long-context reliability</b> <span class="chip ch">ch 9</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Long sessions drift. Four primitives keep them honest: cache the system prompt with a one-hour TTL, re-inject the key instructions at a fixed cadence, pass structured state between subagents rather than prose, and log every call with a request id. Without the log a silent failure is unfalsifiable.</p><div class="callout blue"><strong>Picture it:</strong> On a long shift you re-read the batch sheet every hour, hand over in writing, and sign the log.</div><div class="callout"><strong>The trap:</strong> Summarising the whole history every turn; it is lossy and does not keep instructions salient.</div><div class="callout green"><strong>In Formulaite:</strong> memory.py Conversation.token_estimate is the drift signal; re-injecting SYSTEM_PROMPT every ten steps is the fix in agent.py.</div></div></div><div class="concept" data-key="Hardcoded versus softcoded behaviours"><div class="chead" role="button" tabindex="0"><div><span class="idx">05</span><b>Hardcoded versus softcoded behaviours</b> <span class="chip ch">ch 10</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Hardcoded rules live in the SDK allow-list or inside the MCP server&#x27;s tool surface; no user can flip them. Softcoded rules live in CLAUDE.md, rules files and permissionMode; they are preferences. Safety goes in the hard layer. Ergonomics go in the soft layer.</p><div class="callout blue"><strong>Picture it:</strong> The fume hood interlock is hardware. &#x27;Please label your beakers&#x27; is a sign on the wall.</div><div class="callout"><strong>The trap:</strong> Putting &#x27;never write to production&#x27; in ./CLAUDE.md; a user can flip a softcoded rule.</div><div class="callout green"><strong>In Formulaite:</strong> gates.py and the tool registry are Formulaite&#x27;s hard layer; ./CLAUDE.md style preferences are the soft layer.</div></div></div><div class="concept" data-key="Audit logging is architecture"><div class="chead" role="button" tabindex="0"><div><span class="idx">06</span><b>Audit logging is architecture</b> <span class="chip ch">ch 10</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Log every tool call, every delegation and every refusal with a fixed schema: user, session, action, parameters, outcome, timestamp. Three reasons: falsifiability (what did the agent access on Tuesday?), refusal forensics for the throttle layer, and compliance. Design it in; do not retrofit it.</p><div class="callout blue"><strong>Picture it:</strong> The batch record is not paperwork after the fact; it is the reason a recall can be traced to one drum.</div><div class="callout"><strong>The trap:</strong> Treating the log as an ops concern the exam does not grade.</div><div class="callout green"><strong>In Formulaite:</strong> glassbox.py is exactly this: GlassBox.log() with kind, tags and meta, saved per run and replayable.</div></div></div><div class="concept" data-key="Circuit-breaking fallback wrapper"><div class="chead" role="button" tabindex="0"><div><span class="idx">07</span><b>Circuit-breaking fallback wrapper</b> <span class="chip ch">ch 13</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>The plain retry loop becomes a class that counts consecutive failed calls. Past a threshold it opens the circuit and refuses to try at all. That stops a silent retry storm before it burns the budget. A success resets the count.</p><div class="callout blue"><strong>Picture it:</strong> After ten failed supplier calls in a row you stop dialling and escalate, instead of tying up the phone all day.</div><pre><code>class FallbackWrapper:
+    def __init__(self, max_attempts=3, base_delay=1.0, circuit_threshold=10):
+        self.max_attempts, self.base_delay, self.circuit_threshold = max_attempts, base_delay, circuit_threshold
+        self._consecutive_failures = 0
+    async def __call__(self, call):  # the object is callable, like a function
+        if self._consecutive_failures &gt;= self.circuit_threshold: raise CircuitOpen(&quot;circuit open&quot;)
+        for attempt in range(self.max_attempts):
+            try:
+                result = await call(); self._consecutive_failures = 0; return result
+            except (anthropic.RateLimitError, anthropic.APITimeoutError) as exc:
+                last_exc = exc; await asyncio.sleep(self.base_delay * (2 ** attempt))
+        self._consecutive_failures += 1; raise last_exc</code></pre><div class="note">The counter lives on the object, so one wrapper per dependency tracks its own health.</div><div class="callout"><strong>The trap:</strong> Retrying inside the loop without a cap; three hundred calls in ninety seconds is the failure mode.</div><div class="callout green"><strong>In Formulaite:</strong> One FallbackWrapper per Formulaite dependency: the model in models.py and the supplier reader in formulaite_tools.py.</div></div></div><div class="concept" data-key="One artefact, five layers"><div class="chead" role="button" tabindex="0"><div><span class="idx">08</span><b>One artefact, five layers</b> <span class="chip ch">ch 9</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>The same chatbot appears in five chapters. It gains a coordinator, an injection screen, a citations schema, business validators and a judge. That is what the exam grades: stacking primitives on one problem and saying why each is needed. Build one thing and keep adding layers.</p><div class="callout blue"><strong>Picture it:</strong> One base formula, then preservative, then stabiliser, then fragrance, then the final QC step. You do not start a new pot each time.</div><div class="callout"><strong>The trap:</strong> Building eight unrelated demos instead of one system that compounds.</div><div class="callout green"><strong>In Formulaite:</strong> The Formulaite research agent is the artefact; each rung of this ladder adds one layer to agent.py rather than starting over.</div></div></div></div>
+</section>
+
+<section id="cheat">
+ <span class="num">05 · Cheat sheet</span>
+ <h2>Claude Certified Architect Foundations Playbook — cheat sheet</h2>
+ <p class="small">Everything on one sheet. <button class="btn" id="printBtn" type="button">Print this cheat sheet</button></p>
+ 
+<div class="cs-grid">
+ <div><h3>Vocabulary</h3><div class="tablewrap"><table><thead><tr><th>Term</th><th>Means</th></tr></thead><tbody><tr><td class="t">Hub-and-Spoke</td><td>User to coordinator to scoped subagents to a structured answer; the Domain 1 template.</td></tr><tr><td class="t">Coordinator</td><td>The routing agent; must have &quot;Agent&quot; in allowed_tools to delegate.</td></tr><tr><td class="t">AgentDefinition</td><td>A subagent spec: description, prompt, tools, optional model.</td></tr><tr><td class="t">Structured context passing</td><td>Hand a subagent a task-shaped payload, not the raw user question.</td></tr><tr><td class="t">Batch API</td><td>Async endpoint at /v1/messages/batches; fifty percent off input and output, separate rate limits.</td></tr><tr><td class="t">Prompt caching</td><td>cache_control on a long stable block; reads cost ninety percent less, five-minute or one-hour TTL.</td></tr><tr><td class="t">Structured outputs</td><td>output_config.format or messages.parse; schema-valid JSON guaranteed by constrained sampling.</td></tr><tr><td class="t">Fallback loop</td><td>Backoff retry for rate limits, timeouts, refusals; three attempts, 1s 2s 4s.</td></tr><tr><td class="t">MCP</td><td>Open standard connecting agents to tools; transports stdio, HTTP, SSE.</td></tr><tr><td class="t">mcp__server__tool</td><td>The strict MCP tool name; double underscores, never dots.</td></tr><tr><td class="t">.mcp.json</td><td>Server registrations at the project root; loaded only if settingSources includes project.</td></tr><tr><td class="t">permissionMode</td><td>Silences built-in edit tools only; never auto-approves MCP tools.</td></tr><tr><td class="t">CLAUDE.md scopes</td><td>Managed, Project, User, Local; Local wins; only Project ships with the repo.</td></tr><tr><td class="t">Hook</td><td>A non-interactive shell command run on an event such as PostToolUse.</td></tr><tr><td class="t">Skill versus slash command</td><td>Skill is agent-invoked; slash command is human-typed.</td></tr><tr><td class="t">Harmlessness screen</td><td>A Haiku classifier returning is_harmful before input reaches the agent.</td></tr><tr><td class="t">Silent failure</td><td>Output that is valid and wrong; no exception, no red log.</td></tr><tr><td class="t">Golden set</td><td>Pinned inputs with known-correct outputs, diffed in CI on every change.</td></tr><tr><td class="t">LLM-as-judge</td><td>A second cheap model call scoring the first answer; flag under 0.7, refuse under 0.5.</td></tr><tr><td class="t">Blast radius</td><td>What a jailbroken or hallucinating agent could damage with its current permissions.</td></tr></tbody></table></div></div>
+ <div><h3>The pattern</h3><ol><li>Read the stem twice; name the pattern: scale, routing, silent, portability, trust.</li><li>Cross out the knob-turns: bigger model, better prompt, lower temperature.</li><li>Name the layer that changes the shape: coordinator, schema, scope, screen, detector.</li><li>Say which order the layers ship in, and why the first one comes first.</li><li>Check the answer against the wrong-answer cues for that pattern.</li><li>Build it once in the prep repo so the recognition becomes reflex.</li></ol>
+  <h3>Decisions</h3><div class="tablewrap"><table><thead><tr><th>When</th><th>Use</th><th>Not</th></tr></thead><tbody><tr><td>A user is waiting and p95 under five seconds is in the SLA</td><td>synchronous Messages API, cached system prompt</td><td>the Batch API</td></tr><tr><td>The work can wait up to an hour: nightly extraction, evals, bulk classification</td><td>the Batch API at fifty percent off</td><td>more rate-limit quota or a smaller model</td></tr><tr><td>The same long block goes out on many calls</td><td>cache_control ephemeral, 1h TTL for long sessions</td><td>sending it every time or trimming it below the minimum</td></tr><tr><td>Output is malformed some of the time</td><td>output_config.format or messages.parse</td><td>temperature zero, regex or retries</td></tr><tr><td>Output is well-formed but breaks a business rule</td><td>a Pydantic field or model validator</td><td>a schema constraint the API rejects</td></tr><tr><td>The call returns data in a known shape</td><td>structured outputs</td><td>tool use</td></tr><tr><td>The call must act on an outside system</td><td>tool use, with structured outputs on the tool&#x27;s result</td><td>structured outputs alone</td></tr><tr><td>A rule must be unflippable for safety</td><td>the allow-list or the MCP tool surface</td><td>CLAUDE.md or a rules file</td></tr></tbody></table></div></div>
+</div>
+<h3>Rules of thumb</h3><div class="tablewrap"><table><thead><tr><th>Do</th><th>Don't</th></tr></thead><tbody><tr><td>Put &quot;Agent&quot; in the coordinator&#x27;s allowed_tools before defining any subagent.</td><td>Debug the subagent when the coordinator cannot delegate.</td></tr><tr><td>Route anything that can wait an hour through the Batch API.</td><td>Switch to a cheaper model and call that the cost fix.</td></tr><tr><td>Pin a schema for shape and add a validator for business rules.</td><td>Put minimum, maximum or string length in the schema; they are not supported.</td></tr><tr><td>Wrap every model and tool call in a backoff loop with a hard cap.</td><td>Retry malformed JSON; the schema layer already made it impossible.</td></tr><tr><td>Use relative paths, a .env.example and the project root for .mcp.json.</td><td>Blame the teammate&#x27;s Claude Code version.</td></tr><tr><td>Keep team rules in ./CLAUDE.md and personal ones in ~/.claude/CLAUDE.md.</td><td>Believe in a plugin scope or a six-tool Claude Code.</td></tr><tr><td>Screen input with a Haiku classifier before the agent sees it.</td><td>Rely on the system prompt as the whole injection defence.</td></tr><tr><td>Hardcode safety rules in the allow-list or the MCP tool surface.</td><td>Put &#x27;never write to production&#x27; in a CLAUDE.md file.</td></tr><tr><td>Keep a golden set and a judge, and run the golden set in CI.</td><td>Answer a silent-failure stem with more log verbosity.</td></tr><tr><td>Log every call, delegation and refusal with a fixed schema.</td><td>Treat the audit log as an ops task to add later.</td></tr></tbody></table></div>
+<h3>Skeletons</h3><h4>Coordinator with a read-only researcher</h4><pre><code>options = ClaudeAgentOptions(
+    model=&quot;claude-opus-4-7&quot;,
+    allowed_tools=[&quot;Read&quot;, &quot;Glob&quot;, &quot;Grep&quot;, &quot;Agent&quot;],
+    agents={
+        &quot;researcher&quot;: AgentDefinition(
+            description=&quot;Searches project files and returns structured citations.&quot;,
+            prompt=RESEARCHER_PROMPT, tools=[&quot;Read&quot;, &quot;Glob&quot;, &quot;Grep&quot;], model=&quot;claude-haiku-4-5&quot;),
+        &quot;synthesizer&quot;: AgentDefinition(
+            description=&quot;Composes a cited final answer from researcher output.&quot;,
+            prompt=SYNTHESIZER_PROMPT, tools=[&quot;Read&quot;], model=&quot;claude-haiku-4-5&quot;),
+    },
+)</code></pre><h4>Typed output plus validator plus fallback</h4><pre><code>class ResearcherOutput(BaseModel):
+    citations: list[Citation]
+    confidence: Literal[&quot;low&quot;, &quot;medium&quot;, &quot;high&quot;]
+    refusal_reason: str | None = None
+    @field_validator(&quot;citations&quot;)
+    def files_must_exist(cls, v):
+        assert all(Path(c.file).exists() for c in v), &quot;citation points nowhere&quot;; return v
+async def call_researcher(task: dict) -&gt; ResearcherOutput:
+    response = await with_fallback(lambda: client.messages.parse(
+        model=&quot;claude-haiku-4-5&quot;, max_tokens=2048, output_format=ResearcherOutput,
+        messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: json.dumps(task)}]))
+    return response.parsed_output</code></pre><h4>Portable MCP server tool</h4><pre><code># summarizer_server.py
+from mcp.server.fastmcp import FastMCP
+mcp = FastMCP(&quot;summarizer&quot;)
+@mcp.tool()
+def summarize_repo(path: str = &quot;.&quot;) -&gt; str:
+    &quot;&quot;&quot;Summarize the repository&#x27;s README and top-level file structure.
+    Does not search file contents; use the filesystem server for content reads.
+    &quot;&quot;&quot;
+    ...
+if __name__ == &quot;__main__&quot;:
+    mcp.run(transport=&quot;stdio&quot;)</code></pre><h4>Judge gate after the synthesizer</h4><pre><code>answer = synthesize(question, citations)
+verdict = judge(question, str(answer))
+box.log(&quot;judge&quot;, quality=verdict.quality, confidence=verdict.confidence)
+if verdict.confidence &lt; 0.5:
+    return refuse(question, reason=verdict.reason)   # logged refusal
+if verdict.confidence &lt; 0.7:
+    return flag_for_review(answer, verdict.reason)
+return answer</code></pre>
+<h3>Before you ship</h3><ul class="check"><li><input type="checkbox" class="ship"><span>Coordinator&#x27;s allowed_tools includes &quot;Agent&quot;; every subagent&#x27;s tools list is narrower than the coordinator&#x27;s.</span></li><li><input type="checkbox" class="ship"><span>Every model call has a schema or a Pydantic output_format, and a validator for the rules the schema cannot say.</span></li><li><input type="checkbox" class="ship"><span>Every model and tool call sits inside a backoff loop with a hard cap and, per dependency, a circuit breaker.</span></li><li><input type="checkbox" class="ship"><span>.mcp.json is at the project root with relative paths, a pinned version and a committed .env.example; a fresh clone runs in CI.</span></li><li><input type="checkbox" class="ship"><span>MCP tools are on allowedTools per server; permissionMode is not being asked to do that job.</span></li><li><input type="checkbox" class="ship"><span>Team rules are in ./CLAUDE.md; safety rules are hardcoded in the allow-list, not in any CLAUDE.md.</span></li><li><input type="checkbox" class="ship"><span>A Haiku harmlessness screen runs before the agent and every refusal is logged with user, input and layer.</span></li><li><input type="checkbox" class="ship"><span>A golden set runs on every commit and a judge scores live answers; the nightly judge run goes through Batch.</span></li></ul>
+
+</section>
+
+<section id="s06">
+ <span class="num">06 · You're done when…</span>
+ <div class="callout green"><ol><li>Read a Formulaite incident in one sentence (wrong claim, tool missing on a teammate&#x27;s laptop, cost spike, quiet wrong drawer, user asks for more access), name its pattern, and say which layer fixes it.</li><li>Run the Formulaite coordinator with a read-only researcher and a drawer that is guaranteed schema-valid, then break delegation by removing the Agent tool and explain the symptom.</li><li>Show a drawer that passes the gate but is wrong, and point to the assertion, golden-set diff or judge verdict in the Glass Box that flagged it.</li></ol></div>
+</section>
+
+<section id="s07">
+ <span class="num">07 · Where this comes from</span>
+ 
+<p><strong>Book:</strong> <em>Claude Certified Architect Foundations Playbook</em>, J Cook, 148 pages. Markdown copy: <code>books-md/claude-certified-architect-foundations-playbook.md</code>. Notes with chapter citations: <code>docs/book-notes/claude-certified-architect-foundations-playbook.md</code>.</p>
+<p><strong>Chapters covered:</strong> 1 Chapter 1: What the CCA-F Actually Tests, 2 Chapter 2: How the Exam Actually Works, 3 Chapter 3: The 5 Judgment Patterns the Exam Actually Tests, 4 Chapter 4: Domain 1 Part 1 — Agentic Architecture, 5 Chapter 5: Domain 1 Part 2 — Orchestration, 6 Chapter 6: Domain 2 — Tool Design and MCP Integration, 7 Chapter 7: Domain 3 — Claude Code Configuration and Workflows, 8 Chapter 8: Domain 4 — Prompt Engineering and Structured Output, 9 Chapter 9: Domain 5 — Context Management and Reliability, 10 Chapter 10: Safety, Trust Hierarchy, and Responsible Deployment, 11 Chapter 11: The Money Chapter, 12 Chapter 12: The Launchpad, 13 Appendix A: Resources, Glossary, Domain Cheat Sheets, and the Open Repo.</p>
+<h3>In the author's words</h3><div class="quote">“Recognition is faster than recall, holds up under pressure, and is harder to break with a tricky distractor.”<span class="who">chapter 3</span></div><div class="quote">“Four layers, two subagents, one schema, one refusal path. No better prompt anywhere.”<span class="who">chapter 4</span></div><div class="quote">“Domain 2 is the scoping domain, full stop.”<span class="who">chapter 6</span></div><div class="quote">“Schema is a guarantee on shape. Fallback is a strategy on outcome.”<span class="who">chapter 8</span></div><div class="quote">“A silent failure is an output that is valid and wrong”<span class="who">chapter 9</span></div>
+<h3>Python constructs this book leans on</h3><div class="tablewrap"><table><thead><tr><th>Construct</th><th>What it does here</th><th>Where</th></tr></thead><tbody><tr><td class="t">async for … in query(...) with asyncio.run</td><td>Streams an Agent SDK session message by message; reading this at sight is the whole Python bar for the exam.</td><td class="small">Chapter 2, The Python Prerequisite Reality</td></tr><tr><td class="t">AgentDefinition(...) inside a dict passed as agents=</td><td>A named subagent with description, prompt and its own tools list; the coordinator picks by name.</td><td class="small">Chapter 4, The Agent SDK Subagent Pattern, Line by Line</td></tr><tr><td class="t">lambda wrapped by an async retry helper</td><td>with_fallback(lambda: client.messages.create(...)) delays the call so it can be retried with 2 ** attempt backoff.</td><td class="small">Chapter 5, Fallback Loops: What Fails, How to Recover</td></tr><tr><td class="t">except (RateLimitError, APITimeoutError) as exc</td><td>Catching a tuple of exception types means only transient errors are retried; everything else raises at once.</td><td class="small">Chapter 5, Fallback Loops</td></tr><tr><td class="t">pydantic BaseModel with Literal[...] and str | None = None</td><td>A typed shape the API fills by construction; Literal is an enum, the optional field is a refusal slot; see drawer.py IngredientDrawer.</td><td class="small">Chapter 5, BUILD STEP, and Chapter 8</td></tr><tr><td class="t">@field_validator and @model_validator(mode=&quot;after&quot;)</td><td>Business-rule checks that run after the schema; the same job gates.py does with plain functions.</td><td class="small">Chapter 8, The Structured-Output Enforcement Stack; Citations and Provenance</td></tr><tr><td class="t">list comprehension building Request(...) objects</td><td>for i, q in enumerate(queries) turns a list of questions into one Batch API call with custom_id plumbing.</td><td class="small">Chapter 5, BUILD STEP Step 5</td></tr><tr><td class="t">@mcp.tool() on a function with a docstring</td><td>FastMCP turns a plain function into an MCP tool; the docstring becomes the description the router reads; compare tools.py @registry.tool.</td><td class="small">Chapter 6, BUILD STEP Step 4</td></tr><tr><td class="t">class with async __call__</td><td>FallbackWrapper is an object you call like a function; it keeps a consecutive-failure count for the circuit breaker.</td><td class="small">Appendix A, fallback_wrapper.py</td></tr><tr><td class="t">yaml.safe_load(open(...).read())</td><td>Reads operator_policy.yaml once at start so the allow-list is frozen for the session.</td><td class="small">Chapter 10, BUILD STEP Step 3</td></tr></tbody></table></div>
+<h3>Deliberately left out of this guide</h3><ul><li><strong>The partner-gate logistics, the four access paths and the Access Path Worksheet</strong> — Chapter 2, The Partner-Gate, Demystified</li><li><strong>The LinkedIn update, five outreach DMs and the renewal-cost scenarios</strong> — Chapter 11, The Money Chapter</li><li><strong>The sixty mock questions themselves; the guide keeps only the scoring decision rule</strong> — Chapter 12, The Launchpad</li><li><strong>The TypeScript crosswalk and the Anthropic Academy course map</strong> — Appendix A</li></ul>
+
+ <details><summary>How you'd have built this guide yourself</summary>
+  <p>List the chapter headings first, then read the book in chapter order and write one card per idea that changes what you would build. Sort the cards into three piles: needed for the simplest working thing, needed for the version you would show someone, needed for the version that runs unattended. Those piles are the levels; the simplest thing in each pile is the build ladder. Copy quotes exactly and keep the chapter number next to every card, so you can go back to the source when a card stops making sense.</p>
+ </details>
+</section>
+</main>
+<script>
+(function(){
+ const KEY='bookguide.claude-certified-architect-foundations-playbook';
+ let state={got:{},ship:{},tab:'foundation'};
+ try{const s=localStorage.getItem(KEY); if(s) state=Object.assign(state,JSON.parse(s));}catch(e){}
+ function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+ // ladder
+ document.querySelectorAll('.rung').forEach(r=>{const go=()=>{document.querySelectorAll('.rung,.rungbody').forEach(x=>x.classList.toggle('on',x.dataset.rung===r.dataset.rung));}; r.onclick=go; r.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};});
+ // chapter rows
+ document.querySelectorAll('.chrow').forEach(r=>{const go=()=>r.classList.toggle('on'); r.onclick=go; r.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};});
+ // tabs
+ const tabs=document.querySelectorAll('#ctabs button');
+ function showTab(lvl){tabs.forEach(b=>b.classList.toggle('on',b.dataset.level===lvl)); document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.dataset.level===lvl)); state.tab=lvl; save();}
+ tabs.forEach(b=>b.onclick=()=>showTab(b.dataset.level));
+ // concepts
+ function progress(){document.querySelectorAll('.panel').forEach(p=>{const all=p.querySelectorAll('.got'), n=[...all].filter(c=>c.checked).length; p.querySelector('.bar i').style.width=(all.length?100*n/all.length:0)+'%'; p.querySelector('.txt').textContent=n+' / '+all.length+' got it';});}
+ document.querySelectorAll('.concept').forEach(c=>{
+  const head=c.querySelector('.chead'), box=c.querySelector('.got'), key=c.dataset.key;
+  box.checked=!!state.got[key]; c.classList.toggle('done',box.checked);
+  head.onclick=e=>{if(e.target.closest('label')) return; c.classList.toggle('open');};
+  head.onkeydown=e=>{if(e.key==='Enter'){c.classList.toggle('open');}};
+  box.onchange=()=>{state.got[key]=box.checked; c.classList.toggle('done',box.checked); save(); progress();};
+ });
+ document.querySelectorAll('.ship').forEach((b,i)=>{b.checked=!!state.ship[i]; b.onchange=()=>{state.ship[i]=b.checked; save();};});
+ showTab(state.tab||'foundation'); progress();
+ const pb=document.getElementById('printBtn'); if(pb){pb.onclick=()=>{document.body.classList.add('printing'); window.print();}; window.onafterprint=()=>document.body.classList.remove('printing');}
+ const ob=document.getElementById('openFirst'); if(ob){ob.onclick=()=>{showTab('foundation'); const first=document.querySelector('.panel[data-level=foundation] .concept'); if(first){first.classList.add('open'); first.scrollIntoView({behavior:'smooth',block:'start'});}};}
+})();
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad:true,theme:"neutral",securityLevel:"loose"});</script>
+</body>
+</html>

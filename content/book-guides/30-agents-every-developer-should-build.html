@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+</head>
+<body>
+<title>30 Agents Every Developer Should Build: A Practical Field Guide</title>
+<style>
+:root{color-scheme:light;
+ --surface:#faf9f5;--surface-2:#f2f0e9;--surface-3:#e8e6dc;--surface-ink:#141413;--line:#d9d7cc;--line-soft:#e8e6dc;
+ --ink:#141413;--ink-2:#5c5b57;--ink-3:#6b6a65;--on-ink:#faf9f5;
+ --accent:#d97757;--accent-2:#6a9bcc;--accent-3:#788c5d;
+ --font-head:"Poppins",Arial,sans-serif;--font-body:"Lora",Georgia,serif;--font-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--surface);color:var(--ink-2);font-family:var(--font-body);font-size:17px;line-height:1.7}
+main{max-width:980px;margin:0 auto;padding:36px 22px 90px}
+h1,h2,h3,h4{font-family:var(--font-head);color:var(--ink);line-height:1.2;margin:0 0 10px;text-wrap:balance}
+h1{font-size:38px;letter-spacing:-.02em;font-weight:600}
+h2{font-size:25px;font-weight:600}
+h3{font-size:18px;font-weight:600}
+h4{font-size:15px;font-weight:600;margin-bottom:6px}
+p{margin:0 0 12px;max-width:70ch}
+strong{color:var(--ink)}
+a{color:var(--ink);text-decoration-color:var(--accent);text-underline-offset:3px}
+code,.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+code{font-size:.86em;background:var(--surface-3);padding:1px 5px;border-radius:5px;color:var(--ink)}
+pre{background:var(--surface-3);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-family:var(--font-mono);font-size:12.5px;line-height:1.6;color:var(--ink);overflow-x:auto;margin:8px 0 6px;white-space:pre}
+pre code{background:none;padding:0;font-size:inherit}
+section{margin-top:52px}
+.num{font-family:var(--font-mono);color:var(--ink-3);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px}
+.eyebrow{font-family:var(--font-mono);color:var(--ink-3);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase}
+.byline{font-family:var(--font-head);font-size:14px;color:var(--ink-3);margin:-4px 0 12px}
+.strip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0 10px}
+.strip div{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:13px 15px;font-size:15px}
+.strip b{display:block;font-family:var(--font-head);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
+.callout{border-left:3px solid var(--accent);background:var(--surface-2);border-radius:0 12px 12px 0;padding:12px 16px;margin:14px 0;font-size:15.5px}
+.callout.blue{border-color:var(--accent-2)}.callout.green{border-color:var(--accent-3)}
+.callout ol,.callout ul{margin:6px 0 0 18px;padding:0}.callout li{margin:4px 0}
+.callout p:last-child{margin-bottom:0}
+.chip{display:inline-block;font-family:var(--font-head);font-size:11px;font-weight:600;letter-spacing:.04em;border-radius:6px;padding:2px 8px;color:#141413;vertical-align:middle}
+.chip.foundation{background:var(--accent-3)}.chip.intermediate{background:var(--accent-2)}.chip.advanced{background:var(--accent)}
+.chip.ch{background:var(--surface-3);color:var(--ink-2);font-family:var(--font-mono);font-weight:500}
+.diagram{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:14px;margin:14px 0;overflow-x:auto}
+.diagram pre.mermaid{background:none;border:none;padding:0;margin:0;white-space:pre;overflow:visible;text-align:center}
+.diagram svg{max-width:100%;height:auto}
+/* ladder */
+.ladder{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0}
+.rung{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:16px 18px;cursor:pointer}
+.rung:hover{border-color:var(--accent)}
+.rung.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+.rung .lvl{font-family:var(--font-head);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.rung h3{margin:4px 0 6px}
+.rung p{font-size:14.5px;margin:0}
+.rung .time{font-family:var(--font-mono);font-size:12px;color:var(--ink-3);margin-top:8px}
+.rungbody{display:none;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-top:-2px}
+.rungbody.on{display:block}
+.rungbody ol{margin:6px 0 10px 20px;padding:0}.rungbody li{margin:5px 0}
+.meta{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-3)}
+/* chapter map */
+.chmap{border-top:1px solid var(--line);margin-top:10px}
+.chrow{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:start;padding:10px 6px;border-bottom:1px solid var(--line-soft);cursor:pointer}
+.chrow:hover{background:var(--surface-2)}
+.chrow .n{font-family:var(--font-mono);color:var(--ink-3);font-size:13px;padding-top:4px}
+.chrow b{font-family:var(--font-head);font-size:15px;color:var(--ink);display:block}
+.chrow span.adds{font-size:14.5px;color:var(--ink-2)}
+.chrow .secs{display:none;font-size:13.5px;color:var(--ink-3);margin-top:6px;font-family:var(--font-mono)}
+.chrow.on .secs{display:block}
+/* concepts */
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 6px}
+.tabs button{font-family:var(--font-head);font-weight:600;font-size:13.5px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:10px;padding:9px 14px;cursor:pointer}
+.tabs button:hover{border-color:var(--accent)}
+.tabs button.on{background:var(--accent);border-color:var(--accent);color:#141413}
+.tabs button .cnt{font-family:var(--font-mono);font-weight:500;font-size:12px;margin-left:6px;color:var(--ink-3)}
+.tabs button.on .cnt{color:#141413}
+.prog{display:flex;align-items:center;gap:10px;margin:8px 0 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-3)}
+.prog .bar{flex:1;height:9px;background:var(--surface-3);border-radius:0 4px 4px 0;overflow:hidden}
+.prog .bar i{display:block;height:100%;width:0;background:var(--accent-3);transition:width .25s}
+.panel{display:none}.panel.on{display:block}
+.concept{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;margin:10px 0;overflow:hidden}
+.concept.done{border-color:var(--accent-3)}
+.chead{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px 16px;cursor:pointer}
+.chead:hover{background:var(--surface-3)}
+.chead b{font-family:var(--font-head);font-size:15.5px;color:var(--ink)}
+.chead .idx{font-family:var(--font-mono);color:var(--ink-3);font-size:12px;margin-right:8px}
+.chead label{font-family:var(--font-head);font-size:12.5px;color:var(--ink-2);display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap}
+.chead input{width:16px;height:16px;accent-color:#788c5d}
+.cbody{display:none;padding:4px 16px 16px;border-top:1px solid var(--line-soft)}
+.concept.open .cbody{display:block}
+.cbody p{font-size:15.5px}
+.cbody .callout{margin:10px 0;font-size:14.5px}
+.cbody .note{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-3);margin:0 0 8px}
+.showall{margin:8px 0 0;font-family:var(--font-head);font-size:13px;color:var(--ink-3)}
+/* tables */
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin:8px 0 14px}
+th{font-family:var(--font-head);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:7px 8px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+td.t{font-family:var(--font-mono);font-size:13px;color:var(--ink);white-space:nowrap}
+.tablewrap{overflow-x:auto}
+.check{list-style:none;padding:0;margin:6px 0}
+.check li{display:flex;gap:10px;align-items:flex-start;padding:5px 0;font-size:15px}
+.check input{margin-top:5px;accent-color:#788c5d}
+.btn{font-family:var(--font-head);font-weight:600;font-size:13.5px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:10px;padding:8px 14px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.go{background:var(--accent);border-color:var(--accent);color:#141413}
+.cs-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:800px){.cs-grid,.strip,.ladder{grid-template-columns:1fr}.chrow{grid-template-columns:36px 1fr}.chrow .chip{grid-column:2}}
+details{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:12px 18px;margin-top:14px}
+summary{font-family:var(--font-head);font-weight:600;color:var(--ink);cursor:pointer}
+.quote{border-left:3px solid var(--accent-2);padding:4px 14px;margin:10px 0;font-style:italic;font-size:15.5px}
+.quote .who{display:block;font-style:normal;font-family:var(--font-mono);font-size:12px;color:var(--ink-3);margin-top:2px}
+.small{font-size:14px;color:var(--ink-3)}
+.toplinks{display:flex;flex-wrap:wrap;gap:8px 16px;font-family:var(--font-head);font-size:13.5px;margin:10px 0 0}
+.toplinks a{color:var(--ink-2)}
+@media print{
+ body{font-size:12px} main{padding:0;max-width:none}
+ body.printing main>*:not(#cheat){display:none} .btn,.toplinks{display:none}
+ pre{white-space:pre-wrap;font-size:10.5px} .cs-grid{grid-template-columns:1fr 1fr} section{margin-top:16px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+</style>
+<main>
+<header>
+ <span class="eyebrow">Formulaite bookshelf · book 9 of 14 · Thirty builds</span>
+ <h1>30 Agents Every Developer Should Build: A Practical Field Guide</h1>
+ <div class="byline">Gordon A. Crawford · 695 pages · 34 concept cards</div>
+ <p>A field guide to thirty agent shapes, from proxy to research to validation agents, all built on one cognitive loop and one running customer-support example.</p>
+ 
+ <div class="strip">
+  <div><b>Goal</b>By the end you can build a Formulaite ingredient-research agent that plans sub-questions, reads supplier pages through safe tool contracts, keeps a source label on every drawer field, fact-checks each claim against its passage, sends gate failures back as fix instructions, escalates low-confidence drawers to a human, and reports its own five metrics from the Glass Box.</div>
+  <div><b>Output</b>A build ladder (3 rungs), 15 chapters mapped, 34 concept cards you tick off, and a printable cheat sheet.</div>
+  <div><b>Time</b>Foundation ~20 min · Intermediate ~22 min · Advanced ~26 min. Whole guide ~80 min over several sittings.</div>
+ </div>
+ <div class="callout"><strong>How to drive this page.</strong>
+  <ol>
+   <li>Press <button class="btn go" id="openFirst" type="button">Open the first card</button> — it jumps to the Foundation cards and opens card 01.</li>
+   <li>Read one card, tick <strong>Got it</strong>, open the next. The bar shows your progress and remembers it on this browser.</li>
+   <li>When Foundation is done, do <strong>Rung 1</strong> of the build ladder before reading Intermediate. Print the cheat sheet from section 05.</li>
+  </ol>
+  <div class="toplinks"><a href="30-agents-every-developer-should-build-cheatsheet.md">Cheat sheet as Markdown</a> · <a href="index.html">All nine guides</a></div>
+ </div>
+</header>
+
+<section id="s01">
+ <span class="num">01 · Where this is going</span>
+ <h2>Every agent is the same loop, perceive, reason, plan, act, learn, wrapped in modules that talk through a broker; what changes across the thirty agents is which module gets the hard job.</h2>
+ <p><strong>Read this book when:</strong> Open it once the basic tool loop works and you want a catalogue of proven architectures to borrow: retrieval, extraction, validation, recovery, arbitration and monitoring.</p>
+ <p>The one picture that holds the whole book. Every chapter adds a box or an arrow to it; nothing later replaces it.</p>
+ <div class="diagram"><pre class="mermaid">flowchart TD
+  A[Ingredient request] --&gt; B[Perceive and plan]
+  B --&gt; C[Model proposes a tool call]
+  C --&gt; D[Registry checks name and arguments]
+  D --&gt;|blocked| H[Escalate to human with dossier]
+  D --&gt; E[Safe tool runs with timeout]
+  E --&gt; F[Result with source label]
+  F --&gt; C
+  C --&gt;|fill drawer| G[Deterministic gate]
+  G --&gt;|fail with reasons| C
+  G --&gt;|low confidence| H
+  G --&gt;|pass| I[Drawer saved]
+  E --&gt; J[Glass Box trace]
+  G --&gt; J</pre></div>
+</section>
+
+<section id="s02">
+ <span class="num">02 · Build ladder</span>
+ <h2>Three things to build, in order</h2>
+ <p>Each rung is a Formulaite feature. Click a rung for its steps. Do rung 1 after the Foundation cards, rung 2 after Intermediate, rung 3 after Advanced.</p>
+ <div class="ladder"><div class="rung on" data-rung="0" role="button" tabindex="0"><div class="lvl">Rung 1 · Simple</div><h3>A proxy-then-tool-loop drawer filler with a Glass Box</h3><p>An agent with a five-part constitution that picks from a three-tool menu, turns the fill_drawer call into a validated IngredientDrawer, and leaves a readable trace.</p><div class="time">~2 hours</div></div><div class="rung" data-rung="1" role="button" tabindex="0"><div class="lvl">Rung 2 · Intermediate</div><h3>Supplier-page research with provenance, safe tools and a validator loop</h3><p>The agent reads supplier pages through a typed, timed tool contract, resolves trade names to INCI keys, keeps a source label on every field, and the gate sends fix instructions back until the drawer passes or a retry cap is hit.</p><div class="time">~half a day</div></div><div class="rung" data-rung="2" role="button" tabindex="0"><div class="lvl">Rung 3 · Advanced</div><h3>Fact-checked drawer with zero-trust tools, arbitration and evals</h3><p>Each drawer claim is checked against its cited passage, every tool call is re-authorised, conflicting use levels go to an arbiter and then a human, and the Glass Box feeds a five-metric report with a drift detector.</p><div class="time">~2 days</div></div></div><div class="rungbody on" data-rung="0"><h4>Steps for rung 1: A proxy-then-tool-loop drawer filler with a Glass Box</h4><ol><li>Write the system prompt in agent.py as five blocks: identity, rules, capabilities, output format, hierarchy.</li><li>Print as_tool_schema() from drawer.py and the registry schema from tools.py; fix any vague description.</li><li>Run Agent.run(&#x27;Glycerin&#x27;) and watch the loop: model proposes, ToolRegistry.call executes, result returns.</li><li>Make IngredientDrawer.from_model_kwargs reject a payload with missing sections instead of accepting it.</li><li>Replay the GlassBox and read each Event aloud: input, prompt, tool call, verdict, final action.</li></ol><div class="meta">Chapters 1, 3, 5 · Agent Lab files: <code>agent.py</code> · <code>drawer.py</code> · <code>tools.py</code> · <code>glassbox.py</code> · ~2 hours</div></div><div class="rungbody" data-rung="1"><h4>Steps for rung 2: Supplier-page research with provenance, safe tools and a validator loop</h4><ol><li>Wrap read_supplier_page in formulaite_tools.py with input validation, a timeout and typed errors.</li><li>Attach a source label to every chunk the tool returns and make check_has_sources in gates.py use it.</li><li>Add an alias map to catalogue_lookup so a trade name resolves to the INCI key before lookup.</li><li>Make run_gates return reasons the model can act on and cap the fix loop in agent.py at three rounds.</li><li>Add a session budget in memory.py using token_estimate() and refuse the big model when it is spent.</li></ol><div class="meta">Chapters 4, 6, 7, 10 · Agent Lab files: <code>formulaite_tools.py</code> · <code>tools.py</code> · <code>gates.py</code> · <code>memory.py</code> · ~half a day</div></div><div class="rungbody" data-rung="2"><h4>Steps for rung 3: Fact-checked drawer with zero-trust tools, arbitration and evals</h4><ol><li>Split each drawer section into atomic claims and add check_claims_supported to gates.py.</li><li>Add a per-call permission check in ToolRegistry.call so fill_drawer cannot write for a read-only role.</li><li>Flag a supplier-versus-catalogue use-level conflict and route it to a needs_human status with both sources.</li><li>Compute task success, response time, tool latency and fallback frequency from saved GlassBox runs.</li><li>Order the gates: banned ingredient, use-level limit, forbidden claims, then softer quality checks.</li><li>Add a drift detector on the gate-fail rate that logs, tightens oversight, then halts the agent.</li></ol><div class="meta">Chapters 8, 9, 12, 13, 14, 17 · Agent Lab files: <code>gates.py</code> · <code>tools.py</code> · <code>glassbox.py</code> · <code>agent.py</code> · ~2 days</div></div>
+</section>
+
+<section id="s03">
+ <span class="num">03 · Chapter map</span>
+ <h2>What each chapter adds to the machine</h2>
+ <p>Colour = the level it belongs to. Click a chapter to see its sections.</p>
+ <div class="chmap"><div class="chrow" role="button" tabindex="0"><div class="n">1</div><div><b>Foundations of Agent Engineering</b><span class="adds">The five-phase cognitive loop, the cognition core as broker, the agent shapes from proxy to multi-agent, and the maturity ladder from rules to learning.</span><div class="secs">The cognitive loop · Communication patterns between components · Choosing an agent brain: patterns of perception-to-action · Conceptualization and requirements analysis · Evaluation and optimization · Proxy agent: The intelligent intermediary · Assistant system: The tool-augmented helper · Level 2: Tool-using agents – Augmented execution</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">2</div><div><b>The Agent Engineer&#x27;s Toolkit</b><span class="adds">Frameworks as capability multipliers, the integrate-first-then-replace rule, model selection and vector stores as swappable memory.</span><div class="secs">Comprehensive analysis of key frameworks · Build-versus-integrate decisions · Model selection and integration · The memory revolution: How vector databases are supercharging AI agents · Tool integration frameworks</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">3</div><div><b>The Art of Agent Prompting</b><span class="adds">The system prompt as a constitution with five parts, the PTCF frame, and the just-enough rule for examples.</span><div class="secs">The system prompt: The agent&#x27;s constitution · The user prompt: The dynamic stimulus · Deconstructing PTCF: A walk-through with an enterprise agent · How many examples are enough in few-shot learning? · Chain-of-thought: The methodical analyst</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">4</div><div><b>Agent Deployment and Responsible Development</b><span class="adds">Cost-aware routing with a budget tracker and cache, resilience patterns, zero trust for agents and a defence-in-depth stack.</span><div class="secs">Infrastructure requirements by agent typology · Performance optimization · Understanding the threat landscape · Extending zero trust to AI agents · Defense-in-depth architecture · Transparency and explainability</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">5</div><div><b>Cognitive Architectures: Autonomy, Planning, and Memory</b><span class="adds">Safety checks before autonomous action, goal trees, three memory types, observability that makes failure legible, and escalation as a feature.</span><div class="secs">The anatomy of autonomy: Building on the cognitive loop · Guardrails and Safety Mechanisms · Hierarchical decomposition: The architecture of complexity · Types of memory in intelligent agents · Designing for scalability and maintainability · Ensuring robustness and reliability</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">6</div><div><b>Retrieval-Augmented Generation and Search Agents</b><span class="adds">Retrieve-augment-generate, provenance as a parallel track, the five-stage document pipeline with confidence gates, and the research agent&#x27;s scan-cluster-synthesise loop.</span><div class="secs">Guiding principles · The retrieval process: Architecture in action · Implementation patterns and tools · Architecture: The five-stage document intelligence pipeline · The research workflow and cognitive loop · Advanced technical architecture · Case study: Accelerating drug discovery</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">7</div><div><b>Tool Manipulation and Orchestration Agents</b><span class="adds">Think-Plan-Act with a registry of typed contracts, safe wrappers, the selection funnel, four failure modes, a recovery ladder and arbitration between specialists.</span><div class="secs">The Tool-Using agent pattern · Function-calling architecture patterns · The selection funnel · Common failure modes · Architectural recovery strategies · Architecture for arbitration · Case study: Multi-agent insurance claims workflow</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">8</div><div><b>Data Analysis and Reasoning Agents</b><span class="adds">Code execution with bounded reflection, and the Verification and Validation agent: atomic claims, NLI verdicts, credibility weights and consistency across sources.</span><div class="secs">Intent analysis and planning · Code formulation and execution · Fact-checking · Logical coherence · Consistency analysis · Universal problem-solving strategies</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">9</div><div><b>Software Development Agents</b><span class="adds">Compliance agents that scan, evaluate and remediate, and the closed-loop control system: sense, critic, planner, human approval, validate, deploy.</span><div class="secs">The TDG architecture and workflow · Core capabilities and technical architecture · Architectural principles: The closed-loop control system · Learning mechanisms and feedback translation · Operationalizing continuous adaptation</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">10</div><div><b>Conversational and Content Creation Agents</b><span class="adds">The dual-memory hierarchy with the RAD loop, and brand consistency as a generator-validator loop with hard constraints.</span><div class="secs">Natural dialog management and context tracking · The dual-memory hierarchy · Brand consistency as a constraint satisfaction problem · Implementing the creative orchestration loop</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">12</div><div><b>Ethical and Explainable Agents</b><span class="adds">Calibrated confidence, one decision log rendered for two audiences, and counterfactuals that turn a refusal into a next step.</span><div class="secs">Value alignment frameworks · Bias detection and mitigation · Reasoning transparency techniques · Decision explanation frameworks · Confidence communication methods</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">13</div><div><b>Healthcare and Scientific Agents</b><span class="adds">Fault-tolerant literature scanning with circuit breakers and dedup, knowledge-gap detection, and hypothesis generation.</span><div class="secs">Medical knowledge integration · Clinical decision support frameworks · Literature synthesis frameworks · Knowledge gap identification · Hypothesis generation systems</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">14</div><div><b>Financial and Legal Domain Agents</b><span class="adds">Clause-level document pipelines with a parallel compliance gate that can veto delivery.</span><div class="secs">Risk assessment frameworks · Legal knowledge base integration · Contract analysis frameworks · Case study: Legal research and brief preparation assistant</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">15</div><div><b>Education and Collective Intelligence Agents</b><span class="adds">Bayesian belief updates and the propose, critique, refine consensus protocol with weighted votes.</span><div class="secs">Student progress tracking: The Bayesian update cycle · Consensus mechanisms and voting systems · Case study: Multi-agent rubric design with collaborative consensus</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">17</div><div><b>Epilogue: The Future of Intelligent Agents</b><span class="adds">Governance moved inside the loop: priorities before preferences, a staged circuit breaker and statistical drift detection.</span><div class="secs">Autonomous agent evolution and adaptation · Agent governance and self-regulation · Building agent capability roadmaps · Measuring ROI and impact</div></div><span class="chip advanced">advanced</span></div></div>
+</section>
+
+<section id="s04">
+ <span class="num">04 · Concept cards</span>
+ <h2>Foundation → Intermediate → Advanced</h2>
+ <p>One idea per card: what it is, a picture for it, the code if there is any, the trap, and where it lives in Formulaite. Tick a card when you could explain it to someone else.</p>
+ <div class="tabs" id="ctabs"><button data-level="foundation" class="on">Foundation<span class="cnt">10 cards · ~20 min</span></button><button data-level="intermediate" class="">Intermediate<span class="cnt">11 cards · ~22 min</span></button><button data-level="advanced" class="">Advanced<span class="cnt">13 cards · ~26 min</span></button></div><div class="panel on" data-level="foundation"><div class="prog"><span class="lbl">Foundation</span><div class="bar"><i></i></div><span class="txt">0 / 10 got it</span></div><div class="concept" data-key="The cognitive loop"><div class="chead" role="button" tabindex="0"><div><span class="idx">01</span><b>The cognitive loop</b> <span class="chip ch">ch 1</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>An agent is not one prompt. It cycles through five phases: perceive the input, reason about what it means, plan the steps, act with tools, and learn from the result. Each phase is a separate function you can test and swap.</p><div class="callout blue"><strong>Picture it:</strong> A formulator reading a brief: note what was asked, work out what kind of product it is, list the lab steps, run them, then write down what to do differently next time.</div><pre><code>def create_action_plan(reasoning_result):
+    intent = reasoning_result[&quot;intent&quot;]
+    priority = reasoning_result[&quot;priority&quot;]
+    if priority == &quot;urgent&quot;:
+        return [&quot;escalate_to_human&quot;, &quot;log_urgent_case&quot;]
+    if intent == &quot;billing_issue&quot;:
+        return [&quot;fetch_account_details&quot;, &quot;analyze_billing_history&quot;,
+                &quot;generate_explanation&quot;, &quot;offer_resolution&quot;]
+    return [&quot;draft_general_reply&quot;]</code></pre><div class="note">Planning only names the steps. It never knows how the account is fetched or how the reply is phrased.</div><div class="callout"><strong>The trap:</strong> Stuffing all five phases into one giant prompt, so nothing can be tested on its own.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py — Agent.run() is the loop; models.py perceives and plans, formulaite_tools.py acts, and glassbox.py is where learning starts.</div></div></div><div class="concept" data-key="The cognition core is a broker, not a brain"><div class="chead" role="button" tabindex="0"><div><span class="idx">02</span><b>The cognition core is a broker, not a brain</b> <span class="chip ch">ch 1</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>The core does not know everything. It routes between five layers: Profile for tone and rules, Planning for steps, Knowledge for facts, Tools for action and Reasoning for validation. Intelligence comes from clean handoffs, not from one big mind.</p><div class="callout blue"><strong>Picture it:</strong> A production manager on the factory floor: she weighs nothing herself, she passes the job between QC, the mixing room and the label desk.</div><pre><code>async def process_query(self, query, user_id, context):
+    core_state = {&quot;query&quot;: query, &quot;user_id&quot;: user_id, &quot;context&quot;: context}
+    await self._apply_profile(core_state)
+    plan = await self.planner.decompose(core_state)
+    core_state[&quot;plan&quot;] = plan.steps
+    core_state[&quot;knowledge&quot;] = await self.knowledge_base.retrieve(core_state)
+    if &quot;check_billing&quot; in plan.steps and &quot;billing_api&quot; in self.tools:
+        core_state[&quot;billing&quot;] = await self.tools[&quot;billing_api&quot;].invoke(user_id)
+    draft = await self._compose_response(core_state)
+    validated, flags = await self.reasoning.validate(draft, core_state)
+    return {&quot;response&quot;: validated,
+            &quot;action&quot;: &quot;escalate&quot; if flags.requires_escalation else &quot;reply&quot;}</code></pre><div class="note">Each await hands off to one layer; the core only carries the state dictionary between them and validates before replying.</div><div class="callout"><strong>The trap:</strong> Letting the model be the broker, so a timeout in one layer silently becomes a made-up answer.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py — Agent composes model, tools, glassbox and gate; it owns no clever logic of its own, it coordinates.</div></div></div><div class="concept" data-key="Proxy agent: sanitise, constrain, parse, validate"><div class="chead" role="button" tabindex="0"><div><span class="idx">03</span><b>Proxy agent: sanitise, constrain, parse, validate</b> <span class="chip ch">ch 1</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A proxy agent turns messy human text into one validated object and forwards nothing else. Strip dangerous input first. Ask the model for JSON only. Parse it, check every required key, and reject anything malformed. It is boring in exactly the right places.</p><div class="callout blue"><strong>Picture it:</strong> Goods-in at a warehouse: the courier can say anything, but only a delivery note with every field filled gets stamped and passed inside.</div><pre><code>EXPECTED_KEYS = {&quot;intent&quot;, &quot;category&quot;, &quot;priority&quot;, &quot;user_email&quot;, &quot;requires_human&quot;}
+def sanitize_support_text(text: str) -&gt; str:
+    cleaned = re.sub(r&quot;&lt;script.*?&gt;.*?&lt;/script&gt;&quot;, &quot;&quot;, text, flags=re.I | re.S)
+    return re.sub(r&quot;\s+&quot;, &quot; &quot;, cleaned).strip()
+def build_ticket_payload(user_query: str) -&gt; dict:
+    raw_response = chain.run({&quot;query&quot;: sanitize_support_text(user_query)})
+    payload = json.loads(raw_response)
+    missing = EXPECTED_KEYS.difference(payload.keys())
+    if missing:
+        raise ValueError(f&quot;Missing required keys: {sorted(missing)}&quot;)
+    return payload</code></pre><div class="note">EXPECTED_KEYS.difference(payload.keys()) lists what the model forgot; a missing key raises instead of passing junk on.</div><div class="callout"><strong>The trap:</strong> Trusting that JSON-looking text is valid JSON with the right keys.</div><div class="callout green"><strong>In Formulaite:</strong> drawer.py — IngredientDrawer.from_model_kwargs plus missing() is the proxy step: fill_drawer output becomes a typed object or it is rejected.</div></div></div><div class="concept" data-key="Model decides, code executes"><div class="chead" role="button" tabindex="0"><div><span class="idx">04</span><b>Model decides, code executes</b> <span class="chip ch">ch 1</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>The runtime loop is small. The model reads the messages and the tool list. It answers or asks for tool calls. Your code runs the tools, appends each result, and calls the model again. The loop ends when the model stops asking.</p><div class="callout blue"><strong>Picture it:</strong> A chef calling out orders: the chef never touches the fryer, the line cooks do, and each plate comes back to the pass before the next call.</div><pre><code>messages.append(message.model_dump(exclude_none=True))
+while getattr(message, &quot;tool_calls&quot;, None):
+    for tool_call in message.tool_calls:
+        try:
+            arguments = json.loads(tool_call.function.arguments or &quot;{}&quot;)
+            tool_result = run_tool(tool_call.function.name, arguments)
+        except Exception as exc:
+            tool_result = {&quot;error&quot;: str(exc)}
+        messages.append({&quot;role&quot;: &quot;tool&quot;, &quot;tool_call_id&quot;: tool_call.id,
+                         &quot;content&quot;: json.dumps(tool_result)})
+    response = client.chat.completions.create(model=&quot;gpt-4o&quot;, messages=messages, tools=tools)
+    message = response.choices[0].message</code></pre><div class="note">while getattr(message, &#x27;tool_calls&#x27;, None) keeps looping only while the model still wants a tool; a failed tool becomes an error dict, not a crash.</div><div class="callout"><strong>The trap:</strong> Forgetting a step budget, so a confused model can loop forever.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py — the same while-loop lives in Agent.run(); tools.py ToolRegistry.call() is run_tool with an allow-list and max_steps is the budget.</div></div></div><div class="concept" data-key="A tool schema is a menu of actions"><div class="chead" role="button" tabindex="0"><div><span class="idx">05</span><b>A tool schema is a menu of actions</b> <span class="chip ch">ch 1</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Each tool is shown to the model as a name, a description of when to use it, and a JSON schema for its inputs. The model does not understand the API. It picks from a menu and fills in the blanks. Good descriptions decide how well it picks.</p><div class="callout blue"><strong>Picture it:</strong> A restaurant menu: the diner cannot enter the kitchen, but a clear dish name and description gets the right order placed.</div><pre><code>tools = [{
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;search_knowledge_base&quot;,
+        &quot;description&quot;: &quot;Search the support knowledge base for recovery steps, &quot;
+                       &quot;policy guidance, or troubleshooting instructions.&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {&quot;query&quot;: {&quot;type&quot;: &quot;string&quot;,
+                                     &quot;description&quot;: &quot;The customer issue or search phrase.&quot;}},
+            &quot;required&quot;: [&quot;query&quot;],
+            &quot;additionalProperties&quot;: False}}}]</code></pre><div class="note">additionalProperties False means the model cannot invent extra arguments; the description says when, not just what.</div><div class="callout"><strong>The trap:</strong> Writing a description like Gets information, then blaming the model for choosing the wrong tool.</div><div class="callout green"><strong>In Formulaite:</strong> tools.py — Tool builds this shape from a Python signature; drawer.py as_tool_schema() is the fill_drawer menu entry.</div></div></div><div class="concept" data-key="Pick the simplest brain: reactive, deliberative, hybrid"><div class="chead" role="button" tabindex="0"><div><span class="idx">06</span><b>Pick the simplest brain: reactive, deliberative, hybrid</b> <span class="chip ch">ch 1</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A reactive agent maps input to output with rules: fast, predictable, brittle. A deliberative agent senses, builds a model, plans, then acts: slower, but it can explain itself. A hybrid classifies first and sends easy cases to rules and hard ones to the planner.</p><div class="callout blue"><strong>Picture it:</strong> A pH strip versus a full stability study. Use the strip when it is enough; book the study only for the tricky batch.</div><pre><code>class HybridSupportAgent:
+    urgent_terms = {&quot;refund&quot;, &quot;escalate&quot;, &quot;complaint&quot;, &quot;chargeback&quot;, &quot;supervisor&quot;}
+    def priority_classify(self, message: str) -&gt; str:
+        text = message.lower()
+        if any(term in text for term in self.urgent_terms):
+            return &quot;urgent&quot;
+        if any(term in text for term in [&quot;hello&quot;, &quot;hi&quot;, &quot;password&quot;, &quot;hours&quot;]):
+            return &quot;normal&quot;
+        return &quot;urgent&quot;
+    def process(self, message: str) -&gt; str:
+        return self.reactive(message) if self.priority_classify(message) == &quot;normal&quot; else self.deliberative(message)</code></pre><div class="note">priority_classify is the switch; anything unknown is treated as urgent, so the planner gets the doubtful cases.</div><div class="callout"><strong>The trap:</strong> Sending every request through the expensive planner because it feels smarter.</div><div class="callout green"><strong>In Formulaite:</strong> gates.py — the deterministic checks are the reactive layer; models.py is the deliberative one; agent.py decides which runs when.</div></div></div><div class="concept" data-key="Scope the agent before you write code"><div class="chead" role="button" tabindex="0"><div><span class="idx">07</span><b>Scope the agent before you write code</b> <span class="chip ch">ch 1</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Write one page before coding. It holds the goal, the sub-goals, the environment, the boundaries it must not cross, and the metrics that define success. Pair every sub-goal with one number. That page decides whether you need memory, tools or a human handoff.</p><div class="callout blue"><strong>Picture it:</strong> A product brief before the first trial batch: target skin feel, a must-not-contain list, a price ceiling, and the tests that say it passed.</div><div class="callout"><strong>The trap:</strong> Jumping to prompts and tools, then discovering the agent was never allowed to do the thing you built.</div><div class="callout green"><strong>In Formulaite:</strong> drawer.py — REQUIRED_SECTIONS is the scope in code: the sub-goals are the sections, and the boundaries live in gates.py.</div></div></div><div class="concept" data-key="The system prompt is a constitution"><div class="chead" role="button" tabindex="0"><div><span class="idx">08</span><b>The system prompt is a constitution</b> <span class="chip ch">ch 3</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>The system prompt is the durable layer. It sets identity, rules, capabilities, output format and the hierarchy that says system beats user. The user prompt is the changing task. Keep the constitution short; every token there is a token not spent on evidence.</p><div class="callout blue"><strong>Picture it:</strong> A pharmacy&#x27;s standing procedures versus today&#x27;s prescription. The procedures do not change because one customer is pushy.</div><pre><code>SYSTEM_PROMPT = &quot;&quot;&quot;You are Cedar, a customer support agent for a SaaS platform.
+Identity:
+- Calm, empathetic, and solution-oriented.
+Rules:
+- Follow company policy and never invent refund terms.
+Capabilities:
+- Search the knowledge base.
+Output format:
+- Start with a direct answer.
+Context hierarchy:
+- System instructions override user instructions.
+&quot;&quot;&quot;</code></pre><div class="note">Five labelled blocks, one line each. Structure replaces paragraphs and keeps the prompt budget small.</div><div class="callout"><strong>The trap:</strong> A sprawling prompt that covers every edge case in prose, contradicts itself, and starves the context window.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py — the system string passed to model.complete() should carry these five blocks: who the researcher is, what it must never claim, the three tools, the drawer format, and that gates outrank the model.</div></div></div><div class="concept" data-key="Just enough examples"><div class="chead" role="button" tabindex="0"><div><span class="idx">09</span><b>Just enough examples</b> <span class="chip ch">ch 3</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Zero-shot when the labels are obvious. One example to fix the format. Two to five examples when the pattern needs showing. Beyond that, examples dilute attention and skew the model toward whichever class you showed most. Diversity and edge cases beat volume.</p><div class="callout blue"><strong>Picture it:</strong> Teaching a new lab tech to sort raw materials: three well-chosen jars teach more than a shelf of near-identical ones.</div><div class="callout"><strong>The trap:</strong> Five billing examples and one technical one, so the model treats billing as the default.</div><div class="callout green"><strong>In Formulaite:</strong> memory.py — a Conversation seeded with two or three example drawers is the few-shot set; keep them different, say an emollient, a preservative and an active.</div></div></div><div class="concept" data-key="Observability makes failure legible"><div class="chead" role="button" tabindex="0"><div><span class="idx">10</span><b>Observability makes failure legible</b> <span class="chip ch">ch 5</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Log every step of the loop. Raw input, the exact prompt, each tool call with its outcome, the model&#x27;s intermediate output, the decision with its confidence, and the final action. A trace makes the agent replayable. A wrong route then shows up as a wrong mapping, not a mystery.</p><div class="callout blue"><strong>Picture it:</strong> A batch record: every weighing, every temperature, every signature. When a batch fails you read the sheet instead of guessing.</div><div class="callout"><strong>The trap:</strong> Logging only the final answer and then arguing about whether the model was being irrational.</div><div class="callout green"><strong>In Formulaite:</strong> glassbox.py — GlassBox records each model reply, tool call and gate verdict as an Event; replay() is the trace the book describes.</div></div></div></div><div class="panel" data-level="intermediate"><div class="prog"><span class="lbl">Intermediate</span><div class="bar"><i></i></div><span class="txt">0 / 11 got it</span></div><div class="concept" data-key="Retrieve, augment, generate"><div class="chead" role="button" tabindex="0"><div><span class="idx">01</span><b>Retrieve, augment, generate</b> <span class="chip ch">ch 6</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Separate knowing from answering. First retrieve the passage that governs the question. Then put it into the prompt. Then generate an answer that stays inside that evidence. When the answer is wrong you can ask which of the three steps failed.</p><div class="callout blue"><strong>Picture it:</strong> Before answering a customer about a preservative, you pull the supplier&#x27;s spec sheet, read the relevant line, and quote it, rather than answering from memory.</div><pre><code>def build_vectorstore(docs):
+    splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+    chunks = splitter.split_documents(docs)
+    embeddings = HuggingFaceEmbeddings(model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;)
+    return FAISS.from_documents(chunks, embeddings)
+
+def build_qa_chain(vectorstore):
+    llm = ChatOpenAI(model=&quot;gpt-4o-mini&quot;, temperature=0)
+    retriever = vectorstore.as_retriever(search_kwargs={&quot;k&quot;: 4})
+    return RetrievalQA.from_chain_type(llm=llm, chain_type=&quot;stuff&quot;,
+                                       retriever=retriever, return_source_documents=True)</code></pre><div class="note">k=4 is how many chunks reach the model; return_source_documents=True is the start of provenance.</div><div class="callout"><strong>The trap:</strong> Making the model smarter when the real fix is making the system better informed.</div><div class="callout green"><strong>In Formulaite:</strong> formulaite_tools.py — read_supplier_page is the retrieve step; models.py generates the drawer from the returned text, not from memory.</div></div></div><div class="concept" data-key="Provenance runs in parallel"><div class="chead" role="button" tabindex="0"><div><span class="idx">02</span><b>Provenance runs in parallel</b> <span class="chip ch">ch 6</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Provenance is not a footnote added at the end. It is a second track that runs beside the pipeline, collecting source ids, timestamps and confidence as the work happens. Every claim must point back to the passage that produced it. If the evidence is partial, say so.</p><div class="callout blue"><strong>Picture it:</strong> Lot numbers on every raw material: you can trace any finished jar back to the drum it came from.</div><div class="callout"><strong>The trap:</strong> Adding citations afterwards from memory, which is how a wrong policy version gets cited.</div><div class="callout green"><strong>In Formulaite:</strong> drawer.py — the sources field is the provenance track; gates.py check_has_sources fails a drawer whose sections cannot point back to a page.</div></div></div><div class="concept" data-key="Entity linking: one ingredient, many names"><div class="chead" role="button" tabindex="0"><div><span class="idx">03</span><b>Entity linking: one ingredient, many names</b> <span class="chip ch">ch 6</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>The same thing is named differently across sources: a marketing name, an internal code, a SKU. Without a canonical entity, retrieval fragments and the agent misses half the record. Map every alias to one id before you search.</p><div class="callout blue"><strong>Picture it:</strong> Glycerin, glycerol, glycerine and the trade name on the drum are one substance. The catalogue needs one key for all of them.</div><div class="callout"><strong>The trap:</strong> Searching for the trade name only and concluding there is no safety data.</div><div class="callout green"><strong>In Formulaite:</strong> formulaite_tools.py — catalogue_lookup(inci) should resolve trade names and CAS numbers to the INCI key before it looks anything up.</div></div></div><div class="concept" data-key="Confidence is the gate between raw text and data"><div class="chead" role="button" tabindex="0"><div><span class="idx">04</span><b>Confidence is the gate between raw text and data</b> <span class="chip ch">ch 6</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A document pipeline has five stages: triage, preprocessing with OCR, layout parsing, schema-driven extraction, validation. OCR must emit a confidence per token and that number must survive downstream. High-confidence text flows on. Low-confidence text goes to a fallback or a human.</p><div class="callout blue"><strong>Picture it:</strong> A faded label on a drum: you do not guess the percentage, you flag it and check the certificate.</div><pre><code>CONFIDENCE_THRESHOLD = 60
+@dataclass
+class OcrToken:
+    text: str
+    confidence: float
+def preprocess_and_ocr(pdf_path: str) -&gt; List[OcrToken]:
+    tokens = []
+    for page in convert_from_path(pdf_path, dpi=300):
+        data = pytesseract.image_to_data(page, output_type=pytesseract.Output.DICT)
+        for text, conf_raw in zip(data[&quot;text&quot;], data[&quot;conf&quot;]):
+            if text.strip() and float(conf_raw) &gt;= CONFIDENCE_THRESHOLD:
+                tokens.append(OcrToken(text=text.strip(), confidence=float(conf_raw)))</code></pre><div class="note">The threshold is the gate: a token below 60 never becomes a field value, but it is still visible for review.</div><div class="callout"><strong>The trap:</strong> Silently promoting a low-confidence number into the record because it looked plausible.</div><div class="callout green"><strong>In Formulaite:</strong> formulaite_tools.py — a PDF path in read_supplier_page would use this stage; drawer.py fields should carry a confidence next to each value.</div></div></div><div class="concept" data-key="Tool contracts with a safe wrapper"><div class="chead" role="button" tabindex="0"><div><span class="idx">05</span><b>Tool contracts with a safe wrapper</b> <span class="chip ch">ch 7</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A registry entry is a contract: name, description, input schema, output schema and the function. A safe wrapper validates the input before the call, runs the function under a timeout, and validates the output before it returns. Malformed input fails fast; slow APIs time out; exceptions become structured errors.</p><div class="callout blue"><strong>Picture it:</strong> A locked cabinet with a checklist on each drawer: what you may put in, what comes out, and a timer on the door.</div><pre><code>def safe_tool(input_model, output_model, timeout_seconds: int = 5):
+    def decorator(fn):
+        @wraps(fn)
+        def wrapped(payload):
+            validated = input_model.model_validate(payload)
+            def run():
+                return output_model.model_validate(fn(validated.model_dump())).model_dump()
+            with ThreadPoolExecutor(max_workers=1) as executor:
+                future = executor.submit(run)
+                return future.result(timeout=timeout_seconds)
+        return wrapped
+    return decorator</code></pre><div class="note">Two model_validate calls bracket the real function; future.result(timeout=...) turns a hang into a TimeoutError.</div><div class="callout"><strong>The trap:</strong> Validating the tool name but not its arguments, so the model can pass a made-up field to a live system.</div><div class="callout green"><strong>In Formulaite:</strong> tools.py — Tool.__call__ and _schema_from_signature are the contract; wrap read_supplier_page in this safe_tool pattern in formulaite_tools.py.</div></div></div><div class="concept" data-key="Reasoning core and execution engine are different parts"><div class="chead" role="button" tabindex="0"><div><span class="idx">06</span><b>Reasoning core and execution engine are different parts</b> <span class="chip ch">ch 7</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Think, Plan, Act. The reasoning core turns a request into a plan of tool calls. The execution engine runs the plan: it tracks state, retries transient failures, and stops cleanly when a step keeps failing. The reasoning core never mutates anything itself.</p><div class="callout blue"><strong>Picture it:</strong> The formulator writes the batch instructions; the technician runs them and notes each step. Neither does the other&#x27;s job.</div><pre><code>def execute_plan(plan, registry):
+    state = {&quot;steps&quot;: []}
+    for step in plan:
+        spec = registry.get(step[&quot;tool&quot;])   # unknown tool raises before anything runs
+        for attempt in range(1, 4):
+            try:
+                result = spec.function_ref(step.get(&quot;args&quot;, {}))
+                state[&quot;steps&quot;].append({&quot;tool&quot;: step[&quot;tool&quot;], &quot;result&quot;: result})
+                break
+            except Exception as exc:
+                if attempt == 3:
+                    raise RuntimeError(f&quot;Execution failed for {step[&#x27;tool&#x27;]}&quot;) from exc</code></pre><div class="note">registry.get raises on an unknown tool before anything runs; three attempts, then a clean RuntimeError, and the caller gets state back.</div><div class="callout"><strong>The trap:</strong> Letting the planner call APIs directly, so a bad plan and a bad call are impossible to tell apart.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py — the Agent is the execution engine; models.py is the reasoning core that only proposes ToolUseBlocks.</div></div></div><div class="concept" data-key="Name the failure"><div class="chead" role="button" tabindex="0"><div><span class="idx">07</span><b>Name the failure</b> <span class="chip ch">ch 7</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Tool failures come in four kinds. Input validation errors: the arguments do not fit the schema. Runtime failures: the call was valid but the service timed out. Semantic mismatches: the call worked but the answer does not fit the question. Unavailability: the dependency is down. Each kind needs a different fix.</p><div class="callout blue"><strong>Picture it:</strong> Wrong units on the order form, the supplier&#x27;s phone line down, the right product but the wrong grade, the supplier closed for the holidays.</div><pre><code>class ToolRuntimeError(Exception):
+    &quot;&quot;&quot;Raised when a tool starts correctly but fails while executing.&quot;&quot;&quot;
+
+class ToolUnavailableError(Exception):
+    &quot;&quot;&quot;Raised when an external dependency is offline or inaccessible.&quot;&quot;&quot;
+
+@dataclass
+class TicketCreationTool(CustomerTool):
+    allowed_categories: List[str]
+    def validate_input(self, payload):
+        if payload.get(&quot;category&quot;) not in self.allowed_categories:
+            raise ValueError(f&quot;Invalid category {payload.get(&#x27;category&#x27;)!r}&quot;)</code></pre><div class="note">Distinct exception classes let the caller branch on the kind of failure instead of parsing error text.</div><div class="callout"><strong>The trap:</strong> Catching Exception and retrying everything, including the validation errors that will never succeed.</div><div class="callout green"><strong>In Formulaite:</strong> tools.py — ToolError is one class today; split it into input, runtime, mismatch and unavailable so gates.py and agent.py can respond differently.</div></div></div><div class="concept" data-key="The recovery ladder"><div class="chead" role="button" tabindex="0"><div><span class="idx">08</span><b>The recovery ladder</b> <span class="chip ch">ch 7</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Recovery is layered. A safe wrapper retries transient errors with backoff. A fallback chain tries a second route to the same goal. Confidence-based switching discards a weak result and picks another tool. Failure memory blocks a sick tool for a while. Escalation hands the human the full context.</p><div class="callout blue"><strong>Picture it:</strong> Supplier A is out: try the approved alternate, reject the sample that looks off, note not to call A this week, and if nothing works ring the formulator with the whole story.</div><div class="callout"><strong>The trap:</strong> Retrying forever against a service that is down, and calling that resilience.</div><div class="callout green"><strong>In Formulaite:</strong> formulaite_tools.py — read_supplier_page should fall back to the cached catalogue text; agent.py should mark the tool blocked after repeated ToolError.</div></div></div><div class="concept" data-key="Three memories, three triggers"><div class="chead" role="button" tabindex="0"><div><span class="idx">09</span><b>Three memories, three triggers</b> <span class="chip ch">ch 5</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Working memory is the current conversation in the prompt: fast, but bounded by tokens. Episodic memory is what happened before, per user, with timestamps. Semantic memory is what is true: the fact base. Route by trigger: the current turn, a reference to the past, or a factual question.</p><div class="callout blue"><strong>Picture it:</strong> The notes on today&#x27;s bench, last month&#x27;s batch records, and the ingredient reference book. You reach for a different one depending on the question.</div><div class="callout"><strong>The trap:</strong> Letting the model answer a policy question from a remembered chat instead of the source of truth.</div><div class="callout green"><strong>In Formulaite:</strong> memory.py — Conversation is working memory; the catalogue in formulaite_tools.py is semantic memory; saved GlassBox runs are the start of episodic memory.</div></div></div><div class="concept" data-key="Cost-aware routing with a budget"><div class="chead" role="button" tabindex="0"><div><span class="idx">10</span><b>Cost-aware routing with a budget</b> <span class="chip ch">ch 4</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Not every request deserves the biggest model. Classify the query into simple, moderate or complex. Send simple ones to a cheap model, cache repeated answers with a time-to-live, and keep a per-session budget that can refuse the expensive model. Monitor tokens per session and cache hit rate.</p><div class="callout blue"><strong>Picture it:</strong> You do not send every sample to the external lab. Routine checks happen on the bench; only the odd ones go out.</div><pre><code>@dataclass
+class BudgetTracker:
+    session_budget_usd: float
+    spent_usd: float = 0.0
+    def can_afford(self, model_name: str) -&gt; bool:
+        return self.spent_usd + MODEL_COST.get(model_name, 0.0) &lt;= self.session_budget_usd
+    def charge(self, model_name: str) -&gt; None:
+        self.spent_usd += MODEL_COST.get(model_name, 0.0)
+def _choose_model(tier: str, budget: BudgetTracker) -&gt; str:
+    if tier == &quot;simple&quot; and budget.can_afford(&quot;gpt-3.5-turbo&quot;):
+        return &quot;gpt-3.5-turbo&quot;
+    return &quot;gpt-4-turbo&quot; if budget.can_afford(&quot;gpt-4-turbo&quot;) else &quot;gpt-3.5-turbo&quot;</code></pre><div class="note">can_afford is checked before the call and charge runs after. The budget is a runtime constraint, not a report.</div><div class="callout"><strong>The trap:</strong> Routing on cost alone and getting shallow answers that cause more escalations than the saving.</div><div class="callout green"><strong>In Formulaite:</strong> memory.py — token_estimate() is the cheapest budget signal; models.py could pick ScriptedModel or a small Claude model by tier.</div></div></div><div class="concept" data-key="Generator plus validator loop"><div class="chead" role="button" tabindex="0"><div><span class="idx">11</span><b>Generator plus validator loop</b> <span class="chip ch">ch 10</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Generation and judgement are different jobs. One agent drafts. A validator checks the draft against hard constraints and returns not just pass or fail but instructions to fix it. The generator revises. Cap the retries; after that, a human reviews.</p><div class="callout blue"><strong>Picture it:</strong> The copywriter drafts the label; regulatory reads it against the claims list and sends back exactly which words to change.</div><pre><code>def validate_against_brand(response: str, guidelines: dict) -&gt; dict:
+    forbidden_terms = guidelines[&quot;forbidden_terms&quot;]
+    required_tone = guidelines[&quot;required_tone&quot;]
+    lowered = response.lower()
+    violations = [term for term in forbidden_terms if term.lower() in lowered]
+    tone_ok = required_tone.lower() in lowered
+    instructions = &quot;&quot;
+    if violations:
+        instructions += f&quot;Remove forbidden terms: {violations}. &quot;
+    if not tone_ok:
+        instructions += f&quot;Adjust the tone to be {required_tone}. &quot;
+    return {&quot;passed&quot;: not violations and tone_ok, &quot;instructions&quot;: instructions}</code></pre><div class="note">The return carries instructions, not just a verdict; that is what makes the loop actionable.</div><div class="callout"><strong>The trap:</strong> A validator that only says FAIL, so the generator guesses what to change.</div><div class="callout green"><strong>In Formulaite:</strong> gates.py — run_gates returns a GateVerdict with reasons; agent.py sends those reasons back as a tool_result, which is exactly this loop.</div></div></div></div><div class="panel" data-level="advanced"><div class="prog"><span class="lbl">Advanced</span><div class="bar"><i></i></div><span class="txt">0 / 13 got it</span></div><div class="concept" data-key="Zero trust for agents"><div class="chead" role="button" tabindex="0"><div><span class="idx">01</span><b>Zero trust for agents</b> <span class="chip ch">ch 4</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Trust nothing by default. Grant only the tools and data the current task needs. Re-authorise every tool call, not just the session. Isolate memory per customer or tenant. Watch the sequence of calls, not just the result. Deviation from declared capability is a security event.</p><div class="callout blue"><strong>Picture it:</strong> A key card that opens only the rooms on today&#x27;s job sheet, checked at every door, not just at reception.</div><div class="callout"><strong>The trap:</strong> Giving the agent broad access because it might need it later.</div><div class="callout green"><strong>In Formulaite:</strong> tools.py — ToolRegistry.call() is the door; add a per-call policy check so fill_drawer cannot write to the catalogue for a read-only role.</div></div></div><div class="concept" data-key="Tool gating inside defence in depth"><div class="chead" role="button" tabindex="0"><div><span class="idx">02</span><b>Tool gating inside defence in depth</b> <span class="chip ch">ch 4</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Assume each control can fail and stack them. Validate input, enforce a schema on model output, govern memory, gate tools, harden interfaces, observe behaviour. Tool gating is the middle layer. It means an allow-list, per-tool parameter validation, and a logged rejection for anything outside it.</p><div class="callout blue"><strong>Picture it:</strong> Goggles, a fume hood and a locked acid cabinet. Any one can fail; together they make an accident expensive.</div><pre><code>def whitelist_tools(allowed_tools):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(tool_name: str, *args, **kwargs):
+            if tool_name not in allowed_tools:
+                logger.warning(&quot;Blocked unauthorized tool call: %s&quot;, tool_name)
+                raise PermissionError(f&quot;Tool not allowed: {tool_name}&quot;)
+            if tool_name == &quot;search_kb&quot; and not str(kwargs.get(&quot;query&quot;, &quot;&quot;)).strip():
+                raise ValueError(&quot;search_kb requires a non-empty query&quot;)
+            return func(tool_name, *args, **kwargs)
+        return wrapper
+    return decorator</code></pre><div class="note">The decorator checks the name and the parameters before func ever runs; the warning line is the audit trail.</div><div class="callout"><strong>The trap:</strong> Hardening the prompt and leaving the tool layer open, which is the attacker&#x27;s path of least resistance.</div><div class="callout green"><strong>In Formulaite:</strong> tools.py — the @registry.tool decorator can carry this gate; glassbox.py should record every blocked call as an Event.</div></div></div><div class="concept" data-key="Safety check before autonomous action"><div class="chead" role="button" tabindex="0"><div><span class="idx">03</span><b>Safety check before autonomous action</b> <span class="chip ch">ch 5</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Before the agent acts on its own, run a plain function with three questions. Is the action within the limit for this tier? Does the agent hold the data permission it needs? Could the action harm the customer if wrong? Return ok plus a list of violations. Any violation means revise or escalate.</p><div class="callout blue"><strong>Picture it:</strong> Before releasing a batch: is it within the allowed use level, do we hold the certificate, and what happens if we are wrong?</div><pre><code>def autonomous_safety_check(decision_context, planned_actions):
+    violations = []
+    if &quot;apply_account_credits&quot; in planned_actions:
+        credit_amount = float(decision_context.get(&quot;requested_credit_amount&quot;, 0.0))
+        credit_limit = get_autonomous_credit_limit(decision_context[&quot;user_tier&quot;])
+        if credit_amount &gt; credit_limit:
+            violations.append(&quot;credit_limit_exceeded&quot;)
+    if requires_sensitive_data_access(planned_actions) and &quot;sensitive_data_read&quot; not in set(decision_context.get(&quot;permissions&quot;, [])):
+        violations.append(&quot;insufficient_data_permissions&quot;)
+    if assess_customer_impact_risk(planned_actions) &gt; float(decision_context[&quot;escalation_threshold&quot;]):
+        violations.append(&quot;high_customer_impact_risk&quot;)
+    return len(violations) == 0, violations</code></pre><div class="note">The pair (ok, violations) is the whole interface: one boolean for the loop, one list for the human.</div><div class="callout"><strong>The trap:</strong> Trying anyway when the request exceeds the limit and hoping the API rejects it.</div><div class="callout green"><strong>In Formulaite:</strong> gates.py — run_gates returns GateVerdict(passed, reasons), the same pair; add a check for the autonomous use-level ceiling per product type.</div></div></div><div class="concept" data-key="Escalation is a feature, not a failure"><div class="chead" role="button" tabindex="0"><div><span class="idx">04</span><b>Escalation is a feature, not a failure</b> <span class="chip ch">ch 5</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Uncertainty is a first-class state. Perception must also ask: is this safe, in scope, and clear? If not, the loop must not proceed to action. The agent should be able to say: I can do this safely, I need clarification, a person can do this, or this is unsafe and blocked.</p><div class="callout blue"><strong>Picture it:</strong> A good technician stops and asks when the label is smudged. Guessing the concentration is the failure, not asking.</div><pre><code>def handle_request_with_fallback(user_text: str) -&gt; str:
+    parsed = parse_intent(user_text)
+    if is_prompt_injection(user_text):
+        return &quot;I cannot process this request safely. I am flagging it for security review.&quot;
+    if parsed.confidence &lt; 0.6:
+        return escalate_to_human(user_text, parsed, &quot;low_confidence_intent&quot;)
+    for attempt in range(2):
+        try:
+            return execute_tool(parsed.intent, parsed.entities)
+        except ToolExecutionError as exc:
+            if attempt == 1:
+                return escalate_to_human(user_text, parsed, f&quot;tool_failure: {exc}&quot;)</code></pre><div class="note">Two gates run before the tool, in order: injection, then confidence. Each escalation names its reason.</div><div class="callout"><strong>The trap:</strong> Treating the human handoff as an error path with no context attached.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py — RunResult needs a status such as needs_human with the failed GateVerdict reasons and the Glass Box run id attached.</div></div></div><div class="concept" data-key="Fact-checking is a control mechanism"><div class="chead" role="button" tabindex="0"><div><span class="idx">05</span><b>Fact-checking is a control mechanism</b> <span class="chip ch">ch 8</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Split a statement into atomic claims. Retrieve evidence for each from sources with known provenance. Let a natural language inference model label each pair as entailment, contradiction or neutral. Weight sources by credibility: a database row beats a blog post. Aggregate into one confidence and act on it.</p><div class="callout blue"><strong>Picture it:</strong> The drawer says up to 5 percent and skin-safe. Check the first against the supplier sheet and the second against the safety assessment, separately.</div><pre><code>def fact_check(claim: str, evidence: str) -&gt; Dict[str, object]:
+    claim, evidence = (claim or &quot;&quot;).strip(), (evidence or &quot;&quot;).strip()
+    if not claim or not evidence:
+        return {&quot;label&quot;: &quot;NEUTRAL&quot;, &quot;score&quot;: 0.0}
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+    model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
+    # Premise = evidence, hypothesis = claim.
+    inputs = tokenizer(evidence, claim, return_tensors=&quot;pt&quot;, truncation=True, max_length=512)
+    with torch.no_grad():
+        outputs = model(**inputs)
+    raw_label, score = _select_best_nli_label(outputs.logits[0], _id_to_nli_label(model))
+    return {&quot;label&quot;: _normalize_label(raw_label), &quot;score&quot;: score}</code></pre><div class="note">Evidence is the premise and the claim is the hypothesis; empty input returns NEUTRAL, never a guess.</div><div class="callout"><strong>The trap:</strong> Marking a claim true because one source agrees while two others disagree.</div><div class="callout green"><strong>In Formulaite:</strong> gates.py — a check_claims_supported gate would run each drawer sentence against its cited supplier passage and fail on contradiction.</div></div></div><div class="concept" data-key="Arbitration when specialists disagree"><div class="chead" role="button" tabindex="0"><div><span class="idx">06</span><b>Arbitration when specialists disagree</b> <span class="chip ch">ch 7</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>In a multi-agent system, disagreement is normal. Detect it by comparing structured outputs, for example embedding similarity below a threshold. A separate arbiter re-reads the sources and past cases and returns a decision with a calibrated confidence. Above the bar, automate. Below it, send the whole dossier to a human.</p><div class="callout blue"><strong>Picture it:</strong> Two chemists disagree on a preservative. The lab manager reads both notes and the old batch records, then decides or takes it to the client.</div><div class="callout"><strong>The trap:</strong> Letting the first agent to answer win, or averaging two wrong answers into a third.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py — a second model pass over a failed drawer plus a human-review status is the arbiter; glassbox.py must log both drafts, the similarity and the decision.</div></div></div><div class="concept" data-key="Five metrics and the improvement loop"><div class="chead" role="button" tabindex="0"><div><span class="idx">07</span><b>Five metrics and the improvement loop</b> <span class="chip ch">ch 1</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Measure task success rate, average response time, user satisfaction, tool invocation latency and fallback frequency. Define success strictly: closed, not reopened, within policy. Then run deploy, measure, analyse, modify, re-evaluate. Each metric points to a different layer to fix.</p><div class="callout blue"><strong>Picture it:</strong> Yield, batch time, complaints, supplier lead time and how often you had to rework. Different numbers, different fixes.</div><pre><code>class EvaluationReport:
+    def __init__(self, entries: list[TelemetryEntry]) -&gt; None:
+        if not entries:
+            raise ValueError(&quot;EvaluationReport requires at least one telemetry entry.&quot;)
+        self.entries = entries
+    @property
+    def task_success_rate(self) -&gt; float:
+        resolved = sum(1 for entry in self.entries if entry.resolved)
+        return resolved / len(self.entries)
+    @property
+    def fallback_frequency(self) -&gt; float:
+        return sum(1 for entry in self.entries if entry.fell_back) / len(self.entries)</code></pre><div class="note">Each metric is a @property computed from the same telemetry list; JSON lines in, numbers out.</div><div class="callout"><strong>The trap:</strong> Counting a ticket as resolved the moment it closes, so a flattering number hides reopened cases.</div><div class="callout green"><strong>In Formulaite:</strong> glassbox.py — GlassBox.of_kind(&#x27;gate&#x27;) and of_kind(&#x27;tool_call&#x27;) give resolved, fell_back and latency per run; a scripts/ checker can build this report.</div></div></div><div class="concept" data-key="Closed-loop control with a human where risk changes"><div class="chead" role="button" tabindex="0"><div><span class="idx">08</span><b>Closed-loop control with a human where risk changes</b> <span class="chip ch">ch 9</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A self-improving agent is a thermostat. Sense explicit, implicit and synthetic feedback and keep them separate. A critic scores outcomes against KPIs. A planner turns patterns into one testable hypothesis. Changes to prompts or thresholds pause for human approval. Validate on held-out cases before deploying, and keep rollback.</p><div class="callout blue"><strong>Picture it:</strong> Adjusting a recipe: measure the complaints, propose one change, test it on a small batch, and keep the old recipe on file.</div><div class="callout"><strong>The trap:</strong> Changing the prompt on intuition after every bad ticket and calling it learning.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py — version the system prompt and gate thresholds; evals built from glassbox.py runs decide whether a new version ships.</div></div></div><div class="concept" data-key="Fault-tolerant scanning: ingestion separable from synthesis"><div class="chead" role="button" tabindex="0"><div><span class="idx">09</span><b>Fault-tolerant scanning: ingestion separable from synthesis</b> <span class="chip ch">ch 13</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A research agent scans many sources, clusters what it finds, then synthesises. Treat each source as its own dependency with its own rate limit, budget, cache and circuit breaker, and deduplicate before interpreting. If one source fails, the clustering state stays untouched and the report never learns the noise as fact.</p><div class="callout blue"><strong>Picture it:</strong> Three suppliers, three phone lines. If one is down you do not rewrite the formula; you note the gap and carry on.</div><pre><code>class CircuitBreaker:
+    def __init__(self, failure_threshold=3, recovery_timeout_seconds=60):
+        self.failure_threshold, self.recovery_timeout_seconds = failure_threshold, recovery_timeout_seconds
+        self.failures, self.opened_at = 0, None
+    def allow_request(self) -&gt; bool:
+        if self.opened_at is None:
+            return True
+        return (time.time() - self.opened_at) &gt;= self.recovery_timeout_seconds  # half-open probe
+    def record_failure(self) -&gt; None:
+        self.failures += 1
+        if self.failures &gt;= self.failure_threshold:
+            self.opened_at = time.time()</code></pre><div class="note">Three failures open the breaker; after the cooldown one probe request is allowed through.</div><div class="callout"><strong>The trap:</strong> Letting one noisy source dominate the synthesis because it returned the most results.</div><div class="callout green"><strong>In Formulaite:</strong> formulaite_tools.py — give read_supplier_page a per-domain CircuitBreaker and dedup by URL plus title; the drawer never learns a 503 as a fact.</div></div></div><div class="concept" data-key="Knowledge gap detection"><div class="chead" role="button" tabindex="0"><div><span class="idx">10</span><b>Knowledge gap detection</b> <span class="chip ch">ch 13</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A research agent that only summarises is useful; one that says what the literature leaves unanswered is strategic. Look for topics often mentioned but never studied directly, for two active fields that rarely meet, and for questions that faded but are still cited. Rank gaps by novelty, feasibility, impact and data availability.</p><div class="callout blue"><strong>Picture it:</strong> Every supplier sheet mentions humidity as a caveat and none tests it. That missing test is the next experiment.</div><pre><code>@dataclass
+class KnowledgeGap:
+    topic: str
+    strategy: str
+    evidence: str
+    novelty: float
+    feasibility: float
+    potential_impact: float
+    data_availability: float
+# negative space: referenced often, studied never
+if references &gt;= 3 and studies == 0:
+    gaps.append(KnowledgeGap(topic=topic, strategy=&quot;negative_space&quot;, evidence=f&quot;Topic &#x27;{topic}&#x27; is frequently referenced but has no direct studies.&quot;, novelty=0.9, feasibility=0.7, potential_impact=0.8, data_availability=0.6))</code></pre><div class="note">The rule is tiny: referenced at least three times, studied zero times. The four scores make the gap rankable.</div><div class="callout"><strong>The trap:</strong> Open-ended brainstorming of research ideas instead of selecting from evidence patterns.</div><div class="callout green"><strong>In Formulaite:</strong> drawer.py — an open_questions section filled by this rule would tell the formulator what the supplier pages never actually tested.</div></div></div><div class="concept" data-key="Calibrate before you narrate"><div class="chead" role="button" tabindex="0"><div><span class="idx">11</span><b>Calibrate before you narrate</b> <span class="chip ch">ch 12</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A confidence score only means something if 80 percent confident is right about 80 percent of the time. Raw model certainty is not that. Score first, calibrate, then write the explanation, so the polished story does not inflate the number. Below a threshold, escalate rather than bluff. Show users a word, staff a number.</p><div class="callout blue"><strong>Picture it:</strong> A pH meter is calibrated before you read the sample, not adjusted afterwards to match what you expected.</div><pre><code>class TemperatureScaler:
+    &quot;&quot;&quot;Calibrate a raw logit into a probability using temperature scaling.&quot;&quot;&quot;
+    def __init__(self, temperature: float = 1.0) -&gt; None:
+        if temperature &lt;= 0:
+            raise ValueError(&quot;temperature must be greater than 0&quot;)
+        self.temperature = temperature
+    def calibrate(self, logit: float) -&gt; float:
+        scaled = logit / self.temperature
+        if scaled &gt;= 0:
+            return 1.0 / (1.0 + math.exp(-scaled))
+        z = math.exp(scaled)
+        return z / (1.0 + z)</code></pre><div class="note">A larger temperature softens overconfident scores; the output is the number you are willing to say out loud.</div><div class="callout"><strong>The trap:</strong> Generating a confident explanation first, then attaching a score that drifts up to match it.</div><div class="callout green"><strong>In Formulaite:</strong> drawer.py — a confidence field per section, set from evidence scores before the model writes prose; gates.py escalates below the threshold.</div></div></div><div class="concept" data-key="Priorities before preferences"><div class="chead" role="button" tabindex="0"><div><span class="idx">12</span><b>Priorities before preferences</b> <span class="chip ch">ch 17</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>When values compete, order them. Satisfy the highest-priority constraint first, then optimise the next only inside what is already safe. A strict order beats a weighted average because a low-priority gain can never erode a high-priority guarantee. Watch a metric&#x27;s distribution over time; drift gets a staged response: log, increase oversight, restrict, halt.</p><div class="callout blue"><strong>Picture it:</strong> Safety limit first, then regulatory claims, then skin feel. A nicer texture never buys you an over-limit preservative.</div><pre><code>@dataclass
+class BehavioralDriftDetector:
+    baseline_window: int = 1000
+    alpha: float = 0.05
+    def record_action(self, metric_value: float) -&gt; bool:
+        if not self._baseline_ready:
+            self._baseline.append(float(metric_value))
+            self._baseline_ready = len(self._baseline) &gt;= self.baseline_window
+            return False
+        self._current.append(float(metric_value))
+        result = ks_2samp(self._baseline, list(self._current), alternative=&quot;two-sided&quot;)
+        return result.pvalue &lt; self.alpha</code></pre><div class="note">A two-sample KS test compares the recent window with the baseline; p below alpha means the behaviour moved.</div><div class="callout"><strong>The trap:</strong> Averaging safety against satisfaction, so a happy-customer score can outvote a rule.</div><div class="callout green"><strong>In Formulaite:</strong> gates.py — order the checks: check_not_banned, then check_use_level_in_range, then softer checks; a drift detector on the gate-fail rate belongs beside glassbox.py.</div></div></div><div class="concept" data-key="A compliance gate that can veto"><div class="chead" role="button" tabindex="0"><div><span class="idx">13</span><b>A compliance gate that can veto</b> <span class="chip ch">ch 14</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A document pipeline runs in sequence: parse structure, classify clauses, assess risk, summarise. Compliance validation runs in parallel and can refuse delivery even when the analysis is finished. Sequence gives determinism; the parallel gate gives safety. Surface only the high and critical findings.</p><div class="callout blue"><strong>Picture it:</strong> The formula is finished and looks lovely. Regulatory still reads the claims and can stop the launch.</div><div class="callout"><strong>The trap:</strong> Discovering the compliance problem after the polished summary is already drafted and sent.</div><div class="callout green"><strong>In Formulaite:</strong> gates.py — check_no_forbidden_claims is this veto; run it on every drawer regardless of how well the other sections scored.</div></div></div></div>
+</section>
+
+<section id="cheat">
+ <span class="num">05 · Cheat sheet</span>
+ <h2>30 Agents Every Developer Should Build: A Practical Field Guide — cheat sheet</h2>
+ <p class="small">Everything on one sheet. <button class="btn" id="printBtn" type="button">Print this cheat sheet</button></p>
+ 
+<div class="cs-grid">
+ <div><h3>Vocabulary</h3><div class="tablewrap"><table><thead><tr><th>Term</th><th>Means</th></tr></thead><tbody><tr><td class="t">Cognitive loop</td><td>Perceive, reason, plan, act, learn: the cycle every agent runs.</td></tr><tr><td class="t">Cognition core</td><td>The broker that routes state between profile, planning, knowledge, tools and reasoning.</td></tr><tr><td class="t">Proxy agent</td><td>Sanitise, constrain, parse, validate: one input in, one typed object out.</td></tr><tr><td class="t">Tool schema</td><td>Name, description and JSON parameters: the menu the model orders from.</td></tr><tr><td class="t">Function calling</td><td>The model asks for a tool by name; your code runs it and returns the result.</td></tr><tr><td class="t">Maturity level</td><td>0 manual, 1 rules, 2 tools, 3 planning, 4 learning.</td></tr><tr><td class="t">Provenance</td><td>The source id, timestamp and confidence that travel with every claim.</td></tr><tr><td class="t">Entity linking</td><td>Mapping aliases and trade names to one canonical id before search.</td></tr><tr><td class="t">Chunking</td><td>Splitting a document so the relevant passage can be retrieved on its own.</td></tr><tr><td class="t">Safe wrapper</td><td>Validate input, run under a timeout, validate output, return a structured error.</td></tr><tr><td class="t">Circuit breaker</td><td>Stop calling a failing dependency for a cooldown, then probe once.</td></tr><tr><td class="t">Fallback chain</td><td>A second route to the same goal when the first tool fails.</td></tr><tr><td class="t">Escalation</td><td>A planned handoff to a human with the full context attached.</td></tr><tr><td class="t">NLI</td><td>A model that labels claim versus evidence as entailment, contradiction or neutral.</td></tr><tr><td class="t">Calibration</td><td>A confidence of 0.8 is right about 80 percent of the time.</td></tr><tr><td class="t">Zero trust</td><td>Least privilege, re-verify every call, segment memory, watch the sequence.</td></tr><tr><td class="t">Tool gating</td><td>An allow-list plus per-tool parameter checks, with blocked calls logged.</td></tr><tr><td class="t">Drift</td><td>A metric&#x27;s distribution moving away from its baseline; a governance event.</td></tr></tbody></table></div></div>
+ <div><h3>The pattern</h3><ol><li>Scope: goal, sub-goals, environment, boundaries, metrics, on one page.</li><li>Constitution: identity, rules, capabilities, output format, hierarchy in the system prompt.</li><li>Loop: model proposes a tool call; registry validates; safe tool runs; result returns with a source label.</li><li>Ground: retrieve, augment, generate; provenance runs in parallel.</li><li>Validate: a deterministic gate checks the draft and returns fix instructions; cap the retries.</li><li>Escalate: low confidence, out of scope, or conflicting evidence goes to a human with the dossier.</li><li>Measure: five metrics from the trace; deploy, measure, analyse, modify, re-evaluate.</li></ol>
+  <h3>Decisions</h3><div class="tablewrap"><table><thead><tr><th>When</th><th>Use</th><th>Not</th></tr></thead><tbody><tr><td>The model&#x27;s output feeds a backend or a gate.</td><td>A proxy step: JSON only, parsed and key-checked.</td><td>Free text and hope.</td></tr><tr><td>The question is about facts that change.</td><td>Retrieve first, then generate inside the evidence.</td><td>The model&#x27;s training memory.</td></tr><tr><td>The same substance has several names.</td><td>Entity linking to one canonical key before search.</td><td>Searching the name the user typed.</td></tr><tr><td>A tool call fails.</td><td>Name the failure kind, then the matching rung of the recovery ladder.</td><td>A blanket retry.</td></tr><tr><td>Two sources disagree.</td><td>Weigh by credibility, state the range, or escalate with both.</td><td>The first or loudest source.</td></tr><tr><td>The action changes the outside world.</td><td>A safety check for limit, permission and impact, then human approval.</td><td>Model confidence.</td></tr><tr><td>A request is simple and repeated.</td><td>A cheap model and a TTL cache under a session budget.</td><td>The premium model every time.</td></tr><tr><td>Values compete, for example safety and speed.</td><td>A strict priority order: safety filters first.</td><td>A weighted score.</td></tr></tbody></table></div></div>
+</div>
+<h3>Rules of thumb</h3><div class="tablewrap"><table><thead><tr><th>Do</th><th>Don't</th></tr></thead><tbody><tr><td>Write the tool description as when-to-use, not what-it-is.</td><td>Describe a tool as Gets information.</td></tr><tr><td>Validate arguments before the call and the output after it.</td><td>Check only the tool name.</td></tr><tr><td>Keep a source label on every extracted field.</td><td>Add citations from memory at the end.</td></tr><tr><td>Split a statement into atomic claims before checking it.</td><td>Mark a sentence true because one part of it is.</td></tr><tr><td>Return fix instructions from the validator.</td><td>Return only PASS or FAIL.</td></tr><tr><td>Treat low confidence as a named state that escalates.</td><td>Bluff with a polished answer.</td></tr><tr><td>Name the failure kind before choosing a recovery.</td><td>Retry validation errors that can never succeed.</td></tr><tr><td>Order constraints: safety first, then quality.</td><td>Average safety against satisfaction.</td></tr><tr><td>Route cheap questions to cheap models under a session budget.</td><td>Send everything to the biggest model.</td></tr><tr><td>Log every step so a wrong route is visible as a wrong mapping.</td><td>Log only the final answer.</td></tr></tbody></table></div>
+<h3>Skeletons</h3><h4>Proxy step: sanitise, parse, check keys</h4><pre><code>EXPECTED_KEYS = {&quot;inci&quot;, &quot;function&quot;, &quot;use_level&quot;, &quot;sources&quot;, &quot;requires_human&quot;}
+
+def build_drawer_payload(page_text: str) -&gt; dict:
+    cleaned = re.sub(r&quot;\s+&quot;, &quot; &quot;, page_text).strip()
+    raw = model.complete(prompt.format(page=cleaned))
+    payload = json.loads(raw)
+    missing = EXPECTED_KEYS.difference(payload.keys())
+    if missing:
+        raise ValueError(f&quot;Missing required keys: {sorted(missing)}&quot;)
+    return payload</code></pre><h4>Safe tool with a typed contract and a timeout</h4><pre><code>def safe_tool(input_model, output_model, timeout_seconds=5):
+    def decorator(fn):
+        @wraps(fn)
+        def wrapped(payload):
+            validated = input_model.model_validate(payload)
+            def run():
+                return output_model.model_validate(fn(validated.model_dump())).model_dump()
+            with ThreadPoolExecutor(max_workers=1) as executor:
+                return executor.submit(run).result(timeout=timeout_seconds)
+        return wrapped
+    return decorator</code></pre><h4>Generator and validator loop with a cap</h4><pre><code>feedback = &quot;&quot;
+for attempt in range(MAX_ROUNDS):
+    draft = generator.complete(brief, feedback)
+    verdict = validate_against_brand(draft, guidelines)
+    if verdict[&quot;passed&quot;]:
+        return draft
+    feedback = verdict[&quot;instructions&quot;]
+return escalate_to_human(brief, draft, verdict)</code></pre><h4>Failure taxonomy with matching recovery</h4><pre><code>try:
+    result = tool.run(payload)
+except ValueError as exc:            # input validation: fix the call, never retry
+    return {&quot;ok&quot;: False, &quot;kind&quot;: &quot;input&quot;, &quot;error&quot;: str(exc)}
+except ToolRuntimeError as exc:      # runtime: bounded retry with backoff
+    return {&quot;ok&quot;: False, &quot;kind&quot;: &quot;runtime&quot;, &quot;retryable&quot;: True, &quot;error&quot;: str(exc)}
+except ToolUnavailableError as exc:  # unavailable: open the breaker, try the fallback chain
+    breaker.record_failure()
+    return {&quot;ok&quot;: False, &quot;kind&quot;: &quot;unavailable&quot;, &quot;error&quot;: str(exc)}</code></pre>
+<h3>Before you ship</h3><ul class="check"><li><input type="checkbox" class="ship"><span>The system prompt has identity, rules, capabilities, output format and hierarchy, and it is short.</span></li><li><input type="checkbox" class="ship"><span>Every tool has an input schema, an output schema, a timeout and a logged rejection path.</span></li><li><input type="checkbox" class="ship"><span>Every drawer field carries a source label and a confidence.</span></li><li><input type="checkbox" class="ship"><span>Each drawer claim was checked against its cited passage as entailment, not just similarity.</span></li><li><input type="checkbox" class="ship"><span>The gate returns reasons the model can act on, and retries are capped.</span></li><li><input type="checkbox" class="ship"><span>Low confidence, out of scope and conflicting evidence each have a named escalation status.</span></li><li><input type="checkbox" class="ship"><span>Task success, response time, tool latency and fallback frequency are computed from the trace.</span></li><li><input type="checkbox" class="ship"><span>Gate order puts banned ingredients and use limits before softer quality checks.</span></li></ul>
+
+</section>
+
+<section id="s06">
+ <span class="num">06 · You're done when…</span>
+ <div class="callout green"><ol><li>Give the drawer agent a supplier page that uses a trade name only, and point to the Glass Box event where entity linking resolved it to the INCI key before the catalogue lookup.</li><li>Break read_supplier_page with a timeout, and show the run naming the failure kind, retrying once, falling back to the catalogue text, and ending with a named status instead of a crash.</li><li>Take one finished drawer, split its use-level claim and its safety claim, check each against the cited passage, and make the gate fail the drawer when either is contradicted.</li></ol></div>
+</section>
+
+<section id="s07">
+ <span class="num">07 · Where this comes from</span>
+ 
+<p><strong>Book:</strong> <em>30 Agents Every Developer Should Build: A Practical Field Guide</em>, Gordon A. Crawford, 695 pages. Markdown copy: <code>books-md/30-agents-every-developer-should-build.md</code>. Notes with chapter citations: <code>docs/book-notes/30-agents-every-developer-should-build.md</code>.</p>
+<p><strong>Chapters covered:</strong> 1 Foundations of Agent Engineering, 2 The Agent Engineer&#x27;s Toolkit, 3 The Art of Agent Prompting, 4 Agent Deployment and Responsible Development, 5 Cognitive Architectures: Autonomy, Planning, and Memory, 6 Retrieval-Augmented Generation and Search Agents, 7 Tool Manipulation and Orchestration Agents, 8 Data Analysis and Reasoning Agents, 9 Software Development Agents, 10 Conversational and Content Creation Agents, 12 Ethical and Explainable Agents, 13 Healthcare and Scientific Agents, 14 Financial and Legal Domain Agents, 15 Education and Collective Intelligence Agents, 17 Epilogue: The Future of Intelligent Agents.</p>
+<h3>In the author's words</h3><div class="quote">“model decides, code executes, tool output returns, model finishes”<span class="who">chapter 1</span></div><div class="quote">“answer with citations, not vibes”<span class="who">chapter 6</span></div><div class="quote">“A confident failure is often better than an incorrect success.”<span class="who">chapter 7</span></div><div class="quote">“fact-checking is not a post-processing flourish. It is a control mechanism.”<span class="who">chapter 8</span></div><div class="quote">“The sequential parts of the pipeline give you determinism; the parallel gate gives you safety.”<span class="who">chapter 14</span></div>
+<h3>Python constructs this book leans on</h3><div class="tablewrap"><table><thead><tr><th>Construct</th><th>What it does here</th><th>Where</th></tr></thead><tbody><tr><td class="t">Decorator factory with @wraps</td><td>safe_tool(input_model, output_model) returns a decorator; wraps keeps the real function&#x27;s name for the logs.</td><td class="small">Ch.7 Example implementation; Ch.4 Tool gating</td></tr><tr><td class="t">Pydantic model_validate and model_json_schema</td><td>Turn a dict into a checked object, and a class into the JSON schema the model sees.</td><td class="small">Ch.7 The Tool-Using agent pattern</td></tr><tr><td class="t">@property for computed metrics</td><td>task_success_rate reads like a field but recomputes from the entries list each time.</td><td class="small">Ch.1 A minimal evaluation report implementation</td></tr><tr><td class="t">deque(maxlen=N)</td><td>A list that drops its oldest item automatically; FIFO working memory in one line.</td><td class="small">Ch.10 The dual-memory hierarchy</td></tr><tr><td class="t">ThreadPoolExecutor and future.result(timeout=)</td><td>Run a function in a worker and give up after N seconds instead of hanging.</td><td class="small">Ch.7 safe_tool</td></tr><tr><td class="t">Custom exception classes</td><td>class ToolRuntimeError(Exception) lets except branch on the kind of failure.</td><td class="small">Ch.7 Common failure modes</td></tr><tr><td class="t">set.difference for missing keys</td><td>EXPECTED_KEYS.difference(payload.keys()) lists exactly what the model forgot.</td><td class="small">Ch.1 A complete Python scaffold for the proxy layer</td></tr><tr><td class="t">@dataclass(frozen=True)</td><td>An immutable record: a parsed intent or hypothesis nobody can edit after the fact.</td><td class="small">Ch.5 A production pattern for safe request handling; Ch.12 Hypothesis</td></tr><tr><td class="t">async def and await with stub classes</td><td>Each layer is awaited in turn; stubs with asyncio.sleep stand in for real services.</td><td class="small">Ch.1 A minimal implementation shape</td></tr><tr><td class="t">TTLCache from cachetools</td><td>A dict whose entries expire after ttl seconds; the cheapest cache for repeated lookups.</td><td class="small">Ch.4 Cost-aware routing code example</td></tr></tbody></table></div>
+<h3>Deliberately left out of this guide</h3><ul><li><strong>Multimodal and sensor-fusion agents: vision question answering, speech recognition and smart-building control.</strong> — Chapter 11</li><li><strong>Embodied and physical-world agents: control hierarchies, world models and robotics.</strong> — Chapter 16</li><li><strong>Cloud platform comparisons (AWS, Azure, Google Cloud) and framework feature tables.</strong> — Chapter 2</li><li><strong>The mathematics of SHAP, LIME, POMDPs and Bayesian mastery updates; only the design rules are kept.</strong> — Chapters 12 and 15</li><li><strong>The career and job-market commentary that closes most sections.</strong> — Every chapter</li></ul>
+
+ <details><summary>How you'd have built this guide yourself</summary>
+  <p>List the chapter headings first, then read the book in chapter order and write one card per idea that changes what you would build. Sort the cards into three piles: needed for the simplest working thing, needed for the version you would show someone, needed for the version that runs unattended. Those piles are the levels; the simplest thing in each pile is the build ladder. Copy quotes exactly and keep the chapter number next to every card, so you can go back to the source when a card stops making sense.</p>
+ </details>
+</section>
+</main>
+<script>
+(function(){
+ const KEY='bookguide.30-agents-every-developer-should-build';
+ let state={got:{},ship:{},tab:'foundation'};
+ try{const s=localStorage.getItem(KEY); if(s) state=Object.assign(state,JSON.parse(s));}catch(e){}
+ function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+ // ladder
+ document.querySelectorAll('.rung').forEach(r=>{const go=()=>{document.querySelectorAll('.rung,.rungbody').forEach(x=>x.classList.toggle('on',x.dataset.rung===r.dataset.rung));}; r.onclick=go; r.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};});
+ // chapter rows
+ document.querySelectorAll('.chrow').forEach(r=>{const go=()=>r.classList.toggle('on'); r.onclick=go; r.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};});
+ // tabs
+ const tabs=document.querySelectorAll('#ctabs button');
+ function showTab(lvl){tabs.forEach(b=>b.classList.toggle('on',b.dataset.level===lvl)); document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.dataset.level===lvl)); state.tab=lvl; save();}
+ tabs.forEach(b=>b.onclick=()=>showTab(b.dataset.level));
+ // concepts
+ function progress(){document.querySelectorAll('.panel').forEach(p=>{const all=p.querySelectorAll('.got'), n=[...all].filter(c=>c.checked).length; p.querySelector('.bar i').style.width=(all.length?100*n/all.length:0)+'%'; p.querySelector('.txt').textContent=n+' / '+all.length+' got it';});}
+ document.querySelectorAll('.concept').forEach(c=>{
+  const head=c.querySelector('.chead'), box=c.querySelector('.got'), key=c.dataset.key;
+  box.checked=!!state.got[key]; c.classList.toggle('done',box.checked);
+  head.onclick=e=>{if(e.target.closest('label')) return; c.classList.toggle('open');};
+  head.onkeydown=e=>{if(e.key==='Enter'){c.classList.toggle('open');}};
+  box.onchange=()=>{state.got[key]=box.checked; c.classList.toggle('done',box.checked); save(); progress();};
+ });
+ document.querySelectorAll('.ship').forEach((b,i)=>{b.checked=!!state.ship[i]; b.onchange=()=>{state.ship[i]=b.checked; save();};});
+ showTab(state.tab||'foundation'); progress();
+ const pb=document.getElementById('printBtn'); if(pb){pb.onclick=()=>{document.body.classList.add('printing'); window.print();}; window.onafterprint=()=>document.body.classList.remove('printing');}
+ const ob=document.getElementById('openFirst'); if(ob){ob.onclick=()=>{showTab('foundation'); const first=document.querySelector('.panel[data-level=foundation] .concept'); if(first){first.classList.add('open'); first.scrollIntoView({behavior:'smooth',block:'start'});}};}
+})();
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad:true,theme:"neutral",securityLevel:"loose"});</script>
+</body>
+</html>

@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+</head>
+<body>
+<title>The 7 GenAI Architectures: A Field Guide to Choosing the Right AI System</title>
+<style>
+:root{color-scheme:light;
+ --surface:#faf9f5;--surface-2:#f2f0e9;--surface-3:#e8e6dc;--surface-ink:#141413;--line:#d9d7cc;--line-soft:#e8e6dc;
+ --ink:#141413;--ink-2:#5c5b57;--ink-3:#6b6a65;--on-ink:#faf9f5;
+ --accent:#d97757;--accent-2:#6a9bcc;--accent-3:#788c5d;
+ --font-head:"Poppins",Arial,sans-serif;--font-body:"Lora",Georgia,serif;--font-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--surface);color:var(--ink-2);font-family:var(--font-body);font-size:17px;line-height:1.7}
+main{max-width:980px;margin:0 auto;padding:36px 22px 90px}
+h1,h2,h3,h4{font-family:var(--font-head);color:var(--ink);line-height:1.2;margin:0 0 10px;text-wrap:balance}
+h1{font-size:38px;letter-spacing:-.02em;font-weight:600}
+h2{font-size:25px;font-weight:600}
+h3{font-size:18px;font-weight:600}
+h4{font-size:15px;font-weight:600;margin-bottom:6px}
+p{margin:0 0 12px;max-width:70ch}
+strong{color:var(--ink)}
+a{color:var(--ink);text-decoration-color:var(--accent);text-underline-offset:3px}
+code,.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+code{font-size:.86em;background:var(--surface-3);padding:1px 5px;border-radius:5px;color:var(--ink)}
+pre{background:var(--surface-3);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-family:var(--font-mono);font-size:12.5px;line-height:1.6;color:var(--ink);overflow-x:auto;margin:8px 0 6px;white-space:pre}
+pre code{background:none;padding:0;font-size:inherit}
+section{margin-top:52px}
+.num{font-family:var(--font-mono);color:var(--ink-3);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px}
+.eyebrow{font-family:var(--font-mono);color:var(--ink-3);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase}
+.byline{font-family:var(--font-head);font-size:14px;color:var(--ink-3);margin:-4px 0 12px}
+.strip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0 10px}
+.strip div{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:13px 15px;font-size:15px}
+.strip b{display:block;font-family:var(--font-head);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
+.callout{border-left:3px solid var(--accent);background:var(--surface-2);border-radius:0 12px 12px 0;padding:12px 16px;margin:14px 0;font-size:15.5px}
+.callout.blue{border-color:var(--accent-2)}.callout.green{border-color:var(--accent-3)}
+.callout ol,.callout ul{margin:6px 0 0 18px;padding:0}.callout li{margin:4px 0}
+.callout p:last-child{margin-bottom:0}
+.chip{display:inline-block;font-family:var(--font-head);font-size:11px;font-weight:600;letter-spacing:.04em;border-radius:6px;padding:2px 8px;color:#141413;vertical-align:middle}
+.chip.foundation{background:var(--accent-3)}.chip.intermediate{background:var(--accent-2)}.chip.advanced{background:var(--accent)}
+.chip.ch{background:var(--surface-3);color:var(--ink-2);font-family:var(--font-mono);font-weight:500}
+.diagram{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:14px;margin:14px 0;overflow-x:auto}
+.diagram pre.mermaid{background:none;border:none;padding:0;margin:0;white-space:pre;overflow:visible;text-align:center}
+.diagram svg{max-width:100%;height:auto}
+/* ladder */
+.ladder{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0}
+.rung{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:16px 18px;cursor:pointer}
+.rung:hover{border-color:var(--accent)}
+.rung.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+.rung .lvl{font-family:var(--font-head);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.rung h3{margin:4px 0 6px}
+.rung p{font-size:14.5px;margin:0}
+.rung .time{font-family:var(--font-mono);font-size:12px;color:var(--ink-3);margin-top:8px}
+.rungbody{display:none;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-top:-2px}
+.rungbody.on{display:block}
+.rungbody ol{margin:6px 0 10px 20px;padding:0}.rungbody li{margin:5px 0}
+.meta{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-3)}
+/* chapter map */
+.chmap{border-top:1px solid var(--line);margin-top:10px}
+.chrow{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:start;padding:10px 6px;border-bottom:1px solid var(--line-soft);cursor:pointer}
+.chrow:hover{background:var(--surface-2)}
+.chrow .n{font-family:var(--font-mono);color:var(--ink-3);font-size:13px;padding-top:4px}
+.chrow b{font-family:var(--font-head);font-size:15px;color:var(--ink);display:block}
+.chrow span.adds{font-size:14.5px;color:var(--ink-2)}
+.chrow .secs{display:none;font-size:13.5px;color:var(--ink-3);margin-top:6px;font-family:var(--font-mono)}
+.chrow.on .secs{display:block}
+/* concepts */
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 6px}
+.tabs button{font-family:var(--font-head);font-weight:600;font-size:13.5px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:10px;padding:9px 14px;cursor:pointer}
+.tabs button:hover{border-color:var(--accent)}
+.tabs button.on{background:var(--accent);border-color:var(--accent);color:#141413}
+.tabs button .cnt{font-family:var(--font-mono);font-weight:500;font-size:12px;margin-left:6px;color:var(--ink-3)}
+.tabs button.on .cnt{color:#141413}
+.prog{display:flex;align-items:center;gap:10px;margin:8px 0 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-3)}
+.prog .bar{flex:1;height:9px;background:var(--surface-3);border-radius:0 4px 4px 0;overflow:hidden}
+.prog .bar i{display:block;height:100%;width:0;background:var(--accent-3);transition:width .25s}
+.panel{display:none}.panel.on{display:block}
+.concept{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;margin:10px 0;overflow:hidden}
+.concept.done{border-color:var(--accent-3)}
+.chead{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px 16px;cursor:pointer}
+.chead:hover{background:var(--surface-3)}
+.chead b{font-family:var(--font-head);font-size:15.5px;color:var(--ink)}
+.chead .idx{font-family:var(--font-mono);color:var(--ink-3);font-size:12px;margin-right:8px}
+.chead label{font-family:var(--font-head);font-size:12.5px;color:var(--ink-2);display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap}
+.chead input{width:16px;height:16px;accent-color:#788c5d}
+.cbody{display:none;padding:4px 16px 16px;border-top:1px solid var(--line-soft)}
+.concept.open .cbody{display:block}
+.cbody p{font-size:15.5px}
+.cbody .callout{margin:10px 0;font-size:14.5px}
+.cbody .note{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-3);margin:0 0 8px}
+.showall{margin:8px 0 0;font-family:var(--font-head);font-size:13px;color:var(--ink-3)}
+/* tables */
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin:8px 0 14px}
+th{font-family:var(--font-head);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:7px 8px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+td.t{font-family:var(--font-mono);font-size:13px;color:var(--ink);white-space:nowrap}
+.tablewrap{overflow-x:auto}
+.check{list-style:none;padding:0;margin:6px 0}
+.check li{display:flex;gap:10px;align-items:flex-start;padding:5px 0;font-size:15px}
+.check input{margin-top:5px;accent-color:#788c5d}
+.btn{font-family:var(--font-head);font-weight:600;font-size:13.5px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:10px;padding:8px 14px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.go{background:var(--accent);border-color:var(--accent);color:#141413}
+.cs-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:800px){.cs-grid,.strip,.ladder{grid-template-columns:1fr}.chrow{grid-template-columns:36px 1fr}.chrow .chip{grid-column:2}}
+details{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:12px 18px;margin-top:14px}
+summary{font-family:var(--font-head);font-weight:600;color:var(--ink);cursor:pointer}
+.quote{border-left:3px solid var(--accent-2);padding:4px 14px;margin:10px 0;font-style:italic;font-size:15.5px}
+.quote .who{display:block;font-style:normal;font-family:var(--font-mono);font-size:12px;color:var(--ink-3);margin-top:2px}
+.small{font-size:14px;color:var(--ink-3)}
+.toplinks{display:flex;flex-wrap:wrap;gap:8px 16px;font-family:var(--font-head);font-size:13.5px;margin:10px 0 0}
+.toplinks a{color:var(--ink-2)}
+@media print{
+ body{font-size:12px} main{padding:0;max-width:none}
+ body.printing main>*:not(#cheat){display:none} .btn,.toplinks{display:none}
+ pre{white-space:pre-wrap;font-size:10.5px} .cs-grid{grid-template-columns:1fr 1fr} section{margin-top:16px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+</style>
+<main>
+<header>
+ <span class="eyebrow">Formulaite bookshelf · book 11 of 14 · Choosing the architecture</span>
+ <h1>The 7 GenAI Architectures: A Field Guide to Choosing the Right AI System</h1>
+ <div class="byline">Ranjan Kumar · 477 pages · 35 concept cards</div>
+ <p>A field guide that builds one incident-triage task eight times, from plain code up to a multi-agent crew, and measures what each rung costs so you only climb when the cheaper rung has demonstrably failed.</p>
+ 
+ <div class="strip">
+  <div><b>Goal</b>By the end you can run the Floor Test and the Termination Test on each Formulaite request type, build the cheapest rung that answers it, and give the ingredient-research agent a read-only tool menu, an evidence gate, a give-up field and a three-part budget.</div>
+  <div><b>Output</b>A build ladder (3 rungs), 16 chapters mapped, 35 concept cards you tick off, and a printable cheat sheet.</div>
+  <div><b>Time</b>Foundation ~20 min · Intermediate ~24 min · Advanced ~26 min. Whole guide ~82 min over several sittings.</div>
+ </div>
+ <div class="callout"><strong>How to drive this page.</strong>
+  <ol>
+   <li>Press <button class="btn go" id="openFirst" type="button">Open the first card</button> — it jumps to the Foundation cards and opens card 01.</li>
+   <li>Read one card, tick <strong>Got it</strong>, open the next. The bar shows your progress and remembers it on this browser.</li>
+   <li>When Foundation is done, do <strong>Rung 1</strong> of the build ladder before reading Intermediate. Print the cheat sheet from section 05.</li>
+  </ol>
+  <div class="toplinks"><a href="the-7-genai-architectures-cheatsheet.md">Cheat sheet as Markdown</a> · <a href="index.html">All nine guides</a></div>
+ </div>
+</header>
+
+<section id="s01">
+ <span class="num">01 · Where this is going</span>
+ <h2>Complexity must be earned by a demonstrated failure of the simpler architecture, and every level up has a price you can compute before you pay it.</h2>
+ <p><strong>Read this book when:</strong> Open it when someone proposes an agent for Formulaite and nobody in the room can say what would have to be true for a simpler design to be insufficient.</p>
+ <p>The one picture that holds the whole book. Every chapter adds a box or an arrow to it; nothing later replaces it.</p>
+ <div class="diagram"><pre class="mermaid">flowchart TD
+  F[Floor Test - can a unit test specify the output] --&gt;|yes| L0[Level 0 deterministic code]
+  F --&gt;|no| T[Termination Test - can you state the max model calls]
+  T --&gt;|no| L6[Level 6 autonomous agent decides when it is done]
+  T --&gt;|yes| N[Does the next step depend on the last result]
+  N --&gt;|yes| L5[Level 5 finite reasoning chain]
+  N --&gt;|no| D[Does a step need live data or an action]
+  D --&gt;|yes| L4[Level 4 tool-using LLM, one round]
+  D --&gt;|no| S[Several model calls in an order you can draw]
+  S --&gt;|yes| L3[Level 3 LLM workflow]
+  S --&gt;|no| K[Needs facts outside the request and the model]
+  K --&gt;|yes| L2[Level 2 retrieval with a relevance floor]
+  K --&gt;|no| L1[Level 1 prompt application, one typed call]</pre></div>
+</section>
+
+<section id="s02">
+ <span class="num">02 · Build ladder</span>
+ <h2>Three things to build, in order</h2>
+ <p>Each rung is a Formulaite feature. Click a rung for its steps. Do rung 1 after the Foundation cards, rung 2 after Intermediate, rung 3 after Advanced.</p>
+ <div class="ladder"><div class="rung on" data-rung="0" role="button" tabindex="0"><div class="lvl">Rung 1 · Simple</div><h3>Floor-first drawer fill</h3><p>A Formulaite research path that answers known ingredients from the catalogue with no model call, and fills the drawer with one typed model call only when the catalogue refuses.</p><div class="time">~2 hours</div></div><div class="rung" data-rung="1" role="button" tabindex="0"><div class="lvl">Rung 2 · Intermediate</div><h3>One-round tool research with a read-only menu</h3><p>A tool-using research step where the model picks read_supplier_page and catalogue_lookup once, every value in the drawer is checked against a tool result, and no write tool can reach the menu.</p><div class="time">~a day</div></div><div class="rung" data-rung="2" role="button" tabindex="0"><div class="lvl">Rung 3 · Advanced</div><h3>Bounded autonomous researcher with a give-up field</h3><p>An agent.py loop that runs until the gate passes or the model declares the drawer unreachable, stopped by a three-part Budget, journaled in the Glass Box, and evaluated as rates with intervals.</p><div class="time">~3 days</div></div></div><div class="rungbody on" data-rung="0"><h4>Steps for rung 1: Floor-first drawer fill</h4><ol><li>Run the Floor Test on catalogue_lookup: list ten INCI names and write the correct drawer for each by hand.</li><li>Make catalogue_lookup in formulaite_tools.py return a named refusal for an unknown INCI instead of a default.</li><li>Record the Zero Row in glassbox.py: how many drawers the catalogue fills at zero tokens.</li><li>Add an evidence quote field to the drawer schema in drawer.py and a gate in gates.py that checks the quote is in the supplier page.</li><li>Run ScriptedModel in models.py over the refused ingredients and print the Failure Receipt for each one it cannot fill.</li></ol><div class="meta">Chapters 2, 3, 4 · Agent Lab files: <code>formulaite_tools.py</code> · <code>drawer.py</code> · <code>gates.py</code> · <code>glassbox.py</code> · <code>models.py</code> · ~2 hours</div></div><div class="rungbody" data-rung="1"><h4>Steps for rung 2: One-round tool research with a read-only menu</h4><ol><li>Add a consequence field with no default to Tool in tools.py and filter the registry to read tools before sending it to the model.</li><li>Make read_supplier_page return an error that names the known suppliers instead of raising.</li><li>Write value_supported in gates.py: reject any drawer value that is not a substring of a recorded tool result.</li><li>State the round budget in the system prompt and record every tool call and result in glassbox.py.</li><li>Apply the Substitution Test to one wrong drawer: hand the model the right page by hand and rerun.</li></ol><div class="meta">Chapters 5, 6, 7, 8 · Agent Lab files: <code>tools.py</code> · <code>formulaite_tools.py</code> · <code>gates.py</code> · <code>agent.py</code> · <code>glassbox.py</code> · ~a day</div></div><div class="rungbody" data-rung="2"><h4>Steps for rung 3: Bounded autonomous researcher with a give-up field</h4><ol><li>Add an unreachable flag to fill_drawer and read it before the evidence gate so a give-up is never discarded.</li><li>Replace max_steps in agent.py with Budget(iterations, tokens, seconds) and log which bound fired.</li><li>Carry drawer conclusions and the list of tool calls in memory.py, never the raw page text.</li><li>Write one journal Entry per run to glassbox.py: routed, cause, rounds, stopped_by, tools.</li><li>Score each surface (drawer fields, evidence, tool choice, give-up) as Rate(passes, n) with a Wilson interval.</li><li>Route requests through a Refusal Cascade: catalogue first, single call second, loop last.</li></ol><div class="meta">Chapters 9, 11, 13, 14 · Agent Lab files: <code>agent.py</code> · <code>memory.py</code> · <code>glassbox.py</code> · <code>gates.py</code> · <code>formulaite_tools.py</code> · ~3 days</div></div>
+</section>
+
+<section id="s03">
+ <span class="num">03 · Chapter map</span>
+ <h2>What each chapter adds to the machine</h2>
+ <p>Colour = the level it belongs to. Click a chapter to see its sections.</p>
+ <div class="chmap"><div class="chrow" role="button" tabindex="0"><div class="n">1</div><div><b>Why GenAI Systems Fail at the Architecture Layer</b><span class="adds">Names the architecture layer as the one layer with no eval attached, and Level Inflation as the absence of a decision procedure.</span><div class="secs">What this chapter covers · Level Inflation · The forty lines · What this book will not tell you · How the rest of this book is arranged · Summary</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">2</div><div><b>The Escalation Ladder</b><span class="adds">The eight rungs, the seven yes-or-no questions between them, the Floor Test, the Termination Test, the Failure Receipt and diagnose.py.</span><div class="secs">Why “it depends” is not an answer · What a rung actually is · The eight rungs · The two boundary tests · The Failure Receipt · Building the diagnostic · Running it</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">3</div><div><b>Level 0 - The Floor</b><span class="adds">Deterministic routing with no default branch, two honest refusals, and the Zero Row every later rung is measured against.</span><div class="secs">What Level 0 adds · Two ways to get the floor wrong · The default branch · Running the Floor Test on code you already own · Building the floor · What it costs · What breaks in production · The Failure Receipt</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">4</div><div><b>Architecture 1 - The Prompt Application</b><span class="adds">One typed model call behind a Completer seam, the Format Illusion, and a verbatim evidence quote that ordinary code checks.</span><div class="secs">What Level 1 adds · The naive version, and why the schema is the architecture · What structured output actually guarantees · Checking the quote · What it costs · What breaks in production · The Failure Receipt</div></div><span class="chip foundation">foundation</span></div><div class="chrow" role="button" tabindex="0"><div class="n">5</div><div><b>Architecture 2 - Retrieval-Augmented Generation</b><span class="adds">A BM25 retriever with a relevance floor, chunking measured rather than assumed, a checked citation, and the Substitution Test.</span><div class="secs">What Level 2 adds · The system that loses to Chapter 4 · Building it · Chunking, measured rather than assumed · Turning a claim into a page · The Failure Receipt · Summary</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">6</div><div><b>Architecture 3 - The LLM Workflow</b><span class="adds">A drawable five-stage pipeline where three stages are plain code, the Downstream Veto, and two names on every failure.</span><div class="secs">What Level 3 adds · A sequence you can draw · Building it · Falling back instead of refusing · Measuring inside the pipeline · What it costs · What breaks in production · The Failure Receipt</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">7</div><div><b>Architecture 4 - The Tool-Using LLM</b><span class="adds">Execution with a blast radius: the consequence field, a read-only default menu, one round of tools, and value_supported.</span><div class="secs">What Level 4 adds · The Blast Radius Schema · Building it · The menu is the boundary · What it costs · What breaks in production · Deep dive · The Failure Receipt</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">8</div><div><b>Architecture 5 - Multi-Step Reasoning</b><span class="adds">A finite chain whose next call is chosen from the last result, the Context Ratchet, and the Termination Test answered in code.</span><div class="secs">What Level 5 adds · The boundary, in one sentence · The price Chapter 2 predicted · Building it · There is no new schema · What it costs · What breaks in production · The Failure Receipt</div></div><span class="chip intermediate">intermediate</span></div><div class="chrow" role="button" tabindex="0"><div class="n">9</div><div><b>Architecture 6 - The Autonomous Agent</b><span class="adds">The while loop that decides its own end, the unreachable give-up field, a three-part Budget, three memory layers and the Refusal Premium.</span><div class="secs">What Level 6 adds · The price that runs backwards · Building it · What one round does · Wiring it up · What it costs · Climbing is still not upgrading · Deep dive · The Failure Receipt</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">10</div><div><b>Architecture 7 - The Multi-Agent System</b><span class="adds">Roles with separate tool menus and handoffs, asserted in a test, and the Break-Even Test that decides most crews before an A/B.</span><div class="secs">What Level 7 adds · Conceptual foundation · Building it · Wiring it up · What it costs · Role bleed · Deep dive · The Failure Receipt</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">11</div><div><b>Composite Architectures</b><span class="adds">A deterministic router in front of mixed rungs, the Refusal Cascade, and the Effective Level read off a measured cost curve.</span><div class="secs">What this chapter covers · Building it · What it costs · The Effective Level · What breaks in production · Deep dive · Summary</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">12</div><div><b>Costing an Architecture Before You Build It</b><span class="adds">The Structural Estimate: call count, per-call context and carry discipline, and an estimator that refuses when the Termination Test fails.</span><div class="secs">Why the obvious estimate fails · The price Chapter 2 promised · Building the estimator · Costing the turns · The refusal · The half you cannot estimate · What breaks in production · Where the absolute prices live</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">13</div><div><b>Evaluating Each Level</b><span class="adds">Scoring surfaces that accumulate with each rung, rates with Wilson intervals instead of assertions, and executable labels.</span><div class="secs">What this chapter covers · Scoring surfaces · What the table says · Production considerations · Summary</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">14</div><div><b>Observability Across the Ladder</b><span class="adds">One Event per decision with bounded dimensions, twenty-two counters as group-bys, and the Instrumentation Level.</span><div class="secs">What this chapter covers · Building the record · Measuring the level · The same failure at four rungs · What breaks in production · Summary</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">15</div><div><b>Climbing - Migrating Up Without a Rewrite</b><span class="adds">The Addition Test, the four seams that made twelve climbs cheap, and the cost of adding one tool to three rungs.</span><div class="secs">What this chapter covers · Building it · The tool · Reading this chapter’s own bill · Summary</div></div><span class="chip advanced">advanced</span></div><div class="chrow" role="button" tabindex="0"><div class="n">16</div><div><b>Descending - Rightsizing an Overbuilt System</b><span class="adds">The Removal Receipt in four clauses, unroute before unbuild, and why a counter reading zero has three causes.</span><div class="secs">What this chapter covers · Building it · Running it on this book’s own system · Three zeros, three causes · Summary · Where this leaves you</div></div><span class="chip advanced">advanced</span></div></div>
+</section>
+
+<section id="s04">
+ <span class="num">04 · Concept cards</span>
+ <h2>Foundation → Intermediate → Advanced</h2>
+ <p>One idea per card: what it is, a picture for it, the code if there is any, the trap, and where it lives in Formulaite. Tick a card when you could explain it to someone else.</p>
+ <div class="tabs" id="ctabs"><button data-level="foundation" class="on">Foundation<span class="cnt">10 cards · ~20 min</span></button><button data-level="intermediate" class="">Intermediate<span class="cnt">12 cards · ~24 min</span></button><button data-level="advanced" class="">Advanced<span class="cnt">13 cards · ~26 min</span></button></div><div class="panel on" data-level="foundation"><div class="prog"><span class="lbl">Foundation</span><div class="bar"><i></i></div><span class="txt">0 / 10 got it</span></div><div class="concept" data-key="Level Inflation"><div class="chead" role="button" tabindex="0"><div><span class="idx">01</span><b>Level Inflation</b> <span class="chip ch">ch 1</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Level Inflation is an architecture chosen by hype, a framework default or a misread problem statement. It is not a bad decision. It is the absence of a decision procedure, so nobody can argue with it. The architecture layer is the only layer with no eval and no feedback loop, so an over-built system just looks like a working system.</p><div class="callout blue"><strong>Picture it:</strong> A three-role crew that was mostly fed one-line machine alerts. The service name was already in the string, so a dictionary lookup did the job. Nobody had asked what fraction of inputs actually needed the crew.</div><pre><code>ROLES: dict[str, str] = {
+    &quot;investigator&quot;: (&quot;You are an incident investigator. Given an alert, find the root &quot;
+                     &quot;cause using the tools provided. Hand off to the remediator ...&quot;),
+    &quot;remediator&quot;: (&quot;You are a remediation engineer. Given a diagnosis, propose a fix &quot;
+                   &quot;and a rollback plan. Hand off to the reviewer.&quot;),
+    &quot;reviewer&quot;: (&quot;You are a staff engineer reviewing a proposed fix. Approve it, or &quot;
+                 &quot;hand back to the investigator with what you would need to see.&quot;),
+}
+# What the crew overwhelmingly received:
+#   alert: http_5xx_rate &gt; 0.4 for 5m on checkout-api</code></pre><div class="note">Nothing in the roles is stupid; the mistake is that nobody counted how many inputs were plain alert lines.</div><div class="callout"><strong>The trap:</strong> Justifying a design with capability language (&#x27;it handles complex cases&#x27;) that names no property of the input you can count.</div><div class="callout green"><strong>In Formulaite:</strong> Before adding a research agent to Formulaite, write down which ingredient requests need it; catalogue_lookup in formulaite_tools.py already answers the known ones.</div></div></div><div class="concept" data-key="The Escalation Ladder"><div class="chead" role="button" tabindex="0"><div><span class="idx">02</span><b>The Escalation Ladder</b> <span class="chip ch">ch 2</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Eight architectures, Level 0 to Level 7, ordered by cost rather than by containment. Each level adds exactly one capability the level below structurally cannot provide. You do not climb from the bottom; you eliminate from the top with yes-or-no questions about the task. The default outcome is the floor.</p><div class="callout blue"><strong>Picture it:</strong> A price list, not a career ladder. &#x27;We are still on RAG&#x27; is like saying &#x27;we are still on the cheap shampoo&#x27; - the cheap one may be the right one.</div><pre><code>@dataclass(frozen=True)
+class Gate:
+    &quot;&quot;&quot;One rung boundary: the question, and the answer that stops the descent here.&quot;&quot;&quot;
+    level: int
+    architecture: str
+    question: str
+    field: str
+    stops_when: bool
+    climb_when: str          # the receipt that would justify this rung
+LADDER: tuple[Gate, ...] = (
+    Gate(level=7, architecture=&quot;Multi-Agent System&quot;,
+         question=&quot;Has specialization been measured to win on this task?&quot;, ...),</code></pre><div class="note">Each gate is data: a question, the answer that stops you there, and climb_when - the receipt that would justify the rung above.</div><div class="callout"><strong>The trap:</strong> Assuming Level 4 contains Level 2; a tool-using system with no retriever still cannot read a runbook.</div><div class="callout green"><strong>In Formulaite:</strong> Formulaite has several request types on different rungs: a known INCI is Level 0, a new ingredient is Level 4, and agent.py should not run for both.</div></div></div><div class="concept" data-key="The Floor Test"><div class="chead" role="button" tabindex="0"><div><span class="idx">03</span><b>The Floor Test</b> <span class="chip ch">ch 2</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Ask: can I write a unit test that fully specifies the correct output for any input? If yes, no model belongs on that path. The test is about the output, not the input source. Code that reads a database or an API can still be on the floor. Run it first, every time, per request type.</p><div class="callout blue"><strong>Picture it:</strong> Routing &#x27;alert: http_5xx_rate &gt; 0.4 on checkout-api&#x27; to the payments rota is a dictionary lookup. Asking a model to do it adds latency, spend and a vendor outage to your paging path.</div><pre><code>def floor_test(profile: TaskProfile) -&gt; bool | None:
+    &quot;&quot;&quot;The Level 0 diagnostic. True means no model belongs on this path.&quot;&quot;&quot;
+    return profile.output_fully_specifiable
+
+def recommend_rung(profile: TaskProfile) -&gt; Recommendation:
+    floor = floor_test(profile)
+    if floor is None:
+        return _refuse(profile, FLOOR)        # unanswered: stop the design review
+    if floor is FLOOR.stops_when:
+        return _decide(profile, FLOOR)        # short-circuit: Level 0, done
+    for gate in LADDER:                       # then eliminate from the top down
+        ...</code></pre><div class="note">The Floor Test short-circuits before any ladder question is asked; None means &#x27;not established&#x27; and refuses rather than guessing.</div><div class="callout"><strong>The trap:</strong> Asking &#x27;is the code deterministic?&#x27; instead of &#x27;can I specify the correct output for a hundred real inputs?&#x27;.</div><div class="callout green"><strong>In Formulaite:</strong> gates.py and catalogue_entry in formulaite_tools.py are the floor: pH range, max use level and banned status are lookups, never model calls.</div></div></div><div class="concept" data-key="The Failure Receipt"><div class="chead" role="button" tabindex="0"><div><span class="idx">04</span><b>The Failure Receipt</b> <span class="chip ch">ch 2</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>To climb a rung you need a receipt: a reproducible input, the actual bad output the lower rung produced, and the name of the missing capability. Not a missing quality. If you sit down to write one and cannot, the finding is that you do not need to climb. An unconvincing receipt is a result, not a formality.</p><div class="callout blue"><strong>Picture it:</strong> Like a returns desk: you need the item and the fault, not &#x27;it felt wrong&#x27;. &#x27;The rules cannot read this prose report&#x27; is a receipt; &#x27;the rules are not good enough&#x27; is not.</div><pre><code>@dataclass(frozen=True)
+class Recommendation:
+    &quot;&quot;&quot;A rung, the question that decided it, and what would justify the next one.&quot;&quot;&quot;
+    request_type: str
+    level: int | None
+    architecture: str | None
+    decided_by: str          # so the answer can be argued with
+    escalate_when: str | None  # the receipt the next rung would need
+
+# Printed receipt, Chapter 3:
+#   INC-1042 UNROUTABLE - needs a human because: the report is prose, not an alert line
+#   Missing capability: language understanding over an input no test can specify.</code></pre><div class="note">escalate_when carries the receipt specification, so every recommendation comes with its own expiry condition.</div><div class="callout"><strong>The trap:</strong> Writing &#x27;the answers were not good enough&#x27; - that is a prompt or eval problem, not a capability gap.</div><div class="callout green"><strong>In Formulaite:</strong> Log a failure_receipt event in glassbox.py for each ingredient the catalogue could not fill, with the input and the refusal text; that is what earns the model call.</div></div></div><div class="concept" data-key="Level 0 - Deterministic Code"><div class="chead" role="button" tabindex="0"><div><span class="idx">05</span><b>Level 0 - Deterministic Code</b> <span class="chip ch">ch 3</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Level 0 is the floor, not a rung: rules, thresholds and lookup tables with no model. Its price is that you must enumerate the cases. The one rule that matters is refuse, never default. An else branch that returns a fallback turns &#x27;I do not know&#x27; into a confident wrong answer that nothing downstream can detect.</p><div class="callout blue"><strong>Picture it:</strong> The strawman router answered six of six alerts and got one right, flagging none. The honest router routed two and refused four by name - worse coverage, enormously better truthfulness.</div><pre><code>def route(incident: Incident) -&gt; RoutingDecision:
+    &quot;&quot;&quot;Route one incident, or refuse. There is no default branch.&quot;&quot;&quot;
+    signal = parse_alert(incident.report)
+    if signal is None:
+        return _unroutable(incident, &quot;the report is prose, not an alert line&quot;)
+    service = owner_for(signal.service)
+    if service is None:
+        return _unroutable(incident, f&quot;no rota owns service {signal.service!r}&quot;)
+    severity = severity_for(signal, service)
+    return RoutingDecision(incident_id=incident.incident_id, rota=service.rota,
+        severity=severity, needs_human=False,
+        decided_by=f&quot;{signal.metric} &gt; {signal.threshold} on {signal.service}&quot;)</code></pre><div class="note">Two named refusals and no else; every exit carries decided_by so the page can be argued with at 3am.</div><div class="callout"><strong>The trap:</strong> Writing else: return DEFAULT because &#x27;the path must always produce something&#x27; - it must produce something honest.</div><div class="callout green"><strong>In Formulaite:</strong> catalogue_lookup(inci) in formulaite_tools.py should return a named refusal for an unknown INCI, never a guessed entry.</div></div></div><div class="concept" data-key="The Zero Row"><div class="chead" role="button" tabindex="0"><div><span class="idx">06</span><b>The Zero Row</b> <span class="chip ch">ch 3</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>The Zero Row is the measured cost and the measured failure rate of the deterministic version, taken before any model exists. It is the denominator for every later claim. Teams record the cost half and skip the failure half. The failure half is the one that decides whether you climb.</p><div class="callout blue"><strong>Picture it:</strong> Routing took 2.5 microseconds and zero tokens, and refused four of six incidents. &#x27;Level 0 handles a third of reports&#x27; justifies a specific escalation; &#x27;our rules are not good enough&#x27; justifies anything.</div><pre><code>@register_rung(&quot;Level 0: Deterministic Code&quot;)
+def run(incident: Incident) -&gt; CostLedger:
+    &quot;&quot;&quot;Rung entry point. Measured, so the Zero Row is measured rather than assumed.&quot;&quot;&quot;
+    ledger = CostLedger()
+
+    @measured(&quot;rules.route&quot;, ledger)
+    def _run_once() -&gt; RoutingDecision:
+        return route(incident)
+
+    _run_once()
+    return ledger      # zero model calls, zero tokens - recorded, not hard-coded</code></pre><div class="note">The same @measured decorator prices every rung, so the baseline and the model rows are comparable.</div><div class="callout"><strong>The trap:</strong> Never computing the baseline, so &#x27;the model made it better&#x27; has no denominator.</div><div class="callout green"><strong>In Formulaite:</strong> Record in glassbox.py how many drawers the catalogue fills with zero model calls, and how many it refuses; that is Formulaite&#x27;s Zero Row.</div></div></div><div class="concept" data-key="Level 1 - The Prompt Application"><div class="chead" role="button" tabindex="0"><div><span class="idx">07</span><b>Level 1 - The Prompt Application</b> <span class="chip ch">ch 4</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>One model call, structured output, no external state. It adds language understanding over input you already have, and nothing else. The schema is the architecture and the prompt is configuration. Put the contract in a type the API enforces, and the string-parsing repair layer disappears.</p><div class="callout blue"><strong>Picture it:</strong> A prose incident report says &#x27;their card was charged but the order page spun forever&#x27;. No regex maps that to payment-gateway; one typed call does, in four seconds.</div><pre><code>class Classification(BaseModel):
+    &quot;&quot;&quot;What one model call is allowed to return.&quot;&quot;&quot;
+    service: Literal[&quot;checkout-api&quot;, &quot;payment-gateway&quot;,
+                     &quot;notification-worker&quot;, &quot;search-api&quot;, &quot;unknown&quot;]
+    severity: Literal[&quot;SEV1&quot;, &quot;SEV2&quot;, &quot;SEV3&quot;]
+    summary: str
+    evidence: str          # a verbatim quote, checked by code
+    needs_human: bool      # the escape hatch: an enum with no way out is a default branch
+
+def triage(incident: Incident, completer: Completer) -&gt; RoutingDecision:
+    &quot;&quot;&quot;Classify a report and turn the result into a page, or refuse.&quot;&quot;&quot;
+    return decide(incident, classify(incident, completer))</code></pre><div class="note">Closed enums plus an &#x27;unknown&#x27; member; classify (model-facing) and decide (routing) stay separate functions.</div><div class="callout"><strong>The trap:</strong> Keeping the contract in the prompt and parsing free text, then adding retries and repair prompts for six weeks.</div><div class="callout green"><strong>In Formulaite:</strong> drawer.py&#x27;s as_tool_schema and fill_drawer in formulaite_tools.py are this rung: one typed call that fills the drawer from a supplier page.</div></div></div><div class="concept" data-key="The Format Illusion"><div class="chead" role="button" tabindex="0"><div><span class="idx">08</span><b>The Format Illusion</b> <span class="chip ch">ch 4</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A validated response is not a verified response. A schema validates the shape of the output and never its truth. Only enums are enforced while tokens are generated; lengths, ranges and patterns are demoted to descriptions and enforced by raising after you paid. The tighter the schema, the stronger the illusion.</p><div class="callout blue"><strong>Picture it:</strong> Two of four severities came back wrong while every response validated, quoted real evidence and set needs_human=False. The parse-rate dashboard stayed green.</div><pre><code>class Draft(BaseModel):
+    severity: Literal[&quot;SEV1&quot;, &quot;SEV2&quot;, &quot;SEV3&quot;]
+    summary: str = Field(max_length=200)
+    confidence: float = Field(ge=0.0, le=1.0)
+
+# What the SDK actually transmits - your caps became sentences:
+#   &quot;summary&quot;:    {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;{maxLength: 200}&quot;}
+#   &quot;confidence&quot;: {&quot;type&quot;: &quot;number&quot;, &quot;description&quot;: &quot;{maximum: 1.0, minimum: 0.0}&quot;}
+# Only the enum is enforced during generation. Pydantic raises later,
+# after the tokens are billed.</code></pre><div class="note">Print the transmitted schema once in a test; put real constraints in enums and verify everything else yourself.</div><div class="callout"><strong>The trap:</strong> Adding a confidence field - it is generated by the same process as the answer and is not a probability.</div><div class="callout green"><strong>In Formulaite:</strong> gates.py exists because a drawer that validates is not a drawer that is true; the gate compares the drawer against the catalogue entry.</div></div></div><div class="concept" data-key="The verbatim evidence quote"><div class="chead" role="button" tabindex="0"><div><span class="idx">09</span><b>The verbatim evidence quote</b> <span class="chip ch">ch 4</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Ask the model for something checkable instead of something self-reported. Require a quote copied character for character from the input, then check it with two lines of ordinary code. Invention becomes a hard fail rather than a score. It catches made-up evidence; it does not catch a real quote reasoned about wrongly.</p><div class="callout blue"><strong>Picture it:</strong> A page arrives at 3am with the sentence that caused it attached. The on-call can read it and disagree. A confidence of 0.95 gives them nothing to disagree with.</div><pre><code>def _normalized(text: str) -&gt; str:
+    return &quot; &quot;.join(text.split()).casefold()
+
+def evidence_supported(claim: Classification, incident: Incident) -&gt; bool:
+    &quot;&quot;&quot;Is the model&#x27;s quote actually in the report?&quot;&quot;&quot;
+    quote = _normalized(claim.evidence)
+    return bool(quote) and quote in _normalized(incident.report)
+
+# in classify(): a declared refusal is honoured first, then the quote is checked
+if not evidence_supported(claim, incident):
+    return _unknown(f&quot;quoted evidence not in the report: {claim.evidence!r}&quot;)</code></pre><div class="note">Whitespace and case are forgiven, nothing else; the check runs before anything is paged and costs nothing.</div><div class="callout"><strong>The trap:</strong> Checking the quote before honouring needs_human, which files every honest refusal under &#x27;invented evidence&#x27;.</div><div class="callout green"><strong>In Formulaite:</strong> Add an evidence field per drawer section in drawer.py and a check in gates.py that the quote appears in the supplier page text the tool returned.</div></div></div><div class="concept" data-key="The Completer seam"><div class="chead" role="button" tabindex="0"><div><span class="idx">10</span><b>The Completer seam</b> <span class="chip ch">ch 4</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Every model call goes through one narrow Protocol. A rung asks for typed output and gets back either the parsed object or a failure string, never an SDK exception. A recorded implementation replays committed responses, keyed on a hash of the exact prompt. Tests run with no key, and a prompt edit turns them red on purpose.</p><div class="callout blue"><strong>Picture it:</strong> One door to the vendor. Metering, tracing and replay all wrap that door, and none of the eight rungs knows they exist.</div><pre><code>@dataclass(frozen=True)
+class Completion(Generic[T]):
+    &quot;&quot;&quot;One call&#x27;s typed result, its bill, and why it failed if it did.&quot;&quot;&quot;
+    parsed: T | None
+    usage: Usage
+    failed: str | None = None
+
+class Completer(Protocol):
+    &quot;&quot;&quot;What a rung is allowed to ask a model for. Deliberately narrow.&quot;&quot;&quot;
+    def parse(self, *, system: str, user: str, schema: type[T],
+              effort: str = &quot;low&quot;) -&gt; Completion[T]: ...
+# RecordedCompleter replays by prompt_key = sha256(system + user)[:12]</code></pre><div class="note">No exceptions in the contract; every vendor failure is translated once into the failed field, so nothing above catches SDK errors.</div><div class="callout"><strong>The trap:</strong> Keying the fake on the incident id, so tests stay green after the prompt that production depends on has changed.</div><div class="callout green"><strong>In Formulaite:</strong> models.py&#x27;s ModelClient Protocol with ScriptedModel (offline) and ClaudeModel (online) is Formulaite&#x27;s Completer seam.</div></div></div></div><div class="panel" data-level="intermediate"><div class="prog"><span class="lbl">Intermediate</span><div class="bar"><i></i></div><span class="txt">0 / 12 got it</span></div><div class="concept" data-key="Level 2 - Retrieval with a relevance floor"><div class="chead" role="button" tabindex="0"><div><span class="idx">01</span><b>Level 2 - Retrieval with a relevance floor</b> <span class="chip ch">ch 5</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>RAG adds facts that are in neither the request nor the model. It has two quality surfaces, retrieval and generation, and the retrieval one fails silently. A top_k with no floor always returns k passages, so it cannot say &#x27;nothing here&#x27; - it is the default branch relocated into a ranking function. Set the floor above the best score of queries the corpus cannot answer.</p><div class="callout blue"><strong>Picture it:</strong> A question about a leaking coffee machine scored 3.80 against the escalation policy on the word &#x27;floor&#x27;. FLOOR = 6.0 sits above that whole band and refused six of six off-topic queries at no cost in recall.</div><pre><code>def search(index: Index, query: str, *, limit: int = LIMIT,
+           floor: float = FLOOR) -&gt; tuple[Hit, ...]:
+    query_terms = terms(query)
+    hits: list[Hit] = []
+    for position, passage in enumerate(index.passages):
+        score = _bm25(index, position, query_terms)
+        if score &lt; floor:
+            continue                    # a limit says how many; a floor says whether any
+        hits.append(Hit(passage, score, ...))
+    hits.sort(key=lambda hit: (-hit.score, hit.passage.passage_id))
+    return tuple(hits[:limit])          # empty tuple = &quot;this corpus does not answer that&quot;</code></pre><div class="note">The empty tuple is the load-bearing return value; no passages means no model call is made at all.</div><div class="callout"><strong>The trap:</strong> Splitting two-hundred-word runbooks on headings: the symptom chunk matches the query and the fix chunk holds the answer.</div><div class="callout green"><strong>In Formulaite:</strong> Supplier pages retrieved in formulaite_tools.py need a floor: an ingredient the page set does not cover must refuse, not send three irrelevant pages to the model.</div></div></div><div class="concept" data-key="The Substitution Test"><div class="chead" role="button" tabindex="0"><div><span class="idx">02</span><b>The Substitution Test</b> <span class="chip ch">ch 5</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>One run that locates a fault in a retrieval system. Hand the generator the documents you know are correct and rerun. If the answer becomes right, retrieval is broken. If it stays wrong, generation is broken. No labels, no judge. Substitute the query instead of the documents and it proves whether a better query could have reached the corpus.</p><div class="callout blue"><strong>Picture it:</strong> Like swapping in a known-good battery to see if the torch or the battery is dead - one swap, one answer, before you spend a week on the wrong half.</div><div class="callout"><strong>The trap:</strong> Spending a week tuning prompts against a retrieval fault because the prompt is the half that feels adjustable.</div><div class="callout green"><strong>In Formulaite:</strong> When a drawer is wrong, feed the model the correct supplier page by hand through read_supplier_page&#x27;s stub and rerun; if the drawer is fixed, the page selection was at fault.</div></div></div><div class="concept" data-key="Level 3 - The LLM Workflow"><div class="chead" role="button" tabindex="0"><div><span class="idx">03</span><b>Level 3 - The LLM Workflow</b> <span class="chip ch">ch 6</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Several model calls in a sequence you control and can draw before the run starts. Run the Floor Test on every stage, not once on the system: three of five stages here are plain code and cost 0.2 milliseconds. The capability the rung adds is a stage whose input is an earlier stage&#x27;s output - in this book it is an f-string.</p><div class="callout blue"><strong>Picture it:</strong> classify, extract, retrieve, draft, route. The extract stage that fixes the unsolvable incident is one line: prepend the classified service name to the report before searching.</div><pre><code>STAGES: tuple[tuple[str, StageKind], ...] = (
+    (&quot;classify&quot;, &quot;model&quot;),
+    (&quot;extract&quot;, &quot;code&quot;),
+    (&quot;retrieve&quot;, &quot;code&quot;),
+    (&quot;draft&quot;, &quot;model&quot;),
+    (&quot;route&quot;, &quot;code&quot;),
+)
+
+def extract(claim: Classification, incident: Incident) -&gt; str:
+    return f&quot;{claim.service} {incident.report}&quot;   # the whole capability, no model
+# A model-written query scored 0.75 against this f-string&#x27;s 1.00 and cost a call.</code></pre><div class="note">If you can enumerate the stages at import time you can draw them; a branch whose arms are written in the source is still Level 3.</div><div class="callout"><strong>The trap:</strong> Replacing the report with the classification as the query: a summary is lossy and it broke another incident.</div><div class="callout green"><strong>In Formulaite:</strong> Formulaite&#x27;s research is drawable: catalogue_lookup, then read_supplier_page, then fill_drawer, then run_gates - agent.py could be a fixed pipeline for most ingredients.</div></div></div><div class="concept" data-key="The Downstream Veto"><div class="chead" role="button" tabindex="0"><div><span class="idx">04</span><b>The Downstream Veto</b> <span class="chip ch">ch 6</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A later stage that receives an earlier stage&#x27;s output as a claim, and can see the original input, can overrule it. That is why a well-built pipeline scores its worst stage, not the product of all stages. The structural prerequisite is the report re-sent at every stage; the prompt sentence &#x27;this may be wrong&#x27; turned out to do nothing on its own.</p><div class="callout blue"><strong>Picture it:</strong> Stage 1 said checkout-api. Stage 4 read the passages against the report and corrected it to payment-gateway. Drop the report from stage 4&#x27;s prompt and it can no longer disagree with anything.</div><pre><code>DRAFT_SYSTEM = &quot;&quot;&quot;You triage production incident reports for an on-call rota ...
+An earlier stage has already classified this report. Its classification is
+given to you, and IT MAY BE WRONG. ...
+- Judge the passages against the REPORT, not against the classification.&quot;&quot;&quot;
+
+def build_user(incident, claim, hits) -&gt; str:
+    return (&quot;Retrieved passages:\n\n&quot; f&quot;{context_block(hits)}\n\n&quot;
+            &quot;An earlier stage classified this report as:\n&quot;
+            f&quot;  service: {claim.service}\n  severity: {claim.severity}\n\n&quot;
+            &quot;Classify the incident report between the markers ...\n\n&quot;
+            f&quot;&lt;report&gt;\n{incident.report}\n&lt;/report&gt;&quot;)   # the original, every time</code></pre><div class="note">The claim is labelled as an earlier stage&#x27;s output and the original report travels with it.</div><div class="callout"><strong>The trap:</strong> Dropping the original input from later prompts as a token optimisation - it deletes the veto.</div><div class="callout green"><strong>In Formulaite:</strong> When gates.py sends failure reasons back to the model, the supplier page text must be in the conversation too, or the model has nothing to correct the drawer against.</div></div></div><div class="concept" data-key="The Blame Sink"><div class="chead" role="button" tabindex="0"><div><span class="idx">05</span><b>The Blame Sink</b> <span class="chip ch">ch 6</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>In a pipeline the stage that reports a failure is the last stage able to detect it, not the stage that caused it. Count refusals by reporting stage and everything lands on the final stage. Record two names: reported_by and origin. The walk back stops at the nearest model stage, because a deterministic stage with a green unit test is exonerated.</p><div class="callout blue"><strong>Picture it:</strong> The retriever found nothing and reported the refusal; the cause was stage 1 misclassifying the service. A team watching the retriever would have bought an embedding model for a classifier bug.</div><pre><code>def origin_of(trace, reporting, *, blames_input: bool) -&gt; str:
+    if not blames_input:
+        return reporting                 # its own machinery broke
+    by_name = {record.name: record for record in trace}
+    current = by_name.get(reporting)
+    while current is not None:
+        if current.input_from is None:
+            return current.name          # stage 1 read the request itself
+        upstream = by_name.get(current.input_from)
+        if upstream.kind == &quot;model&quot;:
+            return upstream.name         # nearest probabilistic stage
+        current = upstream               # deterministic: skip, its test exonerates it</code></pre><div class="note">STAGE_INPUT names where each stage&#x27;s input came from; the walk skips code stages and stops at the first model stage.</div><div class="callout"><strong>The trap:</strong> Keying the refusal dashboard on the reporting stage and spending a quarter tuning the stage that was working.</div><div class="callout green"><strong>In Formulaite:</strong> glassbox.py events for a gate failure should carry both reported_by (the gate) and origin (the tool or model step that produced the bad value).</div></div></div><div class="concept" data-key="Level 4 - The Tool-Using LLM"><div class="chead" role="button" tabindex="0"><div><span class="idx">06</span><b>Level 4 - The Tool-Using LLM</b> <span class="chip ch">ch 7</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Level 4 adds execution: the model chooses which tool runs and with what arguments. It is exactly one round - one call picks tools, every tool runs together, a second call answers with a schema. There is no loop and no cap standing in for one. Telling the model its round budget is telling the truth about the system, and it changes behaviour.</p><div class="callout blue"><strong>Picture it:</strong> Told it had one round, the model made 8.84 tool calls and never asked for more. Told nothing, it made 4.13 and asked for a second round 14 times in 15 - that second behaviour is a different rung.</div><pre><code>first = self._client.messages.create(model=self._model, system=system,
+    messages=messages, tools=wire, output_config={&quot;effort&quot;: effort})
+calls = _calls_from(first.content)
+if not calls:
+    return ToolRun(None, spent, failed=&quot;the model asked for no tools&quot;)
+results = tuple(execute(call) for call in calls)      # the caller runs tools, not the seam
+messages.append({&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: first.content})
+messages.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: _result_blocks(results)})
+second = self._client.messages.parse(model=self._model, system=system,
+    messages=messages, tools=wire, output_format=schema,
+    output_config={&quot;effort&quot;: effort})
+# There is no loop here, and no iteration cap standing in for one.</code></pre><div class="note">A finding with no tool result behind it is refused; the tools stay attached on the second request so the model can ask for more, which is measured.</div><div class="callout"><strong>The trap:</strong> Reading max_iterations=2 as &#x27;Level 4 with headroom&#x27; - it is Level 5 with a cap and needs Level 5&#x27;s evaluation.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py with tools.py is Level 4 when the model picks catalogue_lookup and read_supplier_page in one round and then calls fill_drawer.</div></div></div><div class="concept" data-key="The consequence field and the Blast Radius Schema"><div class="chead" role="button" tabindex="0"><div><span class="idx">07</span><b>The consequence field and the Blast Radius Schema</b> <span class="chip ch">ch 7</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>What a system can cause is a property of its tool schemas, computable before any tool is written. Prompts change how likely an outcome is; only the schema changes whether it is reachable. So every ToolSpec carries consequence: read or write, with no default, and the default menu filters on it. A test asserts the blast radius is empty.</p><div class="callout blue"><strong>Picture it:</strong> query_metric and rollback_deploy are identical in shape to a model and to JSON Schema. The rollback at 03:11 happened with three &#x27;never roll back&#x27; sentences in the prompt.</div><pre><code>@dataclass(frozen=True)
+class ToolSpec:
+    name: str
+    description: str
+    parameters: dict[str, Any]              # JSON Schema for the tool&#x27;s input
+    consequence: Literal[&quot;read&quot;, &quot;write&quot;]   # no default - every tool must answer
+
+def menu_for(*, allow_writes: bool = False) -&gt; tuple[ToolSpec, ...]:
+    return TOOLS if allow_writes else tuple(s for s in TOOLS if s.consequence == &quot;read&quot;)
+def blast_radius(tools: tuple[ToolSpec, ...]) -&gt; tuple[str, ...]:
+    return tuple(f&quot;{spec.name}: {spec.description.split(&#x27;.&#x27;)[0].strip().lower()}&quot;
+                 for spec in tools if spec.consequence == &quot;write&quot;)</code></pre><div class="note">consequence is stripped before serialisation - the field that bounds the model is the field the vendor never sees.</div><div class="callout"><strong>The trap:</strong> Computing blast radius per tool; a metrics reader plus a free-text log search compose into a read primitive neither is alone.</div><div class="callout green"><strong>In Formulaite:</strong> Add consequence with no default to Tool in tools.py: catalogue_lookup and read_supplier_page are read, a future save_to_catalogue is write and stays off the default registry.</div></div></div><div class="concept" data-key="Tool errors that name what is available"><div class="chead" role="button" tabindex="0"><div><span class="idx">08</span><b>Tool errors that name what is available</b> <span class="chip ch">ch 7</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Forty-nine of 663 tool calls were wrong. An error that names what was available lets the model correct itself inside the same round, because all calls run together. &#x27;Error: 404&#x27; turns a typo into a refusal. And an empty result is not an error: mark it is_error=False and say so in words, or the model learns to treat health as an obstacle.</p><div class="callout blue"><strong>Picture it:</strong> unknown metric &#x27;orders_created&#x27; for checkout-api; available: http_5xx_rate, p99_latency_ms, cpu_utilization, connection_pool_in_use - one f-string, and the next call is right.</div><pre><code># What a wrong call gets back - one f-string, and the correction happens in-round:
+#   query_metric(metric=&#x27;orders_created&#x27;, service=&#x27;checkout-api&#x27;)
+#   -&gt; unknown metric &#x27;orders_created&#x27; for checkout-api;
+#      available: http_5xx_rate, p99_latency_ms, cpu_utilization, connection_pool_in_use
+
+# A redundant guard behind the menu filter - if it ever fires, alert:
+if spec.consequence == &quot;write&quot; and not self.allow_writes:
+    return self._error(call, f&quot;{call.name} is not permitted in this session&quot;)
+
+def test_no_tool_schema_accepts_a_timestamp():   # the caller binds the window
+    for spec in TOOLS:
+        assert not set(spec.parameters[&quot;properties&quot;]) &amp; {&quot;at&quot;, &quot;until&quot;, &quot;since&quot;, &quot;start&quot;, &quot;end&quot;}</code></pre><div class="note">Every field you leave out is a field a model cannot get wrong; enums replace free integers so bad values fail during generation.</div><div class="callout"><strong>The trap:</strong> Translating vendor exceptions to just their class name, so 27 BadRequestErrors are indistinguishable from a rate limit.</div><div class="callout green"><strong>In Formulaite:</strong> read_supplier_page in formulaite_tools.py should return &#x27;no page for X; known suppliers: ...&#x27; as a tool result rather than raising ToolError.</div></div></div><div class="concept" data-key="value_supported - evidence from tool results"><div class="chead" role="button" tabindex="0"><div><span class="idx">09</span><b>value_supported - evidence from tool results</b> <span class="chip ch">ch 7</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>The evidence check moves from the input to the tool results. A finding must name the tool it copied from and the value it copied, verbatim. &#x27;Roughly 19 percent&#x27; for a reading of 0.1873 is true and uncitable, and on a paging path that is indistinguishable from an invented number. At Level 5 the same check gates what enters the carried state.</p><div class="callout blue"><strong>Picture it:</strong> Like a lab notebook rule: write the number the instrument showed, not your rounding of it. Anyone can then find the reading again.</div><pre><code>def value_supported(finding, calls, results) -&gt; bool:
+    if not finding.evidence_value.strip():
+        return False
+    from_tool = {c.call_id for c in calls if c.name == finding.evidence_tool}
+    haystack = normalized(
+        &quot; &quot;.join(r.content for r in results if r.call_id in from_tool)
+    )
+    return normalized(finding.evidence_value) in haystack
+
+def test_a_rounded_value_is_not_supported():
+    assert not value_supported(a_finding(evidence_value=&quot;roughly 18 percent&quot;),
+                               (call,), (result,))</code></pre><div class="note">The haystack is only the results of the tool the finding names; a paraphrase fails, a verbatim copy passes.</div><div class="callout"><strong>The trap:</strong> Running this check before the give-up field, so every honest &#x27;nothing here would settle it&#x27; is discarded as unsupported.</div><div class="callout green"><strong>In Formulaite:</strong> gates.py should reject a drawer whose max-use level or pH does not appear verbatim in a tool result recorded in the Glass Box.</div></div></div><div class="concept" data-key="Level 5 - Multi-Step Reasoning"><div class="chead" role="button" tabindex="0"><div><span class="idx">10</span><b>Level 5 - Multi-Step Reasoning</b> <span class="chip ch">ch 8</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Level 5 adds one thing: a call whose arguments come from a previous call&#x27;s result, chosen at run time by the model. The chain is still finite: a tuple of step roles fixes the maximum before the run. A step can stop the chain early but cannot make it longer. Down only is a chain. Up is a loop.</p><div class="callout blue"><strong>Picture it:</strong> Step one read &#x27;no healthy upstream for cluster=inventory&#x27; and asked to search the mesh for &#x27;inventory&#x27; - a word that appears in no prompt. Level 4 searched for &#x27;checkout&#x27; and found nothing 13 times in 15.</div><pre><code>STEPS: tuple[Step, ...] = (
+    Step(&quot;observe&quot;, &quot;Establish what is actually failing. Read the telemetry ...&quot;),
+    Step(&quot;localize&quot;, &quot;Find the component responsible. Use the identifiers the previous step read ...&quot;),
+    Step(&quot;confirm&quot;, &quot;Confirm or reject the cause. Read the one thing that would settle it ...&quot;),
+)
+MAX_MODEL_CALLS: int = 2 * len(STEPS)     # the Termination Test&#x27;s answer: arithmetic on a tuple
+def walk(self, nodes, initial, *, done):  # SequentialChain - six lines of body
+    state = initial
+    for node in nodes:
+        if done(state): return state      # early exit only ever shortens the run
+        state = node(state)
+    return state</code></pre><div class="note">Names are roles not a script; MAX_MODEL_CALLS is derived from the tuple so it cannot go stale.</div><div class="callout"><strong>The trap:</strong> Setting the step count high &#x27;because early exit is free&#x27; - some incidents expand to fill whatever depth you offer.</div><div class="callout green"><strong>In Formulaite:</strong> A fixed observe, read, confirm step tuple in agent.py with max_steps = 2 * len(STEPS) turns the lab loop into a chain the Termination Test passes.</div></div></div><div class="concept" data-key="The Termination Test"><div class="chead" role="button" tabindex="0"><div><span class="idx">11</span><b>The Termination Test</b> <span class="chip ch">ch 2</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Can you state, before the run begins, the maximum number of model calls it will make? Yes is Level 5. A capped loop does not pass: max_iterations=10 is an unbounded loop with a circuit breaker. The tell is what happens when the number is reached. &#x27;The work is done&#x27; is a chain. &#x27;We return what we have&#x27; is a loop.</p><div class="callout blue"><strong>Picture it:</strong> A recipe with seven steps ends after seven. A &#x27;keep stirring until it thickens, but stop after ten minutes&#x27; rule is a loop with a timer - the timer is not the design.</div><pre><code>def termination_test(profile: TaskProfile) -&gt; bool | None:
+    &quot;&quot;&quot;The Level 5/6 diagnostic. True means a finite chain: Level 5, not Level 6.&quot;&quot;&quot;
+    return profile.max_model_calls_knowable
+
+# The test as a unit test (Chapter 8). The Level 6 loop cannot be added to CHAINS,
+# because its defining property is the negation of this assertion.
+@pytest.mark.parametrize(&quot;chain&quot;, CHAINS)
+def test_a_node_never_runs_twice(chain) -&gt; None:
+    final = chain.walk(NODES, Counter(), done=lambda s: s.finished)
+    assert len(final.visited) == len(set(final.visited)) == len(NODES)</code></pre><div class="note">The diagnostic refuses with UNRESOLVED when this field is None, because guessing Level 5 here is the design-review failure automated.</div><div class="callout"><strong>The trap:</strong> Answering with a number from a config file instead of a number derived from the structure of the work.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py&#x27;s max_steps is a circuit breaker, not a design: if hitting it means &#x27;return the drawer we have&#x27;, the lab agent is Level 6 and needs Level 6 costing.</div></div></div><div class="concept" data-key="The Context Ratchet"><div class="chead" role="button" tabindex="0"><div><span class="idx">12</span><b>The Context Ratchet</b> <span class="chip ch">ch 8</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Within one run, intermediate state only accumulates. Every step re-buys every earlier step, so what you carry sets the slope: conclusions add a constant per step, raw results add an amount that itself grows. And a wrong early claim gets more authoritative as it is passed on, steering the tool calls that would have contradicted it.</p><div class="callout blue"><strong>Picture it:</strong> Carrying conclusions added 414 then 400 tokens per step. Carrying raw results added 1,046 then 1,650. Over three steps that is 1.65x; over ten it is the difference between affordable and not.</div><pre><code>def carried(state: ChainState, step: Step, index: int, total: int) -&gt; str:
+    parts = [f&quot;&lt;report&gt;\n{state.incident.report}\n&lt;/report&gt;&quot;,     # the original, every step
+             f&quot;You are on step {index + 1} of {total}: {step.name}.&quot;, step.purpose]
+    if state.findings:
+        parts += [&quot;&lt;claims from earlier steps - these may be wrong&gt;&quot;]
+        for name, finding in state.findings:
+            parts.append(f&quot;- step {name}: {finding.cause} (from {finding.evidence_tool}: &quot;
+                         f&quot;{finding.evidence_value!r}). Wanted next: {finding.next_step}&quot;)
+    if state.calls:
+        parts += [&quot;&lt;already read - do not repeat these&gt;&quot;]
+        parts += [f&quot;- {call.render()}&quot; for call in state.calls]   # names, never results
+    return &quot;\n&quot;.join(parts)</code></pre><div class="note">Tool calls are listed by name and arguments; a test asserts the result bytes are never re-sent.</div><div class="callout"><strong>The trap:</strong> Appending every result to a running message list because it is fewer lines than deciding what to keep.</div><div class="callout green"><strong>In Formulaite:</strong> memory.py should carry drawer conclusions and the list of tool calls made, never the raw supplier page text, on every round.</div></div></div></div><div class="panel" data-level="advanced"><div class="prog"><span class="lbl">Advanced</span><div class="bar"><i></i></div><span class="txt">0 / 13 got it</span></div><div class="concept" data-key="Level 6 - The Autonomous Agent"><div class="chead" role="button" tabindex="0"><div><span class="idx">01</span><b>Level 6 - The Autonomous Agent</b> <span class="chip ch">ch 9</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Level 6 adds one thing, the largest jump on the ladder: the system decides when it is done. The diff from Level 5 is a for over a tuple becoming a while over a predicate. The done predicate is now the only bound there is. The agent&#x27;s half is state.finished; yours is a Budget. There is no third term.</p><div class="callout blue"><strong>Picture it:</strong> The loop chose its own depth per incident with identical settings: one round for the easy case, two for the medium, three or four for the hard one, and a refusal for the impossible one.</div><pre><code># Level 6: the whole diff from Level 5&#x27;s walk() is the keyword.
+def run(self, node: Node[State], initial: State, *, done: Done) -&gt; State:
+    state = initial
+    while not done(state):
+        state = node(state)
+    return state
+
+# Wiring it up - &quot;that lambda is the whole architecture&quot;:
+final = walker.run(node, start, done=lambda state: (
+    state.finished or _bound(state, ledger, started, limits) is not None
+))</code></pre><div class="note">The signature lost its plural: run takes one node because the design is &#x27;do the thing again&#x27;.</div><div class="callout"><strong>The trap:</strong> Telling the model &#x27;you have eight rounds&#x27; - that describes a chain, and the model expands to fill it.</div><div class="callout green"><strong>In Formulaite:</strong> agent.py&#x27;s for-else loop over max_steps is this rung; the done predicate is &#x27;run_gates passed&#x27; or a bound.</div></div></div><div class="concept" data-key="The unreachable give-up field"><div class="chead" role="button" tabindex="0"><div><span class="idx">02</span><b>The unreachable give-up field</b> <span class="chip ch">ch 9</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A chain could say &#x27;not yet&#x27; via needs_human plus next_step, but never &#x27;never&#x27;. A loop needs a way to say never, or its only exits are the circuit breakers. Add one boolean, unreachable, and read it before the evidence check. A give-up asserts no fact, so it quotes no value. A defensive gate run first would discard every give-up and send the agent round again.</p><div class="callout blue"><strong>Picture it:</strong> With the field honoured, failures cost 1.23x successes. With it suppressed, 2.12x - and three of five runs ended as &#x27;the model asked for no tools&#x27;, a correct refusal filed as a vendor bug.</div><pre><code>class Verdict(Finding):
+    unreachable: bool = Field(description=(
+        &quot;True when no further reading with these tools could establish the &quot;
+        &quot;cause - not merely that you have not found it yet.&quot;))
+
+# In the round function: unreachable is read BEFORE the citation check.
+finding = run_result.parsed
+if finding.unreachable and honor_unreachable:
+    return replace(recorded(True, f&quot;stopped itself: {finding.next_step}&quot;),
+                   gave_up=finding.next_step or &quot;no further reading would settle it&quot;)
+if not value_supported(finding, calls, results):
+    return recorded(False, f&quot;discarded: {finding.evidence_value!r} is not in any tool result&quot;)</code></pre><div class="note">The give-up is recorded but not carried, because it makes no claim for a later round to inherit.</div><div class="callout"><strong>The trap:</strong> Letting a defensive check eat the give-up path; the runs still finish and the only symptom is the bill.</div><div class="callout green"><strong>In Formulaite:</strong> Add an unreachable flag to fill_drawer in formulaite_tools.py so the agent can say &#x27;no supplier page will fill this section&#x27; and stop, and have agent.py read it before run_gates.</div></div></div><div class="concept" data-key="Budget - three bounds that name themselves"><div class="chead" role="button" tabindex="0"><div><span class="idx">03</span><b>Budget - three bounds that name themselves</b> <span class="chip ch">ch 9</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Most loops ship one bound, the iteration count, which measures the thing you care about least. Rounds, tokens and seconds fail for different reasons: the agent kept finding plausible reads, the working set outgrew convergence, or the incident is still open. So the bound returns a string naming which fired. The deadline is the one that protects your backend.</p><div class="callout blue"><strong>Picture it:</strong> Eight rounds costs one thing on the first incident of the day and another on one that has accumulated forty tool results. A shared flag makes &#x27;which bound keeps firing?&#x27; unanswerable.</div><pre><code>@dataclass(frozen=True)
+class Budget:
+    iterations: int = 8
+    tokens: int = 120_000
+    seconds: float = 600.0
+
+def _bound(state, ledger, started, budget) -&gt; str | None:     # names the bound
+    if len(state.attempts) &gt;= budget.iterations:
+        return f&quot;iterations: {len(state.attempts)} of {budget.iterations}&quot;
+    spent = ledger.total_input_tokens + ledger.total_output_tokens
+    if spent &gt;= budget.tokens: return f&quot;tokens: {spent} of {budget.tokens}&quot;
+    if time.monotonic() - started &gt;= budget.seconds: return f&quot;deadline: {budget.seconds:.0f}s&quot;</code></pre><div class="note">finished is checked before _bound, so a run that answers on its last permitted round is a success, not a bounded run.</div><div class="callout"><strong>The trap:</strong> Reporting a completion rate that is mostly circuit breaker because finished and bounded share one flag.</div><div class="callout green"><strong>In Formulaite:</strong> Replace agent.py&#x27;s single max_steps with Budget(iterations, tokens, seconds) using memory.py&#x27;s token_estimate, and log which bound fired to glassbox.py.</div></div></div><div class="concept" data-key="Three memory layers"><div class="chead" role="button" tabindex="0"><div><span class="idx">04</span><b>Three memory layers</b> <span class="chip ch">ch 9</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>An agent needs three memories with three lifetimes. The scratchpad is the state inside one run - the only layer the loop needs to function, so the only one most teams build. The journal is one small record per finished run: what happened, what it cost, why it stopped. Recall indexes the journal by how incidents presented, excluding the same incident.</p><div class="callout blue"><strong>Picture it:</strong> The morning-after question: why did the agent spend forty minutes and page the wrong rota? If you can only answer from logs, you have a scratchpad, and it died with the process.</div><pre><code>@dataclass(frozen=True)
+class Entry:                    # the journal: one record per finished run
+    run_id: str
+    incident_id: str
+    service: str
+    report: str
+    routed: bool
+    cause: str | None
+    evidence: str | None
+    rounds: int
+    stopped_by: str | None      # which bound, or None when the agent stopped itself
+    tools: tuple[str, ...]</code></pre><div class="note">Deliberately not a transcript; recall reuses Chapter 5&#x27;s BM25 over these records with no vector store.</div><div class="callout"><strong>The trap:</strong> Indexing recall on the verdict instead of the report, or forgetting to exclude the same incident&#x27;s earlier runs.</div><div class="callout green"><strong>In Formulaite:</strong> memory.py&#x27;s Conversation is the scratchpad; glassbox.py saved per run is the journal; recall would index past drawers by the ingredient request text.</div></div></div><div class="concept" data-key="Level 7 - The Multi-Agent System"><div class="chead" role="button" tabindex="0"><div><span class="idx">05</span><b>Level 7 - The Multi-Agent System</b> <span class="chip ch">ch 10</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Level 7 adds roles with separate authority and handoffs between them, and nothing else. Not capability, not intelligence, not self-checking. The authority boundary is three tool menus built by filtering on consequence. The investigator reads, the reviewer holds no tools, and the remediator writes one thing and reads nothing. It is the only rung whose entry condition is a measurement.</p><div class="callout blue"><strong>Picture it:</strong> A single loop holds write authority in every round, including round two when its hypothesis is wrong. The crew&#x27;s remediator has no menu to misbehave with until someone else has made the case.</div><pre><code>MENUS: dict[Role, tuple[ToolSpec, ...]] = {
+    &quot;investigator&quot;: tuple(s for s in TOOLS if s.consequence == &quot;read&quot;),
+    &quot;reviewer&quot;: (),
+    &quot;remediator&quot;: tuple(s for s in TOOLS if s.consequence == &quot;write&quot;),
+}
+
+def test_only_the_remediator_can_change_anything() -&gt; None:
+    radii = {role: blast_radius(menu_for_role(role)) for role in ROLES}
+    assert radii[&quot;investigator&quot;] == ()
+    assert radii[&quot;reviewer&quot;] == ()
+    assert radii[&quot;remediator&quot;] == (
+        &quot;rollback_deploy: roll a service back to a previous deploy&quot;,)</code></pre><div class="note">Menus are built from the consequence field, not from tool names, so a new write tool cannot leak into the investigator by omission.</div><div class="callout"><strong>The trap:</strong> Giving the reviewer only the investigator&#x27;s summary - it then checks a conclusion against a summary of itself.</div><div class="callout green"><strong>In Formulaite:</strong> If Formulaite ever writes to the catalogue, split agent.py into a read-only researcher and a write-only saver with separate ToolRegistry instances from tools.py.</div></div></div><div class="concept" data-key="The Break-Even Test"><div class="chead" role="button" tabindex="0"><div><span class="idx">06</span><b>The Break-Even Test</b> <span class="chip ch">ch 10</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Before an A/B between a crew and one agent, compute R: the crew&#x27;s coordination cost over the agent&#x27;s cost. The crew must reach the agent&#x27;s accuracy times R. Since accuracy cannot exceed 1.0, an agent already above 1/R leaves no reachable outcome. Then ask which specific failures would have to convert, and whether any role has the capability to convert them.</p><div class="callout blue"><strong>Picture it:</strong> R was 1.189 and the agent scored 0.800 against a ceiling of 0.841. On fifteen runs the crew had to go fifteen for fifteen, and the three failures were one incident no role could reach.</div><pre><code># R = crew cost per request / single-agent cost per request
+# accuracy_crew / accuracy_agent must be at least R
+R = 1.189                        # measured: 3,819 added tokens over 20,158
+agent_accuracy = 0.800           # 12 of 15 runs, Chapter 9
+must_reach = agent_accuracy * R  # 0.952 -&gt; fifteen for fifteen on this corpus
+ceiling = 1 / R                  # 0.841: above this no crew can break even</code></pre><div class="note">Coordination cost is structural - handoffs are strings you can build and count without a model.</div><div class="callout"><strong>The trap:</strong> Believing the diagram: three clearer boxes are no evidence about behaviour.</div><div class="callout green"><strong>In Formulaite:</strong> Before building a reviewer agent for drawers, compute R from the handoff size; if run_gates already passes more than 1/R of drawers, no reviewer can pay for itself.</div></div></div><div class="concept" data-key="The Refusal Cascade"><div class="chead" role="button" tabindex="0"><div><span class="idx">07</span><b>The Refusal Cascade</b> <span class="chip ch">ch 11</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A router is not a rung: it chooses a rung per request before any rung runs. Order the rungs a request type could use, cheapest first, try the cheapest, and climb on a refusal rather than a prediction. It works because every rung refuses instead of defaulting. Second clause: cascade only where the failed attempt is free - a Level 0 refusal costs nothing, a Level 5 refusal is billed in full.</p><div class="callout blue"><strong>Picture it:</strong> A page the floor answers never constructs a vendor client, so it cannot fail on a missing key or a degraded provider. One incident on the diagnose ladder paid 45,731 tokens across three refusing rungs for no answer.</div><pre><code>Ask = Literal[&quot;page&quot;, &quot;advise&quot;, &quot;diagnose&quot;]
+LADDERS: dict[Ask, tuple[int, ...]] = {
+    &quot;page&quot;: (0, 1), &quot;advise&quot;: (2, 3), &quot;diagnose&quot;: (4, 5, 6),
+}
+for level in ladder:
+    if level &gt; 0 and active is None:
+        active = AnthropicCompleter()      # a page the floor answers never builds a client
+    attempt, decision, step = try_rung(incident, level, active)
+    attempts.append(attempt)               # refusals stay on the bill
+    if attempt.answered:
+        return Outcome(..., level_reached=level, attempts=tuple(attempts))</code></pre><div class="note">The router reads only two free signals: the floor&#x27;s verdict and the ask the caller already declared.</div><div class="callout"><strong>The trap:</strong> Asking a model which rung a request needs - it LLM-washes the cheapest decision and adds a call to every request.</div><div class="callout green"><strong>In Formulaite:</strong> Route a Formulaite request: catalogue_entry first (free), then a single fill_drawer call, then the tool loop in agent.py, climbing only on a named refusal.</div></div></div><div class="concept" data-key="The Effective Level"><div class="chead" role="button" tabindex="0"><div><span class="idx">08</span><b>The Effective Level</b> <span class="chip ch">ch 11</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>The rung whose measured single-rung cost equals your composite&#x27;s mean cost per request, read off the cost curve by interpolation. It is not the traffic-weighted average of level numbers. That average treats the step from 0 to 1 as the same size as 5 to 6, and flatters an over-built system three times over. It is a property of your traffic mix, and it can exceed the top rung you contain.</p><div class="callout blue"><strong>Picture it:</strong> The same code ran at 2.03 on an alert-heavy mix and 3.93 on a diagnosis-heavy one. The diagnose ladder measured 7.68 with no Level 7 in it, because a cascade pays for rungs that refuse.</div><pre><code># Effective Level = the rung whose single-rung cost equals your mean cost per request,
+# read off the measured cost curve - never an average of level numbers.
+curve = {0: 0, 1: 1_289, 2: 1_462, 3: 2_828, 4: 6_635, 5: 15_467, 6: 17_547}
+# mix 90% floor / 10% loop: averaging labels says 0.6; the curve says 2.21.
+# Report it per ask (0.67 page, 2.56 advise, 7.68 diagnose), never as one product figure.</code></pre><div class="note">Alert on the distribution of level_reached, not on mean cost - the histogram is where cascade waste and refusal drift show.</div><div class="callout"><strong>The trap:</strong> Reporting one product-wide number: 2.29 is arithmetically correct and describes no request that ever ran.</div><div class="callout green"><strong>In Formulaite:</strong> Report Formulaite&#x27;s Effective Level per request type (known INCI versus new ingredient) from the token counts glassbox.py records, never as one number.</div></div></div><div class="concept" data-key="The Structural Estimate"><div class="chead" role="button" tabindex="0"><div><span class="idx">09</span><b>The Structural Estimate</b> <span class="chip ch">ch 12</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Half of cost is computable before anything runs: model call count, per-call context, and the carry discipline that decides whether those multiply or compound. Latency and refusal share are the other half and cannot be estimated. Scaling a measured rung by a guessed multiplier inherits the measurement&#x27;s authority and none of its validity - 3,675 estimated, 20,158 real.</p><div class="callout blue"><strong>Picture it:</strong> Ask &#x27;what does round five send that round one did not?&#x27; A list of conclusions gives a linear curve. &#x27;Everything so far&#x27; gives a curve that agrees at three rounds and is 2.86x at eight.</div><pre><code>def _turns_cost(turns: float, first_input: int, growth: int, carry: Carry) -&gt; float:
+    if turns &lt;= 0:
+        return 0.0
+    if carry == &quot;none&quot; or growth == 0:
+        return turns * first_input                    # linear: everyone&#x27;s mental model
+    if carry == &quot;growing&quot;:
+        ...                                           # compounds: re-reads everything
+    return turns * first_input + growth * turns * (turns - 1) / 2.0   # arithmetic series
+if shape.turns is None and shape.ceiling is None:     # the refusal, in estimate()
+    return Estimate(None, None, None, floor=False, decided_by=
+        &quot;no turn count and no ceiling: the architecture cannot answer &quot;
+        &quot;the Termination Test, so it has no estimable cost&quot;)</code></pre><div class="note">Cost is convex in turns, so an estimate from a mean turn count is a floor; a distribution gives a real number.</div><div class="callout"><strong>The trap:</strong> Filling in a plausible round count for an unbounded loop - it launders &#x27;we did not bound this&#x27; into a budget.</div><div class="callout green"><strong>In Formulaite:</strong> Estimate an agent.py run from three numbers: rounds, tokens per round (the tool schemas tools.py sends), and what memory.py carries between rounds.</div></div></div><div class="concept" data-key="The Scoring Surface"><div class="chead" role="button" tabindex="0"><div><span class="idx">10</span><b>The Scoring Surface</b> <span class="chip ch">ch 13</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>A scoring surface is a place a claim can be wrong independently of the final answer, needing its own labels and its own rate. The count of surfaces is the eval difficulty, an integer. An answer-only harness gets less informative as you climb. And a single assertion on a closed enum is a coin flip: report a rate with a Wilson interval, and refuse with None where nothing was scored.</p><div class="callout blue"><strong>Picture it:</strong> Level 1 service scored 8 of 8 - and the 95 percent interval runs 0.68 to 1.00. Three of four Level 4 incidents disagreed between &#x27;right answer&#x27; and &#x27;right tool choice&#x27;, in both directions.</div><pre><code>@dataclass(frozen=True)
+class Rate:
+    &quot;&quot;&quot;A pass rate over n samples, with the interval that makes n visible.&quot;&quot;&quot;
+    passes: int
+    n: int
+    @property
+    def interval(self) -&gt; tuple[float, float]:
+        if not self.n:
+            return (0.0, 1.0)          # no samples = no information, never a zero
+        z = NormalDist().inv_cdf(1 - (1 - CONFIDENCE) / 2)   # Wilson interval
+        ...
+# Rate(8, 8).interval -&gt; (0.68, 1.00);  Rate(0, 5).render() -&gt; &#x27;0/5 (0.00-0.43)&#x27;</code></pre><div class="note">Checks return True, False or None; a refusal and an unmeasured case both leave the denominator alone.</div><div class="callout"><strong>The trap:</strong> Labelling tool choice by tool name - every run calls all three tools, so it scores 5 of 5 and measures nothing; label the argument.</div><div class="callout green"><strong>In Formulaite:</strong> Formulaite has at least four surfaces - drawer fields, evidence quote, tool choice, give-up - and each needs its own Rate(passes, n) built from Glass Box runs.</div></div></div><div class="concept" data-key="The Instrumentation Level"><div class="chead" role="button" tabindex="0"><div><span class="idx">11</span><b>The Instrumentation Level</b> <span class="chip ch">ch 14</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Cost telemetry cannot represent a decision, so a cost dashboard debugs nothing. Emit one Event per decision with bounded dimensions (level, site, outcome, kind, index) kept separate from unbounded payload, and derive every counter as a group-by. The Instrumentation Level is the highest contiguous rung whose failures the record alone can localize.</p><div class="callout blue"><strong>Picture it:</strong> The same incident at four rungs: 3 events at Level 1 answer &#x27;which prompt, which draw&#x27;; 46 events at Level 6 answer &#x27;how many rounds ran and which bound stopped them&#x27;. A cost ledger answered neither.</div><pre><code>@dataclass(frozen=True)
+class Event:
+    incident_id: str
+    level: int               # bounded dimensions: level, site, outcome, kind, index
+    site: str
+    outcome: Outcome
+    kind: str
+    reason: str = &quot;&quot;         # free text a human reads once - never a counter dimension
+    index: int = 0
+    fields: tuple[tuple[str, str], ...] = ()   # tool arguments: the field INC-1046 turns on
+    requests: int = 0        # vendor requests, which are not model_calls
+# Counters are group-bys: Owed(9, &quot;cost grouped by outcome&quot;, (&quot;outcome&quot;,), {&quot;level&quot;: 6}, ...)</code></pre><div class="note">key() raises if you group by an unbounded field; 148 reason strings collapsed to 22 kinds.</div><div class="callout"><strong>The trap:</strong> Emitting the stop reason only on the paths that stop on purpose - the error path skips the instrumentation.</div><div class="callout green"><strong>In Formulaite:</strong> glassbox.py&#x27;s Event should carry bounded dimensions (step kind, outcome, gate verdict, bound) separately from free-text reasons and tool arguments.</div></div></div><div class="concept" data-key="The Addition Test"><div class="chead" role="button" tabindex="0"><div><span class="idx">12</span><b>The Addition Test</b> <span class="chip ch">ch 15</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Ask two questions of level N before N+1 exists. Can the next capability enter through a seam that already exists? Can a new consumer read N&#x27;s result without reaching inside it? Measured afterwards it is lines changed in rung modules below the new rung, and a pass is zero. Twelve climbs changed 57 rung lines. A rung importing a rung above it is the edge that ends the descent.</p><div class="callout blue"><strong>Picture it:</strong> The one real rewrite in the book was a metering helper built inside the workflow file; a helper that wraps a seam belongs with the seam, not with its first caller.</div><pre><code>def upward_imports() -&gt; tuple[tuple[str, str], ...]:
+    edges: list[tuple[str, str]] = []
+    for module, level in RUNG_LEVEL.items():
+        for imported in imports_of(module):          # parsed with ast, never imported
+            if RUNG_LEVEL.get(imported, -1) &gt; level:
+                edges.append((module, imported))
+    return tuple(edges)
+
+def test_no_rung_module_imports_a_rung_above_it() -&gt; None:
+    assert upward_imports() == ()
+# An upward import passes 467 behavioural tests and breaks only the descent.</code></pre><div class="note">The four seams that paid - result contract, call seam, capability menu, execution seam - were adopted for correctness, testability, security and reversibility, never for extensibility.</div><div class="callout"><strong>The trap:</strong> Widening a seam by replacing a type-enforced rule with a list somebody maintains.</div><div class="callout green"><strong>In Formulaite:</strong> Adding a new tool to Formulaite should touch only formulaite_tools.py; if agent.py must change to offer it, the selection seam is missing.</div></div></div><div class="concept" data-key="The Removal Receipt"><div class="chead" role="button" tabindex="0"><div><span class="idx">13</span><b>The Removal Receipt</b> <span class="chip ch">ch 16</span></div><label><input type="checkbox" class="got"> Got it</label></div><div class="cbody"><p>Climbing needs one case; removal is a universal claim about traffic you have not seen. Four clauses authorize a descent. State the population before you read the counter. Show a decision counter that read zero across it. State the smallest effect that population could detect. Take a first step that can be undone without a deploy. Unroute first, then let the shortened ladder produce the evidence.</p><div class="callout blue"><strong>Picture it:</strong> Level 6 answered zero of five diagnose requests, and the interval on zero of five runs to 0.43. That authorizes taking it off the ladder - one line, 21 percent fewer tokens - and refuses deleting the module.</div><pre><code>if population == 0:
+    return scored(None, &quot;no population: nothing was measured on this ladder&quot;)
+if answered:
+    return scored(None, f&quot;the rung answered {answered} of {population}; it is not idle&quot;)
+if population &lt; needed:
+    return scored(&quot;route&quot;, f&quot;reversible only: {population} requests cannot detect a &quot;
+                           f&quot;{tolerance:.0%} miss rate, and {needed} would&quot;)
+held = [h for h in found if h.blocks == &quot;code&quot;]
+if held:
+    return scored(&quot;route&quot;, f&quot;reversible only: held by {&#x27;, &#x27;.join(h.render() for h in held)}&quot;)
+return scored(&quot;code&quot;, f&quot;answered none of {population} and no rung holds it&quot;)</code></pre><div class="note">Each refusal names the missing clause; the population is a parameter because choosing it is the judgement the receipt rests on.</div><div class="callout"><strong>The trap:</strong> Choosing the population after reading the counter - the zero you end up with is a zero you selected.</div><div class="callout green"><strong>In Formulaite:</strong> Before deleting a Formulaite tool or step, state the population, read its counter in glassbox.py runs, and remove it from the routing table before removing the code.</div></div></div></div>
+</section>
+
+<section id="cheat">
+ <span class="num">05 · Cheat sheet</span>
+ <h2>The 7 GenAI Architectures: A Field Guide to Choosing the Right AI System — cheat sheet</h2>
+ <p class="small">Everything on one sheet. <button class="btn" id="printBtn" type="button">Print this cheat sheet</button></p>
+ 
+<div class="cs-grid">
+ <div><h3>Vocabulary</h3><div class="tablewrap"><table><thead><tr><th>Term</th><th>Means</th></tr></thead><tbody><tr><td class="t">Rung</td><td>One architecture on the ladder; adds exactly one capability the rung below cannot provide and charges for it.</td></tr><tr><td class="t">Floor Test</td><td>Can a unit test fully specify the correct output for any input? Yes means no model.</td></tr><tr><td class="t">Termination Test</td><td>Can you state the maximum model calls before the run? Yes is Level 5, no is Level 6.</td></tr><tr><td class="t">Break-Even Test</td><td>R = crew cost over agent cost; a crew must beat the agent&#x27;s accuracy by R, impossible above 1/R.</td></tr><tr><td class="t">Failure Receipt</td><td>A reproducible input, the actual bad output, and the missing capability - required before climbing.</td></tr><tr><td class="t">Removal Receipt</td><td>Stated population, a counter at zero, the smallest detectable effect, and an undoable first step.</td></tr><tr><td class="t">Zero Row</td><td>The measured cost and failure rate of the deterministic version, before any model exists.</td></tr><tr><td class="t">Format Illusion</td><td>Believing a validated response is a verified one; a schema checks shape, never truth.</td></tr><tr><td class="t">Downstream Veto</td><td>A later stage shown the original input can overrule an earlier stage&#x27;s claim.</td></tr><tr><td class="t">Blame Sink</td><td>The reporting stage is the last one able to detect a fault, not the one that caused it; record origin too.</td></tr><tr><td class="t">Blast Radius Schema</td><td>What a system can cause is a property of its tool schemas, computable before any tool is written.</td></tr><tr><td class="t">consequence</td><td>The read-or-write field on every ToolSpec, with no default, that menus filter on.</td></tr><tr><td class="t">Context Ratchet</td><td>State inside a run only accumulates; what you carry sets the cost slope and hardens early mistakes.</td></tr><tr><td class="t">Refusal Premium</td><td>At an unbounded rung failures run longest, so cost runs inversely to value.</td></tr><tr><td class="t">unreachable</td><td>The give-up field that lets an agent say &#x27;never&#x27;, read before the evidence check.</td></tr><tr><td class="t">Budget</td><td>Three bounds - iterations, tokens, seconds - each naming itself when it fires.</td></tr><tr><td class="t">Refusal Cascade</td><td>Try the cheapest rung and climb on a refusal, only where the failed attempt is free.</td></tr><tr><td class="t">Effective Level</td><td>The rung whose single-rung cost equals your mean cost per request, read off the cost curve.</td></tr><tr><td class="t">Scoring Surface</td><td>A place a claim can be wrong independently of the answer; the count is the eval difficulty.</td></tr><tr><td class="t">Instrumentation Level</td><td>The highest contiguous rung whose failures your record alone can localize.</td></tr></tbody></table></div></div>
+ <div><h3>The pattern</h3><ol><li>Pick ONE request type. Run the Floor Test: if a test can specify the output, no model.</li><li>Eliminate from Level 7 down with yes-or-no questions about the task; refuse if any answer is unknown.</li><li>Build the lowest rung nothing forced you past; every exit refuses by name, never defaults.</li><li>Measure cost and refusal rate on the same columns as the Zero Row.</li><li>Write the Failure Receipt: input, actual output, missing capability. No receipt, no climb.</li><li>Climb one rung; keep the cheap path alive as code and route in front of mixed rungs.</li><li>Descend only with a Removal Receipt: state the population, unroute first, unbuild later.</li></ol>
+  <h3>Decisions</h3><div class="tablewrap"><table><thead><tr><th>When</th><th>Use</th><th>Not</th></tr></thead><tbody><tr><td>A unit test can specify the correct output for every real input</td><td>Level 0 deterministic code with named refusals</td><td>A model classifier on the path</td></tr><tr><td>The answer needs language understanding over input you already hold</td><td>Level 1: one typed call, closed enums, a checked quote</td><td>Retrieval or tools</td></tr><tr><td>The answer needs facts in a document corpus and a stale index is fine</td><td>Level 2: BM25 with a relevance floor and a checked citation</td><td>A vector database before you have measured the lexical baseline</td></tr><tr><td>One call cannot do it but you can draw the steps before the run</td><td>Level 3 workflow with the Floor Test on every stage</td><td>A framework graph or an agent</td></tr><tr><td>A step needs a value that did not exist when the corpus was built</td><td>Level 4: one round of read-only tools with a consequence field</td><td>Putting metric values in the corpus or asking the model for them</td></tr><tr><td>The next call&#x27;s arguments come from the last call&#x27;s result and you can state the max calls</td><td>Level 5: a step tuple with MAX_MODEL_CALLS = 2 * len(STEPS)</td><td>A capped loop</td></tr><tr><td>You cannot state a maximum call count and &#x27;not yet&#x27; must be told from &#x27;never&#x27;</td><td>Level 6 with unreachable, Budget and three memory layers</td><td>A chain with N set high</td></tr><tr><td>Reading and acting must be held by different authorities</td><td>Level 7 role menus asserted in a test, gated by an explicit ask</td><td>Three prompts sharing one tool registry</td></tr></tbody></table></div></div>
+</div>
+<h3>Rules of thumb</h3><div class="tablewrap"><table><thead><tr><th>Do</th><th>Don't</th></tr></thead><tbody><tr><td>Refuse by name on every path that cannot decide.</td><td>Write else: return DEFAULT - it turns &#x27;I do not know&#x27; into a confident wrong answer.</td></tr><tr><td>Put real constraints in enums and verify everything else with code.</td><td>Trust a max_length or a confidence float; the API demotes them to descriptions.</td></tr><tr><td>Ask for a verbatim quote or value and check it as a substring.</td><td>Ask the model how sure it is.</td></tr><tr><td>Give every tool a consequence field with no default and filter the menu on it.</td><td>Rely on &#x27;never take destructive action&#x27; in the prompt.</td></tr><tr><td>Return tool errors that name what was available; mark empty results is_error=False.</td><td>Return &#x27;Error: 404&#x27; or treat a healthy empty result as a failure.</td></tr><tr><td>Carry conclusions and the list of calls made between rounds; re-send the original input every time.</td><td>Append every raw tool result to the conversation.</td></tr><tr><td>Read unreachable before the evidence gate and log which bound stopped a run.</td><td>Let a defensive check swallow the only voluntary exit.</td></tr><tr><td>Report every rate as passes over n with a Wilson interval.</td><td>Assert a single draw of a non-deterministic call.</td></tr><tr><td>Tell the model its round budget at Level 4; tell it there is no number at Level 6.</td><td>Say &#x27;you have eight rounds&#x27; to a loop - it expands to fill them.</td></tr><tr><td>Keep the cheap path alive and never import a rung above you.</td><td>Delete Level 0 when Level 1 ships.</td></tr></tbody></table></div>
+<h3>Skeletons</h3><h4>Top-down rung diagnostic</h4><pre><code>floor = floor_test(profile)
+if floor is None:
+    return _refuse(profile, FLOOR)          # unknown: stop the review
+if floor is FLOOR.stops_when:
+    return _decide(profile, FLOOR)          # Level 0, done
+for gate in LADDER:                         # 7, 6, 5, 4, 3, 2
+    answer = getattr(profile, gate.field)
+    if answer is None:
+        return _refuse(profile, gate)
+    if answer is gate.stops_when:
+        return _decide(profile, gate)
+return _decide(profile, BASE)               # Level 1 by default</code></pre><h4>Read-only tool menu with a blast radius</h4><pre><code>@dataclass(frozen=True)
+class ToolSpec:
+    name: str
+    description: str
+    parameters: dict[str, Any]
+    consequence: Literal[&quot;read&quot;, &quot;write&quot;]   # no default
+
+def menu_for(*, allow_writes: bool = False) -&gt; tuple[ToolSpec, ...]:
+    return TOOLS if allow_writes else tuple(s for s in TOOLS if s.consequence == &quot;read&quot;)
+def blast_radius(tools) -&gt; tuple[str, ...]:
+    return tuple(s.name for s in tools if s.consequence == &quot;write&quot;)
+assert blast_radius(menu_for()) == ()          # asserted in a test, not promised</code></pre><h4>Bounded loop with a give-up field</h4><pre><code>def round_(state):
+    finding = completer.invoke(system=SYSTEM, user=working(state),
+                               tools=menu_for(), execute=box.execute, schema=Verdict).parsed
+    if finding.unreachable:                       # read BEFORE the evidence check
+        return replace(state, finished=True, gave_up=finding.next_step)
+    if not value_supported(finding, state.calls, state.results):
+        return replace(state, attempts=state.attempts + (&quot;discarded&quot;,))
+    return replace(state, findings=state.findings + (finding,),
+                   finished=not finding.needs_human)
+final = walker.run(node, start, done=lambda s: (
+    s.finished or _bound(s, ledger, started, Budget()) is not None))
+stopped_by = None if final.finished else _bound(final, ledger, started, Budget())</code></pre><h4>A rate, not an assertion</h4><pre><code>@dataclass(frozen=True)
+class Rate:
+    passes: int
+    n: int
+    @property
+    def interval(self) -&gt; tuple[float, float]:   # Wilson, 95 percent
+        if not self.n:
+            return (0.0, 1.0)                    # no samples = no information
+        z = NormalDist().inv_cdf(0.975); p, n = self.passes / self.n, self.n
+        centre = (p + z * z / (2 * n)) / (1 + z * z / n)
+        spread = z * ((p * (1 - p) / n + z * z / (4 * n * n)) ** 0.5) / (1 + z * z / n)
+        return (max(0.0, centre - spread), min(1.0, centre + spread))</code></pre>
+<h3>Before you ship</h3><ul class="check"><li><input type="checkbox" class="ship"><span>Every request type has a written rung and the question that decided it; none is justified by capability language.</span></li><li><input type="checkbox" class="ship"><span>The Zero Row is measured: cost and refusal rate of the deterministic path, with a counter per refusal reason.</span></li><li><input type="checkbox" class="ship"><span>Every exit refuses by name; no default branch, no top_k without a floor, no enum without an unknown member.</span></li><li><input type="checkbox" class="ship"><span>Every model claim carries a verbatim quote or value that code checks against the input or a tool result.</span></li><li><input type="checkbox" class="ship"><span>Every tool has consequence set, the default menu&#x27;s blast radius is asserted empty, and no tool takes a timestamp.</span></li><li><input type="checkbox" class="ship"><span>The loop has an unreachable field read before the evidence gate, three named bounds, and a journal entry per run.</span></li><li><input type="checkbox" class="ship"><span>Rates are reported with intervals and n; refusals and unmeasured cases return None, never zero.</span></li><li><input type="checkbox" class="ship"><span>The cheap path still exists as code, no rung imports a rung above it, and the last-rung counter has an N chosen in advance.</span></li></ul>
+
+</section>
+
+<section id="s06">
+ <span class="num">06 · You're done when…</span>
+ <div class="callout green"><ol><li>You can fill a TaskProfile for one Formulaite request type, run the Floor Test and the Termination Test, and name the rung with the question that decided it.</li><li>You can add a consequence field to the lab&#x27;s tools, assert the default registry has an empty blast radius, and reject a drawer value that appears in no tool result.</li><li>You can turn agent.py into a bounded loop with an unreachable field read before the gate, log which of three bounds fired, and report each scoring surface as a rate with an interval.</li></ol></div>
+</section>
+
+<section id="s07">
+ <span class="num">07 · Where this comes from</span>
+ 
+<p><strong>Book:</strong> <em>The 7 GenAI Architectures: A Field Guide to Choosing the Right AI System</em>, Ranjan Kumar, 477 pages. Markdown copy: <code>books-md/the-7-genai-architectures.md</code>. Notes with chapter citations: <code>docs/book-notes/the-7-genai-architectures.md</code>.</p>
+<p><strong>Chapters covered:</strong> 1 Why GenAI Systems Fail at the Architecture Layer, 2 The Escalation Ladder, 3 Level 0 - The Floor, 4 Architecture 1 - The Prompt Application, 5 Architecture 2 - Retrieval-Augmented Generation, 6 Architecture 3 - The LLM Workflow, 7 Architecture 4 - The Tool-Using LLM, 8 Architecture 5 - Multi-Step Reasoning, 9 Architecture 6 - The Autonomous Agent, 10 Architecture 7 - The Multi-Agent System, 11 Composite Architectures, 12 Costing an Architecture Before You Build It, 13 Evaluating Each Level, 14 Observability Across the Ladder, 15 Climbing - Migrating Up Without a Rewrite, 16 Descending - Rightsizing an Overbuilt System.</p>
+<h3>In the author's words</h3><div class="quote">“Level 5 executes a finite chain with a defined end; Level 6 runs an unbounded loop that decides its own termination.”<span class="who">chapter 2</span></div><div class="quote">“A schema validates the shape of a model&#x27;s output and never its truth”<span class="who">chapter 4</span></div><div class="quote">“Every field you leave out is a field a model cannot get wrong.”<span class="who">chapter 7</span></div><div class="quote">“Down only is a chain. Up is a loop.”<span class="who">chapter 8</span></div><div class="quote">“An agent with no way to quit does not just spend more.”<span class="who">chapter 9</span></div>
+<h3>Python constructs this book leans on</h3><div class="tablewrap"><table><thead><tr><th>Construct</th><th>What it does here</th><th>Where</th></tr></thead><tbody><tr><td class="t">@dataclass(frozen=True)</td><td>An immutable bag of fields; the book uses it for every state, spec, budget and event so runs can be snapshotted.</td><td class="small">Chapters 2, 3, 7, 9 (TaskProfile, RoutingDecision, ToolSpec, Budget, Entry)</td></tr><tr><td class="t">typing.Protocol</td><td>An interface described by shape; anything with a matching parse or walk method counts, which is how metering and tracing wrap the seam.</td><td class="small">Chapter 4 Completer, Chapter 8 Chain, Chapter 9 Loop</td></tr><tr><td class="t">Literal[...] fields in a Pydantic BaseModel</td><td>Closed enums are the only constraint enforced while tokens are generated; the book puts every real constraint there.</td><td class="small">Chapter 4 Classification, Chapter 7 ToolSpec.consequence</td></tr><tr><td class="t">Generic[T] and TypeVar bound to BaseModel</td><td>A typed result whose parsed field is whatever schema the caller asked for.</td><td class="small">Chapter 4 Completion[T], Chapter 8 Node[State]</td></tr><tr><td class="t">Keyword-only arguments after *</td><td>Forces callers to name the arguments, so a wrapper can forward them without knowing their order.</td><td class="small">Chapter 4 parse(*, system, user, schema), Chapter 8 walk(nodes, initial, *, done)</td></tr><tr><td class="t">lambda as a done predicate</td><td>A one-line function passed as a value; here it is the whole stopping condition of the agent.</td><td class="small">Chapter 9 walker.run(node, start, done=lambda state: ...)</td></tr><tr><td class="t">dataclasses.replace</td><td>Returns a copy of a frozen dataclass with some fields changed, so state moves forward without mutation.</td><td class="small">Chapter 9 round function</td></tr><tr><td class="t">Nested function with a decorator (@measured)</td><td>A function that wraps another to record latency and tokens without editing the thing measured.</td><td class="small">Chapter 3 run() wrapping route(), Chapter 6 MeteredCompleter</td></tr><tr><td class="t">statistics.NormalDist</td><td>Standard-library z scores for a Wilson interval; no scipy needed.</td><td class="small">Chapter 13 Rate.interval</td></tr><tr><td class="t">ast.parse over source files</td><td>Reads a module&#x27;s imports without running it, so the design check works on a machine with nothing installed.</td><td class="small">Chapter 15 imports_of, Chapter 16 importers</td></tr></tbody></table></div>
+<h3>Deliberately left out of this guide</h3><ul><li><strong>The LangGraph comparison (SequentialChain versus LangGraphChain, checkpointer resumption, fan-out with a merge reducer)</strong> — Chapters 8, 9 and 10 deep dives</li><li><strong>The cost model worksheet with absolute dollar rates and the replay sidecar&#x27;s limits</strong> — Chapter 12 and Appendix B</li><li><strong>The samples_needed arithmetic for sizing an A/B and the judge prompt for free-text summaries</strong> — Chapter 13</li><li><strong>migrate.py and descend.py internals: git-based below-edit counting and import-graph holders</strong> — Chapters 15 and 16</li><li><strong>The companion repository layout, tags per chapter and CI jobs</strong> — Appendix C</li></ul>
+
+ <details><summary>How you'd have built this guide yourself</summary>
+  <p>List the chapter headings first, then read the book in chapter order and write one card per idea that changes what you would build. Sort the cards into three piles: needed for the simplest working thing, needed for the version you would show someone, needed for the version that runs unattended. Those piles are the levels; the simplest thing in each pile is the build ladder. Copy quotes exactly and keep the chapter number next to every card, so you can go back to the source when a card stops making sense.</p>
+ </details>
+</section>
+</main>
+<script>
+(function(){
+ const KEY='bookguide.the-7-genai-architectures';
+ let state={got:{},ship:{},tab:'foundation'};
+ try{const s=localStorage.getItem(KEY); if(s) state=Object.assign(state,JSON.parse(s));}catch(e){}
+ function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+ // ladder
+ document.querySelectorAll('.rung').forEach(r=>{const go=()=>{document.querySelectorAll('.rung,.rungbody').forEach(x=>x.classList.toggle('on',x.dataset.rung===r.dataset.rung));}; r.onclick=go; r.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};});
+ // chapter rows
+ document.querySelectorAll('.chrow').forEach(r=>{const go=()=>r.classList.toggle('on'); r.onclick=go; r.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};});
+ // tabs
+ const tabs=document.querySelectorAll('#ctabs button');
+ function showTab(lvl){tabs.forEach(b=>b.classList.toggle('on',b.dataset.level===lvl)); document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.dataset.level===lvl)); state.tab=lvl; save();}
+ tabs.forEach(b=>b.onclick=()=>showTab(b.dataset.level));
+ // concepts
+ function progress(){document.querySelectorAll('.panel').forEach(p=>{const all=p.querySelectorAll('.got'), n=[...all].filter(c=>c.checked).length; p.querySelector('.bar i').style.width=(all.length?100*n/all.length:0)+'%'; p.querySelector('.txt').textContent=n+' / '+all.length+' got it';});}
+ document.querySelectorAll('.concept').forEach(c=>{
+  const head=c.querySelector('.chead'), box=c.querySelector('.got'), key=c.dataset.key;
+  box.checked=!!state.got[key]; c.classList.toggle('done',box.checked);
+  head.onclick=e=>{if(e.target.closest('label')) return; c.classList.toggle('open');};
+  head.onkeydown=e=>{if(e.key==='Enter'){c.classList.toggle('open');}};
+  box.onchange=()=>{state.got[key]=box.checked; c.classList.toggle('done',box.checked); save(); progress();};
+ });
+ document.querySelectorAll('.ship').forEach((b,i)=>{b.checked=!!state.ship[i]; b.onchange=()=>{state.ship[i]=b.checked; save();};});
+ showTab(state.tab||'foundation'); progress();
+ const pb=document.getElementById('printBtn'); if(pb){pb.onclick=()=>{document.body.classList.add('printing'); window.print();}; window.onafterprint=()=>document.body.classList.remove('printing');}
+ const ob=document.getElementById('openFirst'); if(ob){ob.onclick=()=>{showTab('foundation'); const first=document.querySelector('.panel[data-level=foundation] .concept'); if(first){first.classList.add('open'); first.scrollIntoView({behavior:'smooth',block:'start'});}};}
+})();
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad:true,theme:"neutral",securityLevel:"loose"});</script>
+</body>
+</html>
