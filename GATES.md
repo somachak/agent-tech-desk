@@ -32,5 +32,5 @@ Scope: a Cloudflare Workers site serving the attached knowledge base in its own 
 - [x] G6: the IDE page wiring was watched in a browser — Run fills the output pane, an error shows as an error
   EVIDENCE: 2026-09-07 headless Chromium against the dev server. With the real CDN build the status read "READY · 3.13.2". With a stub runtime (to keep the container light) pressing Run filled the output pane with the three printed lines, the timing field updated, and running 1/0 showed "ZeroDivisionError: division by zero" in the error colour. No console or page errors. Screenshots at /tmp/w_ide.png, w_home.png, w_shelf.png, w_tutor.png, w_sheet.png.
 
-- [ ] G7: committed on main and pushed to Soma's remote
-  EVIDENCE: pending — committed on main and copied to ~/Desktop/Claude/agent-tech-desk with its history. No remote is configured and the build session held no git credentials, so the push is waiting on the remote URL.
+- [x] G7: committed on main and pushed to Soma's remote
+  EVIDENCE: 2026-09-07 pushed to git@github.com:somachak/agent-tech-desk.git — `git ls-remote --heads origin` returns 6bef3cb6e61da1d556a06d508f508a5f24c69fb2 on refs/heads/main, matching local HEAD; branch main tracks origin/main. SSH authenticated as somachak with a new ed25519 key on this Mac.
