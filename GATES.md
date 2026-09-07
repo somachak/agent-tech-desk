@@ -33,4 +33,4 @@ Scope: a Cloudflare Workers site serving the attached knowledge base in its own 
   EVIDENCE: 2026-09-07 headless Chromium against the dev server. With the real CDN build the status read "READY · 3.13.2". With a stub runtime (to keep the container light) pressing Run filled the output pane with the three printed lines, the timing field updated, and running 1/0 showed "ZeroDivisionError: division by zero" in the error colour. No console or page errors. Screenshots at /tmp/w_ide.png, w_home.png, w_shelf.png, w_tutor.png, w_sheet.png.
 
 - [ ] G7: committed on main and pushed to Soma's remote
-  EVIDENCE: pending
+  EVIDENCE: pending — committed on main and copied to ~/Desktop/Claude/agent-tech-desk with its history. No remote is configured and the build session held no git credentials, so the push is waiting on the remote URL.
