@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./dc-siblings.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/mission-docs-design-system-7384423c-d52c-4f5b-aea6-df1bdbd9d593/styles.css">
+  <script src="_ds/mission-docs-design-system-7384423c-d52c-4f5b-aea6-df1bdbd9d593/_ds_bundle.js"></script>
+  <style>
+    html{scroll-behavior:smooth}
+    a{color:var(--text-link);text-decoration:none;border-bottom:1px solid var(--navy-200)}
+    a:hover{color:var(--text-link-hover);border-bottom-color:var(--terra-400)}
+    li::marker{color:var(--terra-600);font-family:var(--font-mono);font-size:11px}
+  </style>
+</helmet>
+<div style="min-height:100vh;background:var(--surface-page);color:var(--text-body);font-family:var(--font-body)">
+  <header style="position:sticky;top:0;z-index:10;background:rgba(251,250,247,0.92);border-bottom:1px solid var(--rule-hairline)">
+    <div style="max-width:1180px;margin:0 auto;padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between;gap:24px">
+      <a href="Course.dc.html" style="border:0;font-weight:600;text-transform:uppercase;letter-spacing:-0.012em;color:var(--navy-800);font-size:14px">Py Constructs</a>
+      <div style="display:flex;align-items:center;gap:24px">
+        <span style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600)">—Chapter 01</span>
+        <span style="font-size:13px;color:var(--text-muted)">Functions & docstrings</span>
+        <span style="font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.22em;color:var(--text-muted)">{{ progressLabel }}</span>
+        <a href="Course.dc.html" style="font-size:13px">Course map</a>
+      </div>
+    </div>
+  </header>
+
+  <div style="max-width:1180px;margin:0 auto;padding:48px 32px 96px;display:grid;grid-template-columns:220px minmax(0,780px);gap:56px;align-items:start">
+    <nav style="position:sticky;top:88px;display:grid;gap:2px;align-content:start">
+      <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px">Contents</div>
+      <sc-for list="{{ rail }}" as="r" hint-placeholder-count="5">
+        <a href="{{ r.href }}" style="border:0;display:grid;grid-template-columns:14px 32px 1fr;gap:6px;align-items:baseline;padding:6px 0;border-top:0.5px solid var(--rule-hairline);color:var(--navy-900);font-size:13px;line-height:1.3">
+          <span style="font-family:var(--font-mono);font-size:11px;color:{{ r.tickColor }}">—</span>
+          <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.08em;color:var(--terra-600)">{{ r.num }}</span>
+          <span>{{ r.title }}</span>
+        </a>
+      </sc-for>
+      <div style="margin-top:24px;padding-top:12px;border-top:2px solid var(--rule-strong);display:grid;gap:6px">
+        <span style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-muted)">Up next</span>
+        <span style="font-size:13px;color:var(--text-faint)">02 Keyword args, *args, **kwargs</span>
+      </div>
+    </nav>
+
+    <article>
+      <div style="margin-bottom:56px">
+        <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600);margin-bottom:16px">Part I — Callable contracts · Chapter 01</div>
+        <h1 style="font-size:48px;font-weight:600;letter-spacing:-0.02em;line-height:1.02;color:var(--navy-900);text-transform:uppercase;margin:0 0 20px;max-width:16ch">Functions & docstrings</h1>
+        <div style="border-top:10px solid var(--navy-800);margin:0 0 24px;width:120px"></div>
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Lede" hint-size="100%,80px">Tutorial §4.8 as Formulaite mini-programs: format_inci_line and build_recipe_card_lines — the text Cosmetic AI Assistant shows on the recipe card after accept.</x-import>
+        <p>Assumes you can read Python already. Dense and practical — no Fibonacci. Product context: https://cosmetic-ai-assistant.web.app/ — formulator bench, assistant draft, recipe cards.</p>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rule-hairline);border:1px solid var(--rule-hairline);margin-top:24px">
+          <div style="background:var(--paper-000);padding:14px 16px"><div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600);margin-bottom:6px">Sections</div><div style="font-size:23px;font-weight:600;color:var(--navy-900);font-family:var(--font-mono)">05</div></div>
+          <div style="background:var(--paper-000);padding:14px 16px"><div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600);margin-bottom:6px">Diagrams</div><div style="font-size:23px;font-weight:600;color:var(--navy-900);font-family:var(--font-mono)">02</div></div>
+          <div style="background:var(--paper-000);padding:14px 16px"><div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600);margin-bottom:6px">Programs</div><div style="font-size:23px;font-weight:600;color:var(--navy-900);font-family:var(--font-mono)">04</div></div>
+        </div>
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="How this page works" tone="quiet" style="{{ mt24 }}" hint-size="100%,90px">Every diagram is a stepped figure: use ‹ › or Play to walk through it. Every program types itself out as you scroll; the ‹ › buttons on a code block step through notes on specific lines, and Run shows its output. Sections are ticked off in the contents rail as you read them.</x-import>
+      </div>
+
+
+      <section id="s1" data-screen-label="1.1 Why functions in Formulaite" style="margin-bottom:72px">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.SectionTitle" index="—1.1" title="Why functions in Formulaite" hint-size="100%,90px"></x-import>
+        <p>Official Tutorial §4.8. In Cosmetic AI Assistant, the same formatting rule must run after every <strong>accept draft</strong>: INCI name plus mass %. A named function is the contract — not copy-pasted f-strings in three UI surfaces.</p>
+        <dc-import name="Flow" spec="{{ flows.call }}" hint-size="100%,400px"></dc-import>
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.PullQuote" hint-size="100%,80px">One helper, many surfaces: recipe card, notebook paste, formulations library preview.</x-import>
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Try this" tone="quiet" hint-size="100%,140px"><span>List three places in Formulaite that would call the same format_inci_line helper.</span></x-import>
+        <div data-sec="s1">
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Section summary" tone="info" hint-size="100%,120px">Functions name a reusable computation. Formulaite uses them for recipe-card text the assistant shows after accept.</x-import>
+        </div>
+      </section>
+
+      <section id="s2" data-screen-label="1.2 def, parameters, return" style="margin-bottom:72px">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.SectionTitle" index="—1.2" title="def, parameters, return" hint-size="100%,90px"></x-import>
+        <p>Syntax: <code>def name(params):</code> then an indented body. Parameters are local names. <code>return</code> exits with a value; without it, Python returns <code>None</code>.</p>
+        <dc-import name="Code" spec="{{ code.def_basic }}" hint-size="100%,280px"></dc-import>
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Tutorial §4.8" tone="quiet" hint-size="100%,120px"><span>Defining Functions — parameters, body, return. We skip the Fibonacci demo and format real INCI lines instead.</span></x-import>
+        <div data-sec="s2">
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Section summary" tone="info" hint-size="100%,120px">def introduces a function; arguments bind to parameters; return sends a value to the caller.</x-import>
+        </div>
+      </section>
+
+      <section id="s3" data-screen-label="1.3 Docstrings that ship" style="margin-bottom:72px">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.SectionTitle" index="—1.3" title="Docstrings that ship" hint-size="100%,90px"></x-import>
+        <p>A <strong>docstring</strong> is a string literal as the first statement in the function body. It documents the contract for humans and for <code>help()</code>. Keep it short and precise — what goes in, what comes out.</p>
+        <dc-import name="Code" spec="{{ code.docstring }}" hint-size="100%,360px"></dc-import>
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Try this" tone="quiet" hint-size="100%,140px"><span>Add a one-line docstring to a helper that returns total_pct from a list of ingredient dicts.</span></x-import>
+        <div data-sec="s3">
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Section summary" tone="info" hint-size="100%,120px">Docstrings live in __doc__. Write them for every public Formulaite helper you expect another engineer (or LLM) to call.</x-import>
+        </div>
+      </section>
+
+      <section id="s4" data-screen-label="1.4 format_inci_line" style="margin-bottom:72px">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.SectionTitle" index="—1.4" title="format_inci_line" hint-size="100%,90px"></x-import>
+        <p>Canonical line format for recipe cards: <code>{INCI} {pct:.1f}%</code>. Coerce with <code>float</code> so ints from JSON still render with one decimal.</p>
+        <dc-import name="Code" spec="{{ code.inci }}" hint-size="100%,360px"></dc-import>
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Sample data" tone="accent" hint-size="100%,120px"><span>Coco-Glucoside 12%, Glycerin 3%, Phenoxyethanol 0.8% — typical mild bodywash actives / humectant / preservative.</span></x-import>
+        <div data-sec="s4">
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Section summary" tone="info" hint-size="100%,120px">format_inci_line(name, pct) is the atomic formatter. Everything else composes it.</x-import>
+        </div>
+      </section>
+
+      <section id="s5" data-screen-label="1.5 · Project Project: build_recipe_card_lines" style="margin-bottom:72px">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.SectionTitle" index="—1.5 · Project" title="Project: build_recipe_card_lines" hint-size="100%,90px"></x-import>
+        <p>Compose: walk a list of ingredient dicts and return a list of formatted strings. This is what the assistant UI renders after accept.</p>
+        <dc-import name="Flow" spec="{{ flows.card_pipe }}" hint-size="100%,400px"></dc-import>
+        <dc-import name="Code" spec="{{ code.project }}" hint-size="100%,440px"></dc-import>
+        <dc-import name="Trace" spec="{{ trace }}" hint-size="100%,480px"></dc-import>
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Acceptance" tone="quiet" hint-size="100%,120px"><span>Given the four-row draft, output must be four lines ending in % with one decimal place.</span></x-import>
+        <div data-sec="s5">
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Section summary" tone="info" hint-size="100%,120px">build_recipe_card_lines maps rows through format_inci_line. Capstone will feed it from FormulaDraft.as_recipe_lines().</x-import>
+        </div>
+      </section>
+
+
+
+      <section id="cheat" data-screen-label="Cheat sheet" style="margin-bottom:48px">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.SectionTitle" index="—" title="Cheat sheet" hint-size="100%,90px"></x-import>
+        <div style="border:1px solid var(--rule-hairline);margin-top:8px"><div style="display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;background:var(--paper-000);border-bottom:1px solid var(--rule-hairline)"><strong style="font-size:13px">def</strong><span style="font-size:13px;color:var(--text-body)">Introduce a named function.</span></div><div style="display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;background:var(--paper-000);border-bottom:1px solid var(--rule-hairline)"><strong style="font-size:13px">parameters</strong><span style="font-size:13px;color:var(--text-body)">Local names bound by the call.</span></div><div style="display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;background:var(--paper-000);border-bottom:1px solid var(--rule-hairline)"><strong style="font-size:13px">return</strong><span style="font-size:13px;color:var(--text-body)">Hand a value back (else None).</span></div><div style="display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;background:var(--paper-000);border-bottom:1px solid var(--rule-hairline)"><strong style="font-size:13px">docstring</strong><span style="font-size:13px;color:var(--text-body)">First string in the body; __doc__ / help().</span></div><div style="display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;background:var(--paper-000);border-bottom:1px solid var(--rule-hairline)"><strong style="font-size:13px">format_inci_line</strong><span style="font-size:13px;color:var(--text-body)">name + pct → recipe-card line.</span></div><div style="display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;background:var(--paper-000);border-bottom:1px solid var(--rule-hairline)"><strong style="font-size:13px">build_recipe_card_lines</strong><span style="font-size:13px;color:var(--text-body)">list[dict] → list[str] for the card UI.</span></div></div>
+        <div data-sec="cheat"></div>
+      </section>
+
+
+      <div style="margin-top:48px;padding-top:24px;border-top:2px solid var(--rule-strong);display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap">
+        <div style="display:grid;gap:4px">
+          <span style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-muted)">{{ doneLabel }}</span>
+          <span style="font-size:13px;color:var(--text-body)">Next: 02 Keyword args, *args, **kwargs</span>
+        </div>
+        <div style="display:flex;gap:8px">
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Button" variant="secondary" onClick="{{ goHub }}" hint-size="110px,36px">Course map</x-import>
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Button" variant="primary" onClick="{{ complete }}" hint-size="180px,36px">{{ completeLabel }}</x-import>
+        </div>
+      </div>
+    </article>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const SECTIONS = [
+  {
+    "id": "s1",
+    "num": "1.1",
+    "title": "Why functions in Formulaite"
+  },
+  {
+    "id": "s2",
+    "num": "1.2",
+    "title": "def, parameters, return"
+  },
+  {
+    "id": "s3",
+    "num": "1.3",
+    "title": "Docstrings that ship"
+  },
+  {
+    "id": "s4",
+    "num": "1.4",
+    "title": "format_inci_line"
+  },
+  {
+    "id": "s5",
+    "num": "1.5",
+    "title": "Project: build_recipe_card_lines"
+  },
+  {
+    "id": "cheat",
+    "num": "—",
+    "title": "Cheat sheet"
+  }
+];
+const FLOWS = {
+  "call": {
+    "fig": "FIG.01",
+    "title": "Call → body → return",
+    "intro": "A function packages a named computation. Callers pass arguments; the body runs; a return value (or None) comes back.",
+    "nodes": [
+      {
+        "id": "call",
+        "label": "Call site",
+        "items": [
+          "format_inci_line(...)"
+        ]
+      },
+      {
+        "id": "bind",
+        "label": "Bind params",
+        "items": [
+          "name",
+          "pct"
+        ]
+      },
+      {
+        "id": "body",
+        "label": "Body runs"
+      },
+      {
+        "id": "ret",
+        "label": "Return str"
+      }
+    ],
+    "path": [
+      {
+        "id": "call",
+        "note": "Assistant accept handler needs one INCI line for the recipe card."
+      },
+      {
+        "id": "bind",
+        "note": "name and pct become local names inside the function."
+      },
+      {
+        "id": "body",
+        "note": "f-string formats the display line; no mutation of shelf data."
+      },
+      {
+        "id": "ret",
+        "note": "Caller receives the string and appends it to the card."
+      }
+    ]
+  },
+  "card_pipe": {
+    "fig": "FIG.02",
+    "title": "Accept draft → recipe card lines",
+    "intro": "After the AI assistant accepts a bodywash draft, Formulaite builds the visible recipe-card text from ingredient rows.",
+    "nodes": [
+      {
+        "id": "rows",
+        "label": "ingredients[]",
+        "items": [
+          "inci",
+          "pct"
+        ]
+      },
+      {
+        "id": "map",
+        "label": "format_inci_line each"
+      },
+      {
+        "id": "join",
+        "label": "build_recipe_card_lines"
+      },
+      {
+        "id": "ui",
+        "label": "Recipe card UI"
+      }
+    ],
+    "path": [
+      {
+        "id": "rows",
+        "note": "Phase A/B rows from the draft — coco-glucoside, glycerin, …"
+      },
+      {
+        "id": "map",
+        "note": "One pure helper per line keeps formatting consistent."
+      },
+      {
+        "id": "join",
+        "note": "List of strings ready for join or per-line render."
+      },
+      {
+        "id": "ui",
+        "note": "Shown after accept — same text users copy to the notebook."
+      }
+    ]
+  }
+};
+const CODE = {
+  "def_basic": {
+    "file": "def_shape.py",
+    "output": [
+      "Coco-Glucoside 12.0%"
+    ],
+    "lines": [
+      {
+        "t": "def format_inci_line(name, pct):",
+        "c": "def names the function; (name, pct) are parameters."
+      },
+      {
+        "t": "    \"\"\"Return one recipe-card INCI line.\"\"\"",
+        "c": "Docstring — first statement; help() and IDEs read it."
+      },
+      {
+        "t": "    return f\"{name} {pct:.1f}%\"",
+        "c": "return hands a value back to the caller."
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "print(format_inci_line('Coco-Glucoside', 12))",
+        "c": "Arguments bind positionally here."
+      }
+    ]
+  },
+  "docstring": {
+    "file": "docstring_help.py",
+    "output": [
+      "format_inci_line(name, pct)",
+      "Return one recipe-card INCI line for the Formulaite assistant.",
+      "",
+      "name: INCI display name (str).",
+      "pct: mass percent as float or int."
+    ],
+    "lines": [
+      {
+        "t": "def format_inci_line(name, pct):"
+      },
+      {
+        "t": "    \"\"\"Return one recipe-card INCI line for the Formulaite assistant.",
+        "c": "Multi-line docstring documents contract."
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "    name: INCI display name (str)."
+      },
+      {
+        "t": "    pct: mass percent as float or int."
+      },
+      {
+        "t": "    \"\"\""
+      },
+      {
+        "t": "    return f\"{name} {float(pct):.1f}%\""
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "print(format_inci_line.__doc__)",
+        "c": "__doc__ holds the string; help(fn) prints it."
+      }
+    ]
+  },
+  "inci": {
+    "file": "format_inci_line.py",
+    "output": [
+      "Coco-Glucoside 12.0%",
+      "Glycerin 3.0%",
+      "Phenoxyethanol 0.8%"
+    ],
+    "lines": [
+      {
+        "t": "def format_inci_line(name, pct):"
+      },
+      {
+        "t": "    \"\"\"Return one recipe-card INCI line.\"\"\""
+      },
+      {
+        "t": "    return f\"{name} {float(pct):.1f}%\""
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "samples = ["
+      },
+      {
+        "t": "    ('Coco-Glucoside', 12),"
+      },
+      {
+        "t": "    ('Glycerin', 3),"
+      },
+      {
+        "t": "    ('Phenoxyethanol', 0.8),"
+      },
+      {
+        "t": "]"
+      },
+      {
+        "t": "for n, p in samples:"
+      },
+      {
+        "t": "    print(format_inci_line(n, p))"
+      }
+    ]
+  },
+  "project": {
+    "file": "build_recipe_card_lines.py",
+    "output": [
+      "Coco-Glucoside 12.0%",
+      "Glycerin 3.0%",
+      "Xanthan Gum 0.4%",
+      "Phenoxyethanol 0.8%"
+    ],
+    "lines": [
+      {
+        "t": "def format_inci_line(name, pct):"
+      },
+      {
+        "t": "    \"\"\"Return one recipe-card INCI line.\"\"\""
+      },
+      {
+        "t": "    return f\"{name} {float(pct):.1f}%\""
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "def build_recipe_card_lines(ingredients):",
+        "c": "ingredients: list of dicts with inci + pct."
+      },
+      {
+        "t": "    \"\"\"Build recipe-card text lines after assistant accept.\"\"\""
+      },
+      {
+        "t": "    lines = []"
+      },
+      {
+        "t": "    for row in ingredients:"
+      },
+      {
+        "t": "        lines.append(format_inci_line(row['inci'], row['pct']))"
+      },
+      {
+        "t": "    return lines"
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "draft = ["
+      },
+      {
+        "t": "    {'inci': 'Coco-Glucoside', 'pct': 12, 'phase': 'A'},"
+      },
+      {
+        "t": "    {'inci': 'Glycerin', 'pct': 3, 'phase': 'A'},"
+      },
+      {
+        "t": "    {'inci': 'Xanthan Gum', 'pct': 0.4, 'phase': 'B'},"
+      },
+      {
+        "t": "    {'inci': 'Phenoxyethanol', 'pct': 0.8, 'phase': 'C'},"
+      },
+      {
+        "t": "]"
+      },
+      {
+        "t": "for line in build_recipe_card_lines(draft):"
+      },
+      {
+        "t": "    print(line)"
+      }
+    ]
+  }
+};
+const TRACE = {
+  "fig": "TRACE.01",
+  "title": "build_recipe_card_lines — one pass",
+  "lines": [
+    "def format_inci_line(name, pct):",
+    "    \"\"\"Return one recipe-card INCI line.\"\"\"",
+    "    return f\"{name} {float(pct):.1f}%\"",
+    "",
+    "def build_recipe_card_lines(ingredients):",
+    "    \"\"\"Build recipe-card text lines after assistant accept.\"\"\"",
+    "    lines = []",
+    "    for row in ingredients:",
+    "        lines.append(format_inci_line(row['inci'], row['pct']))",
+    "    return lines",
+    "",
+    "draft = [",
+    "    {'inci': 'Coco-Glucoside', 'pct': 12, 'phase': 'A'},",
+    "    {'inci': 'Glycerin', 'pct': 3, 'phase': 'A'},",
+    "    {'inci': 'Xanthan Gum', 'pct': 0.4, 'phase': 'B'},",
+    "    {'inci': 'Phenoxyethanol', 'pct': 0.8, 'phase': 'C'},",
+    "]",
+    "for line in build_recipe_card_lines(draft):",
+    "    print(line)"
+  ],
+  "steps": [
+    {
+      "line": 1,
+      "vars": {},
+      "note": "Define format helper first."
+    },
+    {
+      "line": 5,
+      "vars": {},
+      "note": "define build_recipe_card_lines."
+    },
+    {
+      "line": 8,
+      "vars": {
+        "lines": "[]"
+      },
+      "note": "Accumulate formatted strings."
+    },
+    {
+      "line": 12,
+      "vars": {
+        "draft": "4 rows"
+      },
+      "note": "Sample bodywash draft after accept."
+    },
+    {
+      "line": 18,
+      "vars": {},
+      "io": [
+        {
+          "k": "out",
+          "text": "Coco-Glucoside 12.0%"
+        }
+      ],
+      "note": "First card line printed."
+    }
+  ]
+};
+const KEY = 'pyconstructs.progress';
+
+class Component extends DCLogic {
+  state = { seen: {}, done: false };
+  componentDidMount() {
+    try { const all = JSON.parse(localStorage.getItem(KEY) || '{}'); const c = all.ch1 || {}; this.setState({ seen: c.seen || {}, done: !!c.done }); } catch (e) {}
+    if ('IntersectionObserver' in window) {
+      this.io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) this.mark(e.target.getAttribute('data-sec')); }), { threshold: 0.3 });
+      this.obs = setTimeout(() => document.querySelectorAll('[data-sec]').forEach(el => this.io.observe(el)), 1200);
+    }
+  }
+  componentWillUnmount() { clearTimeout(this.obs); if (this.io) this.io.disconnect(); }
+  save() {
+    try { const all = JSON.parse(localStorage.getItem(KEY) || '{}'); all.ch1 = { seen: this.state.seen, done: this.state.done, total: 5 }; localStorage.setItem(KEY, JSON.stringify(all)); } catch (e) {}
+  }
+  mark(id) { if (!id || this.state.seen[id]) return; this.setState(s => ({ seen: { ...s.seen, [id]: true } }), () => this.save()); }
+  complete = () => this.setState(s => ({ done: !s.done }), () => this.save());
+  goHub = () => { window.location.href = 'Course.dc.html'; };
+  renderVals() {
+    const { seen, done } = this.state;
+    const nSeen = SECTIONS.filter(s => s.id.startsWith('s') && seen[s.id]).length;
+    return {
+      flows: FLOWS, code: CODE, trace: TRACE,
+      mt24: { marginTop: '24px' },
+      rail: SECTIONS.map(s => ({ ...s, href: '#' + s.id, tickColor: (s.id === 'cheat' ? done : seen[s.id]) ? 'var(--terra-600)' : 'var(--ink-100)' })),
+      progressLabel: (nSeen + '').padStart(2, '0') + '_05',
+      doneLabel: done ? '—Chapter complete' : '—End of chapter 01',
+      completeLabel: done ? 'Completed (undo)' : 'Mark chapter complete',
+      complete: this.complete, goHub: this.goHub
+    };
+  }
+}
+
+</script>
+</body>
+</html>

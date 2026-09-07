@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/mission-docs-design-system-7384423c-d52c-4f5b-aea6-df1bdbd9d593/styles.css">
+  <script src="_ds/mission-docs-design-system-7384423c-d52c-4f5b-aea6-df1bdbd9d593/_ds_bundle.js"></script>
+</helmet>
+<figure style="margin:0 0 32px;background:var(--paper-100);border:1px solid var(--border-card);padding:20px 24px 16px">
+  <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:16px">
+    <div style="display:flex;gap:12px;align-items:baseline">
+      <span style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600)">{{ fig }}</span>
+      <span style="font-size:12px;color:var(--text-muted)">{{ title }}</span>
+    </div>
+    <span style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-muted)">STEP {{ stepLabel }}</span>
+  </div>
+  <div style="display:flex;justify-content:center;padding:8px 0 4px">
+    <div style="display:grid;grid-template-columns:30px auto auto;align-items:center;position:relative">
+      <sc-for list="{{ nodes }}" as="n" hint-placeholder-count="4">
+        <div style="grid-column:2;grid-row:{{ n.row }};border:1px solid {{ n.bd }};background:{{ n.bg }};color:{{ n.fg }};padding:9px 18px;min-width:220px;text-align:center;font-size:14px;font-weight:500;line-height:1.35;transition:background 180ms cubic-bezier(.2,.6,.2,1),color 180ms cubic-bezier(.2,.6,.2,1),border-color 180ms cubic-bezier(.2,.6,.2,1)">
+          <sc-if value="{{ n.isDecision }}" hint-placeholder-val="{{ false }}"><div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:{{ n.eyebrow }};margin-bottom:3px">decision</div></sc-if>
+          <div>{{ n.label }}</div>
+          <sc-if value="{{ n.hasItems }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:8px;border-top:1px solid {{ n.itemRule }};padding-top:8px;display:grid;gap:3px;font-size:12px;font-weight:400;text-align:left">
+              <sc-for list="{{ n.items }}" as="it" hint-placeholder-count="0"><div style="display:flex;gap:8px"><span style="color:{{ n.tick }}">—</span><span>{{ it }}</span></div></sc-for>
+            </div>
+          </sc-if>
+        </div>
+        <sc-if value="{{ n.showArrow }}" hint-placeholder-val="{{ false }}">
+          <div style="grid-column:2;grid-row:{{ n.arrowRow }};height:28px;display:flex;justify-content:center;position:relative">
+            <div style="width:1px;height:100%;background:{{ n.arrowColor }};position:relative;transition:background 180ms">
+              <div style="position:absolute;bottom:0;left:-4px;border-left:4.5px solid transparent;border-right:4.5px solid transparent;border-top:6px solid {{ n.arrowColor }}"></div>
+            </div>
+            <sc-if value="{{ n.hasDown }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:calc(50% + 8px);top:6px;font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:{{ n.arrowColor }}">{{ n.downLabel }}</span></sc-if>
+          </div>
+        </sc-if>
+        <sc-if value="{{ n.hasSide }}" hint-placeholder-val="{{ false }}">
+          <div style="grid-column:3;grid-row:{{ n.row }};display:flex;align-items:center">
+            <div style="width:36px;height:1px;background:{{ n.sideColor }};position:relative">
+              <span style="position:absolute;left:8px;top:-16px;font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:{{ n.sideColor }}">{{ n.sideLabel }}</span>
+              <div style="position:absolute;right:0;top:-4px;border-top:4.5px solid transparent;border-bottom:4.5px solid transparent;border-left:6px solid {{ n.sideColor }}"></div>
+            </div>
+            <div style="border:1px solid {{ n.sideBd }};background:{{ n.sideBg }};color:{{ n.sideFg }};padding:9px 16px;font-size:14px;font-weight:500;transition:background 180ms,color 180ms">{{ n.sideText }}</div>
+          </div>
+        </sc-if>
+      </sc-for>
+      <sc-if value="{{ hasLoop }}" hint-placeholder-val="{{ false }}">
+        <div style="grid-column:1;grid-row:{{ loopRows }};align-self:stretch;margin:18px 0;border-left:1px solid {{ loopColor }};border-top:1px solid {{ loopColor }};border-bottom:1px solid {{ loopColor }};position:relative;transition:border-color 180ms">
+          <div style="position:absolute;right:-1px;top:-4px;border-top:4.5px solid transparent;border-bottom:4.5px solid transparent;border-left:6px solid {{ loopColor }}"></div>
+          <span style="position:absolute;left:-2px;bottom:-16px;font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:{{ loopColor }}">{{ loopLabel }}</span>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+  <div style="margin-top:20px;border-top:1px solid var(--rule-hairline);padding-top:12px;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start">
+    <div style="font-size:13px;line-height:1.55;color:var(--text-body);min-height:40px">{{ note }}</div>
+    <div style="display:flex;gap:6px;align-items:center">
+      <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Button" variant="secondary" size="sm" onClick="{{ prev }}" hint-size="36px,30px">‹</x-import>
+      <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Button" variant="secondary" size="sm" onClick="{{ next }}" hint-size="36px,30px">›</x-import>
+      <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Button" variant="primary" size="sm" onClick="{{ play }}" hint-size="64px,30px">{{ playLabel }}</x-import>
+    </div>
+  </div>
+</figure>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:720,&quot;height&quot;:560},&quot;spec&quot;:{&quot;editor&quot;:null,&quot;default&quot;:null,&quot;tsType&quot;:&quot;{fig:string,title:string,intro?:string,nodes:{id:string,label:string,kind?:'decision',items?:string[],down?:string,side?:{id:string,label:string,text:string}}[],loop?:{from:string,to:string,label:string},path:{id:string,note:string,via?:'loop'}[]}&quot;}}">
+class Component extends DCLogic {
+  state = { step: -1, playing: false };
+  componentWillUnmount() { clearInterval(this.t); }
+  spec() { return this.props.spec || { nodes: [], path: [] }; }
+  pause = () => { clearInterval(this.t); this.setState({ playing: false }); };
+  play = () => {
+    if (this.state.playing) return this.pause();
+    const n = this.spec().path.length;
+    if (this.state.step >= n - 1) this.setState({ step: -1 });
+    this.setState({ playing: true });
+    this.t = setInterval(() => {
+      this.setState(s => {
+        if (s.step + 1 >= n) { clearInterval(this.t); return { playing: false }; }
+        return { step: s.step + 1 };
+      });
+    }, 1300);
+  };
+  next = () => { this.pause(); this.setState(s => ({ step: Math.min(s.step + 1, this.spec().path.length - 1) })); };
+  prev = () => { this.pause(); this.setState(s => ({ step: Math.max(s.step - 1, -1) })); };
+  renderVals() {
+    const spec = this.spec(), step = this.state.step;
+    const cur = step >= 0 ? spec.path[step] : null;
+    const curId = cur ? cur.id : null;
+    const visited = new Set(spec.path.slice(0, Math.max(step, 0)).map(p => p.id));
+    const idx = id => spec.nodes.findIndex(n => n.id === id);
+    const NAVY = 'var(--navy-700)', GREY = 'var(--ink-300)', TERRA = 'var(--terra-600)';
+    const nodes = spec.nodes.map((n, i) => {
+      const active = n.id === curId, was = visited.has(n.id);
+      const nextN = spec.nodes[i + 1];
+      const flowed = was && nextN && (visited.has(nextN.id) || nextN.id === curId);
+      const sideActive = n.side && n.side.id === curId, sideWas = n.side && visited.has(n.side.id);
+      return {
+        ...n, row: 2 * i + 1, arrowRow: 2 * i + 2,
+        isDecision: n.kind === 'decision', hasItems: !!n.items, items: n.items || [],
+        bg: active ? 'var(--navy-800)' : was ? 'var(--navy-050)' : 'var(--paper-000)',
+        fg: active ? 'var(--paper-000)' : 'var(--navy-900)',
+        bd: active ? 'var(--navy-800)' : n.kind === 'decision' ? NAVY : 'var(--border-card)',
+        eyebrow: active ? 'var(--terra-400)' : TERRA,
+        itemRule: active ? 'var(--navy-500)' : 'var(--rule-hairline)',
+        tick: active ? 'var(--terra-400)' : TERRA,
+        showArrow: i < spec.nodes.length - 1,
+        arrowColor: flowed ? NAVY : GREY,
+        hasDown: !!n.down, downLabel: n.down || '',
+        hasSide: !!n.side, sideLabel: n.side ? n.side.label : '', sideText: n.side ? n.side.text : '',
+        sideColor: (sideActive || sideWas) ? NAVY : GREY,
+        sideBg: sideActive ? 'var(--navy-800)' : sideWas ? 'var(--navy-050)' : 'var(--paper-000)',
+        sideFg: sideActive ? 'var(--paper-000)' : 'var(--navy-900)',
+        sideBd: sideActive ? 'var(--navy-800)' : 'var(--border-card)'
+      };
+    });
+    const loop = spec.loop;
+    const loopOn = loop && cur && cur.via === 'loop';
+    const loopWas = loop && spec.path.slice(0, Math.max(step, 0)).some(p => p.via === 'loop');
+    return {
+      fig: spec.fig || 'FIG.', title: spec.title || '',
+      stepLabel: (step + 1 + '').padStart(2, '0') + '_' + (spec.path.length + '').padStart(2, '0'),
+      nodes,
+      hasLoop: !!loop,
+      loopRows: loop ? (2 * idx(loop.to) + 1) + ' / ' + (2 * idx(loop.from) + 2) : 'auto',
+      loopColor: loopOn ? TERRA : loopWas ? NAVY : GREY,
+      loopLabel: loop ? loop.label : '',
+      note: cur ? cur.note : (spec.intro || 'Step through the diagram with the arrows, or press Play.'),
+      playLabel: this.state.playing ? 'Pause' : 'Play',
+      play: this.play, next: this.next, prev: this.prev
+    };
+  }
+}
+</script>
+</body>
+</html>

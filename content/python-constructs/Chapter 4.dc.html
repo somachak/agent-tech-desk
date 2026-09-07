@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./dc-siblings.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/mission-docs-design-system-7384423c-d52c-4f5b-aea6-df1bdbd9d593/styles.css">
+  <script src="_ds/mission-docs-design-system-7384423c-d52c-4f5b-aea6-df1bdbd9d593/_ds_bundle.js"></script>
+  <style>
+    html{scroll-behavior:smooth}
+    a{color:var(--text-link);text-decoration:none;border-bottom:1px solid var(--navy-200)}
+    a:hover{color:var(--text-link-hover);border-bottom-color:var(--terra-400)}
+    li::marker{color:var(--terra-600);font-family:var(--font-mono);font-size:11px}
+  </style>
+</helmet>
+<div style="min-height:100vh;background:var(--surface-page);color:var(--text-body);font-family:var(--font-body)">
+  <header style="position:sticky;top:0;z-index:10;background:rgba(251,250,247,0.92);border-bottom:1px solid var(--rule-hairline)">
+    <div style="max-width:1180px;margin:0 auto;padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between;gap:24px">
+      <a href="Course.dc.html" style="border:0;font-weight:600;text-transform:uppercase;letter-spacing:-0.012em;color:var(--navy-800);font-size:14px">Py Constructs</a>
+      <div style="display:flex;align-items:center;gap:24px">
+        <span style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600)">—Chapter 04</span>
+        <span style="font-size:13px;color:var(--text-muted)">List comprehensions</span>
+        <span style="font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.22em;color:var(--text-muted)">{{ progressLabel }}</span>
+        <a href="Course.dc.html" style="font-size:13px">Course map</a>
+      </div>
+    </div>
+  </header>
+
+  <div style="max-width:1180px;margin:0 auto;padding:48px 32px 96px;display:grid;grid-template-columns:220px minmax(0,780px);gap:56px;align-items:start">
+    <nav style="position:sticky;top:88px;display:grid;gap:2px;align-content:start">
+      <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px">Contents</div>
+      <sc-for list="{{ rail }}" as="r" hint-placeholder-count="5">
+        <a href="{{ r.href }}" style="border:0;display:grid;grid-template-columns:14px 32px 1fr;gap:6px;align-items:baseline;padding:6px 0;border-top:0.5px solid var(--rule-hairline);color:var(--navy-900);font-size:13px;line-height:1.3">
+          <span style="font-family:var(--font-mono);font-size:11px;color:{{ r.tickColor }}">—</span>
+          <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.08em;color:var(--terra-600)">{{ r.num }}</span>
+          <span>{{ r.title }}</span>
+        </a>
+      </sc-for>
+      <div style="margin-top:24px;padding-top:12px;border-top:2px solid var(--rule-strong);display:grid;gap:6px">
+        <span style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-muted)">Up next</span>
+        <span style="font-size:13px;color:var(--text-faint)">05 Classes — Ingredient, FormulaPhase, FormulaDraft</span>
+      </div>
+    </nav>
+
+    <article>
+      <div style="margin-bottom:56px">
+        <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600);margin-bottom:16px">Part II — Data shaping · Chapter 04</div>
+        <h1 style="font-size:48px;font-weight:600;letter-spacing:-0.02em;line-height:1.02;color:var(--navy-900);text-transform:uppercase;margin:0 0 20px;max-width:16ch">List comprehensions</h1>
+        <div style="border-top:10px solid var(--navy-800);margin:0 0 24px;width:120px"></div>
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Lede" hint-size="100%,80px">§5.1.3 for Formulaite drafts: INCI-only names, banned-filtered keepers, and f-string draft lines from a phase list.</x-import>
+        <p>Same bodywash sample — coco-glucoside, glycerin, xanthan, phenoxyethanol — plus a banned MIT row to filter.</p>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rule-hairline);border:1px solid var(--rule-hairline);margin-top:24px">
+          <div style="background:var(--paper-000);padding:14px 16px"><div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600);margin-bottom:6px">Sections</div><div style="font-size:23px;font-weight:600;color:var(--navy-900);font-family:var(--font-mono)">05</div></div>
+          <div style="background:var(--paper-000);padding:14px 16px"><div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600);margin-bottom:6px">Diagrams</div><div style="font-size:23px;font-weight:600;color:var(--navy-900);font-family:var(--font-mono)">01</div></div>
+          <div style="background:var(--paper-000);padding:14px 16px"><div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600);margin-bottom:6px">Programs</div><div style="font-size:23px;font-weight:600;color:var(--navy-900);font-family:var(--font-mono)">05</div></div>
+        </div>
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="How this page works" tone="quiet" style="{{ mt24 }}" hint-size="100%,90px">Every diagram is a stepped figure: use ‹ › or Play to walk through it. Every program types itself out as you scroll; the ‹ › buttons on a code block step through notes on specific lines, and Run shows its output. Sections are ticked off in the contents rail as you read them.</x-import>
+      </div>
+
+
+      <section id="s1" data-screen-label="4.1 Comprehension shape" style="margin-bottom:72px">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.SectionTitle" index="—4.1" title="Comprehension shape" hint-size="100%,90px"></x-import>
+        <p>Tutorial §5.1.3. Prefer a comprehension when the loop body is a single expression that builds a list — clearer than append loops for Formulaite draft transforms.</p>
+        <dc-import name="Flow" spec="{{ flows.comp }}" hint-size="100%,400px"></dc-import>
+        <dc-import name="Code" spec="{{ code.shape }}" hint-size="100%,220px"></dc-import>
+        <div data-sec="s1">
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Section summary" tone="info" hint-size="100%,120px">[expr for x in xs if cond] = map + filter. New list; source unchanged.</x-import>
+        </div>
+      </section>
+
+      <section id="s2" data-screen-label="4.2 INCI-only names" style="margin-bottom:72px">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.SectionTitle" index="—4.2" title="INCI-only names" hint-size="100%,90px"></x-import>
+        <p>Pull display names for an Inspiration Studio board label or autocomplete.</p>
+        <dc-import name="Code" spec="{{ code.names }}" hint-size="100%,340px"></dc-import>
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Try this" tone="quiet" hint-size="100%,140px"><span>Build a comprehension that lowercases every INCI name.</span></x-import>
+        <div data-sec="s2">
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Section summary" tone="info" hint-size="100%,120px">[row['inci'] for row in phase] — pure map over phase rows.</x-import>
+        </div>
+      </section>
+
+      <section id="s3" data-screen-label="4.3 Banned-filtered keepers" style="margin-bottom:72px">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.SectionTitle" index="—4.3" title="Banned-filtered keepers" hint-size="100%,90px"></x-import>
+        <p>Brand policy: drop banned-flagged materials before the draft is accepted into formulations library.</p>
+        <dc-import name="Code" spec="{{ code.filter_banned }}" hint-size="100%,380px"></dc-import>
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Product rule" tone="accent" hint-size="100%,120px"><span>banned True marks materials Brand X will not ship — e.g. MIT preservative.</span></x-import>
+        <div data-sec="s3">
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Section summary" tone="info" hint-size="100%,120px">[row for row in phase if not row['banned']] — filter keepers.</x-import>
+        </div>
+      </section>
+
+      <section id="s4" data-screen-label="4.4 Draft f-string lines" style="margin-bottom:72px">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.SectionTitle" index="—4.4" title="Draft f-string lines" hint-size="100%,90px"></x-import>
+        <p>Combine filter + map: keepers become <code>f"{inci} {pct}%"</code> lines for the draft pane.</p>
+        <dc-import name="Code" spec="{{ code.draft_lines }}" hint-size="100%,400px"></dc-import>
+        <div data-sec="s4">
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Section summary" tone="info" hint-size="100%,120px">Multi-line comprehension with if — one expression for draft text lines.</x-import>
+        </div>
+      </section>
+
+      <section id="s5" data-screen-label="4.5 · Project Project: three views of a phase" style="margin-bottom:72px">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.SectionTitle" index="—4.5 · Project" title="Project: three views of a phase" hint-size="100%,90px"></x-import>
+        <p>One function, three comprehensions: names, keepers, draft_lines. Matches the required mapping (a)(b)(c).</p>
+        <dc-import name="Code" spec="{{ code.project }}" hint-size="100%,460px"></dc-import>
+        <dc-import name="Trace" spec="{{ trace }}" hint-size="100%,480px"></dc-import>
+        <div data-sec="s5">
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Section summary" tone="info" hint-size="100%,120px">phase_views returns the three Formulaite views. Capstone uses draft_lines after accept.</x-import>
+        </div>
+      </section>
+
+
+
+      <section id="cheat" data-screen-label="Cheat sheet" style="margin-bottom:48px">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.SectionTitle" index="—" title="Cheat sheet" hint-size="100%,90px"></x-import>
+        <div style="border:1px solid var(--rule-hairline);margin-top:8px"><div style="display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;background:var(--paper-000);border-bottom:1px solid var(--rule-hairline)"><strong style="font-size:13px">Shape</strong><span style="font-size:13px;color:var(--text-body)">[expr for x in xs if cond]</span></div><div style="display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;background:var(--paper-000);border-bottom:1px solid var(--rule-hairline)"><strong style="font-size:13px">Map</strong><span style="font-size:13px;color:var(--text-body)">[r['inci'] for r in phase]</span></div><div style="display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;background:var(--paper-000);border-bottom:1px solid var(--rule-hairline)"><strong style="font-size:13px">Filter</strong><span style="font-size:13px;color:var(--text-body)">[r for r in phase if not r['banned']]</span></div><div style="display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;background:var(--paper-000);border-bottom:1px solid var(--rule-hairline)"><strong style="font-size:13px">Map+filter</strong><span style="font-size:13px;color:var(--text-body)">[f'…' for r in phase if …]</span></div><div style="display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;background:var(--paper-000);border-bottom:1px solid var(--rule-hairline)"><strong style="font-size:13px">vs loop</strong><span style="font-size:13px;color:var(--text-body)">Prefer comprehension for single-expression builds.</span></div><div style="display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;background:var(--paper-000);border-bottom:1px solid var(--rule-hairline)"><strong style="font-size:13px">Nested</strong><span style="font-size:13px;color:var(--text-body)">Possible; keep readable — extract a helper if dense.</span></div></div>
+        <div data-sec="cheat"></div>
+      </section>
+
+
+      <div style="margin-top:48px;padding-top:24px;border-top:2px solid var(--rule-strong);display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap">
+        <div style="display:grid;gap:4px">
+          <span style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-muted)">{{ doneLabel }}</span>
+          <span style="font-size:13px;color:var(--text-body)">Next: 05 Classes — Ingredient, FormulaPhase, FormulaDraft</span>
+        </div>
+        <div style="display:flex;gap:8px">
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Button" variant="secondary" onClick="{{ goHub }}" hint-size="110px,36px">Course map</x-import>
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Button" variant="primary" onClick="{{ complete }}" hint-size="180px,36px">{{ completeLabel }}</x-import>
+        </div>
+      </div>
+    </article>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const SECTIONS = [
+  {
+    "id": "s1",
+    "num": "4.1",
+    "title": "Comprehension shape"
+  },
+  {
+    "id": "s2",
+    "num": "4.2",
+    "title": "INCI-only names"
+  },
+  {
+    "id": "s3",
+    "num": "4.3",
+    "title": "Banned-filtered keepers"
+  },
+  {
+    "id": "s4",
+    "num": "4.4",
+    "title": "Draft f-string lines"
+  },
+  {
+    "id": "s5",
+    "num": "4.5",
+    "title": "Project: three views of a phase"
+  },
+  {
+    "id": "cheat",
+    "num": "—",
+    "title": "Cheat sheet"
+  }
+];
+const FLOWS = {
+  "comp": {
+    "fig": "FIG.01",
+    "title": "Map / filter in one expression",
+    "intro": "A list comprehension builds a new list: [expr for item in iterable if condition]. Read it as map + optional filter.",
+    "nodes": [
+      {
+        "id": "src",
+        "label": "phase list"
+      },
+      {
+        "id": "for",
+        "label": "for row in phase"
+      },
+      {
+        "id": "if",
+        "label": "if not banned"
+      },
+      {
+        "id": "expr",
+        "label": "expr → new list"
+      }
+    ],
+    "path": [
+      {
+        "id": "src",
+        "note": "Phase A rows from the bodywash draft."
+      },
+      {
+        "id": "for",
+        "note": "Each row is bound once per iteration."
+      },
+      {
+        "id": "if",
+        "note": "Optional filter — omit for pure map."
+      },
+      {
+        "id": "expr",
+        "note": "INCI string, keeper dict, or f'{inci} {pct}%' line."
+      }
+    ]
+  }
+};
+const CODE = {
+  "shape": {
+    "file": "comp_shape.py",
+    "output": [
+      "['A', 'B', 'C']"
+    ],
+    "lines": [
+      {
+        "t": "phases = ['A', 'B', 'C']"
+      },
+      {
+        "t": "labels = [f'Phase {p}' for p in phases]",
+        "c": "[expr for item in iterable]"
+      },
+      {
+        "t": "print([p for p in phases])",
+        "c": "Identity map — still a new list."
+      }
+    ]
+  },
+  "names": {
+    "file": "inci_only.py",
+    "output": [
+      "['Coco-Glucoside', 'Glycerin', 'Xanthan Gum', 'Phenoxyethanol']"
+    ],
+    "lines": [
+      {
+        "t": "phase = ["
+      },
+      {
+        "t": "    {'inci': 'Coco-Glucoside', 'pct': 12, 'banned': False},"
+      },
+      {
+        "t": "    {'inci': 'Glycerin', 'pct': 3, 'banned': False},"
+      },
+      {
+        "t": "    {'inci': 'Xanthan Gum', 'pct': 0.4, 'banned': False},"
+      },
+      {
+        "t": "    {'inci': 'Phenoxyethanol', 'pct': 0.8, 'banned': False},"
+      },
+      {
+        "t": "]"
+      },
+      {
+        "t": "names = [row['inci'] for row in phase]",
+        "c": "(a) INCI-only names"
+      },
+      {
+        "t": "print(names)"
+      }
+    ]
+  },
+  "filter_banned": {
+    "file": "keepers.py",
+    "output": [
+      "['Coco-Glucoside', 'Glycerin', 'Xanthan Gum', 'Phenoxyethanol']"
+    ],
+    "lines": [
+      {
+        "t": "phase = ["
+      },
+      {
+        "t": "    {'inci': 'Coco-Glucoside', 'pct': 12, 'banned': False},"
+      },
+      {
+        "t": "    {'inci': 'Methylisothiazolinone', 'pct': 0.05, 'banned': True},"
+      },
+      {
+        "t": "    {'inci': 'Glycerin', 'pct': 3, 'banned': False},"
+      },
+      {
+        "t": "    {'inci': 'Xanthan Gum', 'pct': 0.4, 'banned': False},"
+      },
+      {
+        "t": "    {'inci': 'Phenoxyethanol', 'pct': 0.8, 'banned': False},"
+      },
+      {
+        "t": "]"
+      },
+      {
+        "t": "keepers = [row for row in phase if not row['banned']]",
+        "c": "(b) banned-filtered keepers"
+      },
+      {
+        "t": "print([k['inci'] for k in keepers])"
+      }
+    ]
+  },
+  "draft_lines": {
+    "file": "draft_lines.py",
+    "output": [
+      "Coco-Glucoside 12%",
+      "Glycerin 3%",
+      "Xanthan Gum 0.4%",
+      "Phenoxyethanol 0.8%"
+    ],
+    "lines": [
+      {
+        "t": "phase = ["
+      },
+      {
+        "t": "    {'inci': 'Coco-Glucoside', 'pct': 12, 'banned': False},"
+      },
+      {
+        "t": "    {'inci': 'Methylisothiazolinone', 'pct': 0.05, 'banned': True},"
+      },
+      {
+        "t": "    {'inci': 'Glycerin', 'pct': 3, 'banned': False},"
+      },
+      {
+        "t": "    {'inci': 'Xanthan Gum', 'pct': 0.4, 'banned': False},"
+      },
+      {
+        "t": "    {'inci': 'Phenoxyethanol', 'pct': 0.8, 'banned': False},"
+      },
+      {
+        "t": "]"
+      },
+      {
+        "t": "lines = ["
+      },
+      {
+        "t": "    f\"{r['inci']} {r['pct']}%\"",
+        "c": "(c) draft display lines"
+      },
+      {
+        "t": "    for r in phase"
+      },
+      {
+        "t": "    if not r['banned']"
+      },
+      {
+        "t": "]"
+      },
+      {
+        "t": "for line in lines:"
+      },
+      {
+        "t": "    print(line)"
+      }
+    ]
+  },
+  "project": {
+    "file": "three_views.py",
+    "output": [
+      "names: ['Coco-Glucoside', 'Glycerin', 'Xanthan Gum', 'Phenoxyethanol']",
+      "keepers: 4",
+      "Coco-Glucoside 12%",
+      "Glycerin 3%",
+      "Xanthan Gum 0.4%",
+      "Phenoxyethanol 0.8%"
+    ],
+    "lines": [
+      {
+        "t": "def phase_views(phase):"
+      },
+      {
+        "t": "    \"\"\"Return (names, keepers, draft_lines) via comprehensions.\"\"\""
+      },
+      {
+        "t": "    names = [r['inci'] for r in phase]"
+      },
+      {
+        "t": "    keepers = [r for r in phase if not r['banned']]"
+      },
+      {
+        "t": "    draft_lines = ["
+      },
+      {
+        "t": "        f\"{r['inci']} {r['pct']}%\" for r in keepers"
+      },
+      {
+        "t": "    ]"
+      },
+      {
+        "t": "    return names, keepers, draft_lines"
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "phase_a = ["
+      },
+      {
+        "t": "    {'inci': 'Coco-Glucoside', 'pct': 12, 'banned': False},"
+      },
+      {
+        "t": "    {'inci': 'Glycerin', 'pct': 3, 'banned': False},"
+      },
+      {
+        "t": "    {'inci': 'Methylisothiazolinone', 'pct': 0.05, 'banned': True},"
+      },
+      {
+        "t": "    {'inci': 'Xanthan Gum', 'pct': 0.4, 'banned': False},"
+      },
+      {
+        "t": "    {'inci': 'Phenoxyethanol', 'pct': 0.8, 'banned': False},"
+      },
+      {
+        "t": "]"
+      },
+      {
+        "t": "names, keepers, lines = phase_views(phase_a)"
+      },
+      {
+        "t": "print('names:', names)"
+      },
+      {
+        "t": "print('keepers:', len(keepers))"
+      },
+      {
+        "t": "for line in lines:"
+      },
+      {
+        "t": "    print(line)"
+      }
+    ]
+  }
+};
+const TRACE = {
+  "fig": "TRACE.01",
+  "title": "phase_views — three comprehensions",
+  "lines": [
+    "def phase_views(phase):",
+    "    \"\"\"Return (names, keepers, draft_lines) via comprehensions.\"\"\"",
+    "    names = [r['inci'] for r in phase]",
+    "    keepers = [r for r in phase if not r['banned']]",
+    "    draft_lines = [",
+    "        f\"{r['inci']} {r['pct']}%\" for r in keepers",
+    "    ]",
+    "    return names, keepers, draft_lines",
+    "",
+    "phase_a = [",
+    "    {'inci': 'Coco-Glucoside', 'pct': 12, 'banned': False},",
+    "    {'inci': 'Glycerin', 'pct': 3, 'banned': False},",
+    "    {'inci': 'Methylisothiazolinone', 'pct': 0.05, 'banned': True},",
+    "    {'inci': 'Xanthan Gum', 'pct': 0.4, 'banned': False},",
+    "    {'inci': 'Phenoxyethanol', 'pct': 0.8, 'banned': False},",
+    "]",
+    "names, keepers, lines = phase_views(phase_a)",
+    "print('names:', names)",
+    "print('keepers:', len(keepers))",
+    "for line in lines:",
+    "    print(line)"
+  ],
+  "steps": [
+    {
+      "line": 3,
+      "vars": {
+        "names": "5 INCIs"
+      },
+      "note": "Map every row to inci — includes banned."
+    },
+    {
+      "line": 4,
+      "vars": {
+        "keepers": "4 rows"
+      },
+      "note": "Filter drops Methylisothiazolinone."
+    },
+    {
+      "line": 5,
+      "vars": {
+        "draft_lines": "4 strs"
+      },
+      "note": "f-string lines for the draft panel."
+    },
+    {
+      "line": 20,
+      "vars": {},
+      "io": [
+        {
+          "k": "out",
+          "text": "keepers: 4"
+        }
+      ],
+      "note": "Views ready for UI."
+    }
+  ]
+};
+const KEY = 'pyconstructs.progress';
+
+class Component extends DCLogic {
+  state = { seen: {}, done: false };
+  componentDidMount() {
+    try { const all = JSON.parse(localStorage.getItem(KEY) || '{}'); const c = all.ch4 || {}; this.setState({ seen: c.seen || {}, done: !!c.done }); } catch (e) {}
+    if ('IntersectionObserver' in window) {
+      this.io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) this.mark(e.target.getAttribute('data-sec')); }), { threshold: 0.3 });
+      this.obs = setTimeout(() => document.querySelectorAll('[data-sec]').forEach(el => this.io.observe(el)), 1200);
+    }
+  }
+  componentWillUnmount() { clearTimeout(this.obs); if (this.io) this.io.disconnect(); }
+  save() {
+    try { const all = JSON.parse(localStorage.getItem(KEY) || '{}'); all.ch4 = { seen: this.state.seen, done: this.state.done, total: 5 }; localStorage.setItem(KEY, JSON.stringify(all)); } catch (e) {}
+  }
+  mark(id) { if (!id || this.state.seen[id]) return; this.setState(s => ({ seen: { ...s.seen, [id]: true } }), () => this.save()); }
+  complete = () => this.setState(s => ({ done: !s.done }), () => this.save());
+  goHub = () => { window.location.href = 'Course.dc.html'; };
+  renderVals() {
+    const { seen, done } = this.state;
+    const nSeen = SECTIONS.filter(s => s.id.startsWith('s') && seen[s.id]).length;
+    return {
+      flows: FLOWS, code: CODE, trace: TRACE,
+      mt24: { marginTop: '24px' },
+      rail: SECTIONS.map(s => ({ ...s, href: '#' + s.id, tickColor: (s.id === 'cheat' ? done : seen[s.id]) ? 'var(--terra-600)' : 'var(--ink-100)' })),
+      progressLabel: (nSeen + '').padStart(2, '0') + '_05',
+      doneLabel: done ? '—Chapter complete' : '—End of chapter 04',
+      completeLabel: done ? 'Completed (undo)' : 'Mark chapter complete',
+      complete: this.complete, goHub: this.goHub
+    };
+  }
+}
+
+</script>
+</body>
+</html>

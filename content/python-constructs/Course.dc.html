@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./dc-siblings.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/mission-docs-design-system-7384423c-d52c-4f5b-aea6-df1bdbd9d593/styles.css">
+  <script src="_ds/mission-docs-design-system-7384423c-d52c-4f5b-aea6-df1bdbd9d593/_ds_bundle.js"></script>
+  <style>
+    a{color:var(--text-link);text-decoration:none;border-bottom:1px solid var(--navy-200)}
+    a:hover{color:var(--text-link-hover);border-bottom-color:var(--terra-400)}
+  </style>
+</helmet>
+<div style="min-height:100vh;background:var(--surface-page);color:var(--text-body);font-family:var(--font-body)">
+  <header style="position:sticky;top:0;z-index:10;background:rgba(251,250,247,0.92);border-bottom:1px solid var(--rule-hairline)">
+    <div style="max-width:1180px;margin:0 auto;padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between">
+      <span style="font-weight:600;text-transform:uppercase;letter-spacing:-0.012em;color:var(--navy-800);font-size:14px">Py Constructs</span>
+      <span style="font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-muted)">Course map · {{ overall }}</span>
+    </div>
+  </header>
+
+  <div style="max-width:1180px;margin:0 auto;padding:56px 32px 96px;display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:64px;align-items:start">
+    <main>
+      <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600);margin-bottom:16px">—2026 · Soma · Phase 1.2 · Official Tutorial §4.8–§9.10 · 7 chapters · 35 sections</div>
+      <h1 style="font-size:64px;font-weight:700;letter-spacing:-0.02em;line-height:1.02;color:var(--navy-900);text-transform:uppercase;margin:0 0 24px;max-width:14ch">Python Constructs</h1>
+      <div style="border-top:10px solid var(--navy-800);width:160px;margin-bottom:24px"></div>
+      <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Lede" hint-size="100%,80px">Phase 1.2 Mission Docs for the official Python Tutorial <em>§4.8 through §9.10</em> — functions, keyword args, lambda, comprehensions, classes, generators — taught as Formulaite / Cosmetic AI Assistant mini-programs, not toy school examples.</x-import>
+      <p style="margin-bottom:48px">Work in order. Pair with docs.python.org Tutorial sections for the language spec; learn mechanics here with stepped Flow diagrams, typed Code blocks, and Traces. Capstone stitches accept draft → recipe card → phase CSV export. Open <code>LLM-BUILD.md</code> when implementing the stdlib module.</p>
+
+      <sc-for list="{{ parts }}" as="part" hint-placeholder-count="3">
+        <div style="margin-bottom:48px">
+          <div style="display:flex;align-items:baseline;gap:16px;border-bottom:2px solid var(--rule-strong);padding-bottom:8px;margin-bottom:4px">
+            <span style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600)">{{ part.num }}</span>
+            <h2 style="font-size:23px;font-weight:600;color:var(--navy-800);margin:0">{{ part.title }}</h2>
+          </div>
+          <sc-for list="{{ part.chapters }}" as="ch" hint-placeholder-count="3">
+            <div style="display:grid;grid-template-columns:56px 1fr 120px;gap:20px;padding:18px 0;border-bottom:1px solid var(--rule-hairline);align-items:start">
+              <span style="font-family:var(--font-mono);font-size:23px;color:{{ ch.numColor }};letter-spacing:-0.02em;line-height:1">{{ ch.num }}</span>
+              <div>
+                <sc-if value="{{ ch.ready }}" hint-placeholder-val="{{ true }}"><a href="{{ ch.href }}" style="font-size:17px;font-weight:600;color:var(--navy-900);border:0">{{ ch.title }}</a></sc-if>
+                <sc-if value="{{ ch.notReady }}" hint-placeholder-val="{{ false }}"><span style="font-size:17px;font-weight:600;color:var(--text-faint)">{{ ch.title }}</span></sc-if>
+                <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px 14px;margin-top:10px">
+                  <sc-for list="{{ ch.sections }}" as="s" hint-placeholder-count="5">
+                    <div style="display:grid;grid-template-columns:8px 1fr;gap:6px;font-size:11.5px;line-height:1.35;color:{{ s.color }}"><span style="font-family:var(--font-mono);color:{{ s.tick }}">—</span><span>{{ s.title }}</span></div>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="text-align:right;display:grid;gap:6px;justify-items:end">
+                <span style="font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.22em;color:{{ ch.statusColor }}">{{ ch.status }}</span>
+                <sc-if value="{{ ch.ready }}" hint-placeholder-val="{{ true }}"><a href="{{ ch.href }}" style="font-size:12px">{{ ch.cta }}</a></sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+
+      <div style="margin-bottom:48px">
+        <div style="display:flex;align-items:baseline;gap:16px;border-bottom:2px solid var(--rule-strong);padding-bottom:8px;margin-bottom:4px">
+          <span style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600)">Reference</span>
+          <h2 style="font-size:23px;font-weight:600;color:var(--navy-800);margin:0">Build contract</h2>
+        </div>
+        <div style="display:grid;grid-template-columns:56px 1fr 120px;gap:20px;padding:14px 0;border-bottom:1px solid var(--rule-hairline)"><span style="font-family:var(--font-mono);font-size:17px;color:var(--terra-600)">B</span><span style="font-size:15px;color:var(--text-body)"><code>LLM-BUILD.md</code> — Formulaite accept-pipeline APIs + acceptance tests</span><span style="font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.22em;color:var(--status-good);text-align:right">READY</span></div>
+        <div style="display:grid;grid-template-columns:56px 1fr 120px;gap:20px;padding:14px 0;border-bottom:1px solid var(--rule-hairline)"><span style="font-family:var(--font-mono);font-size:17px;color:var(--text-faint)">T</span><span style="font-size:15px;color:var(--text-faint)">docs.python.org Tutorial §4.8–§9.10</span><span style="font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.22em;color:var(--text-faint);text-align:right">SPECS</span></div>
+      </div>
+    </main>
+
+    <aside style="position:sticky;top:88px;display:grid;gap:24px">
+      <div style="background:var(--paper-000);border:1px solid var(--border-card);padding:20px 22px">
+        <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600);margin-bottom:12px">Progress</div>
+        <div style="font-family:var(--font-mono);font-size:48px;font-weight:600;letter-spacing:-0.02em;color:var(--navy-900);line-height:1">{{ overall }}</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:6px">chapters complete</div>
+        <div style="margin-top:16px;display:grid;grid-template-columns:repeat(7,1fr);gap:3px">
+          <sc-for list="{{ ticks }}" as="t" hint-placeholder-count="7"><div style="height:6px;background:{{ t }}"></div></sc-for>
+        </div>
+        <div style="margin-top:16px;border-top:1px solid var(--rule-hairline);padding-top:12px;font-size:12px;color:var(--text-body)">{{ nextUp }}</div>
+      </div>
+      <div style="background:var(--paper-000);border:1px solid var(--border-card);padding:20px 22px">
+        <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600);margin-bottom:12px">What you will build</div>
+        <ul style="margin:0;padding-left:16px;font-size:12.5px;line-height:1.5;display:grid;gap:4px;color:var(--text-body)">
+          <li>Recipe-card INCI formatters.</li>
+          <li>Keyword-only phase rows + Glass Box logs.</li>
+          <li>Shelf ranking with lambda keys.</li>
+          <li>Banned-filtered draft comprehensions.</li>
+          <li>Ingredient / Phase / Draft classes.</li>
+          <li>Token stream + CSV row generators.</li>
+          <li>Accept → card → export pipeline.</li>
+        </ul>
+      </div>
+      <div style="background:var(--paper-000);border:1px solid var(--border-card);padding:20px 22px">
+        <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600);margin-bottom:12px">How each chapter is taught</div>
+        <ol style="margin:0;padding-left:18px;font-size:12.5px;line-height:1.5;display:grid;gap:4px;color:var(--text-body)">
+          <li>Introduce one core construct.</li>
+          <li>Explain how it works.</li>
+          <li>Build a Formulaite mini-program.</li>
+          <li>Trace and improve.</li>
+          <li>Apply on sample bodywash data.</li>
+        </ol>
+      </div>
+      <div style="background:var(--paper-000);border:1px solid var(--border-card);padding:20px 22px">
+        <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600);margin-bottom:12px">For builders</div>
+        <p style="margin:0;font-size:12.5px;line-height:1.5;color:var(--text-body)"><code>LLM-BUILD.md</code> — interfaces, sample data, checklist, acceptance tests for the Phase 1.2 Formulaite module.</p>
+      </div>
+    </aside>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const BOOK = [
+  { num: 'I', title: 'Callable contracts', chapters: [
+    { n: 1, title: 'Functions & docstrings', href: 'Chapter 1.dc.html', ready: true, sections: ['Why functions in Formulaite', 'def, parameters, return', 'Docstrings that ship', 'format_inci_line', 'Project: build_recipe_card_lines'] },
+    { n: 2, title: 'Keyword args, *args, **kwargs', href: 'Chapter 2.dc.html', ready: true, sections: ['Keyword-only with *', 'add_to_phase', '*args for tags', '**kwargs for Glass Box', 'Project: log_assistant_event'] }
+  ] },
+  { num: 'II', title: 'Data shaping', chapters: [
+    { n: 3, title: 'lambda — sort shelf / rank', href: 'Chapter 3.dc.html', ready: true, sections: ['Small anonymous functions', 'key= on sorted', 'Sort by %', 'Tie-break by INCI', 'Project: rank shelf candidates'] },
+    { n: 4, title: 'List comprehensions', href: 'Chapter 4.dc.html', ready: true, sections: ['Comprehension shape', 'INCI-only names', 'Banned-filtered keepers', 'Draft f-string lines', 'Project: three views of a phase'] }
+  ] },
+  { num: 'III', title: 'Structure & streams', chapters: [
+    { n: 5, title: 'Classes — formula objects', href: 'Chapter 5.dc.html', ready: true, sections: ['class and __init__', 'Ingredient', 'FormulaPhase', 'FormulaDraft + total_pct', 'Project: as_recipe_lines'] },
+    { n: 6, title: 'Generators — stream & export', href: 'Chapter 6.dc.html', ready: true, sections: ['yield pauses a function', 'stream_assistant_tokens', 'Consuming with for', 'iter_phase_csv_rows', 'Project: export phase CSV'] }
+  ] },
+  { num: 'IV', title: 'Capstone', chapters: [
+    { n: 7, title: 'Capstone — accept → card → export', href: 'Chapter 7.dc.html', ready: true, sections: ['Product brief', 'Wire the domain objects', 'Accept → log → card', 'Export phase CSV', 'Project: stitch the script'] }
+  ] }
+];
+class Component extends DCLogic {
+  state = { progress: {} };
+  componentDidMount() {
+    const load = () => { try { this.setState({ progress: JSON.parse(localStorage.getItem('pyconstructs.progress') || '{}') }); } catch (e) {} };
+    load(); window.addEventListener('focus', load); this.off = () => window.removeEventListener('focus', load);
+  }
+  componentWillUnmount() { if (this.off) this.off(); }
+  renderVals() {
+    const P = this.state.progress;
+    let doneCount = 0, nextUp = null;
+    const parts = BOOK.map(part => ({ ...part, chapters: part.chapters.map(ch => {
+      const p = P['ch' + ch.n] || {}; const seen = p.seen || {}; const seenN = Object.keys(seen).filter(k => k.startsWith('s')).length;
+      if (p.done) doneCount++;
+      if (!nextUp && ch.ready && !p.done) nextUp = 'Next up: Chapter ' + (ch.n + '').padStart(2, '0') + ' — ' + ch.title + (seenN ? ' (' + seenN + ' of 5 sections read)' : '');
+      const status = !ch.ready ? 'UPCOMING' : p.done ? 'COMPLETE' : seenN ? (seenN + '').padStart(2, '0') + '_05 READ' : 'START';
+      return {
+        ...ch, num: (ch.n + '').padStart(2, '0'), notReady: !ch.ready,
+        numColor: ch.ready ? 'var(--terra-600)' : 'var(--ink-100)',
+        status, statusColor: !ch.ready ? 'var(--text-faint)' : p.done ? 'var(--status-good)' : 'var(--navy-700)',
+        cta: p.done ? 'Review chapter' : seenN ? 'Continue' : 'Start chapter',
+        sections: ch.sections.map((t, i) => ({ title: t, color: ch.ready ? 'var(--text-body)' : 'var(--text-faint)', tick: (ch.ready && seen['s' + (i + 1)]) ? 'var(--terra-600)' : 'var(--ink-100)' }))
+      };
+    }) }));
+    const ticks = BOOK.flatMap(p => p.chapters).map(ch => (P['ch' + ch.n] || {}).done ? 'var(--navy-800)' : ch.ready ? 'var(--navy-200)' : 'var(--paper-300)');
+    return { parts, ticks, overall: (doneCount + '').padStart(2, '0') + '_07', nextUp: nextUp || 'Course complete — ship the Formulaite module from LLM-BUILD.md.' };
+  }
+}
+</script>
+</body>
+</html>

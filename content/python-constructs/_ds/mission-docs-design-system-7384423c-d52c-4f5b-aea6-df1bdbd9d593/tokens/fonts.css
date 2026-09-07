@@ -1,0 +1,5 @@
+/* General Sans (Fontshare) + JetBrains Mono (Google Fonts).
+   Both are served from CDN — no binaries are vendored in this project.
+   Swap these @import lines for local @font-face rules if you self-host. */
+@import url("https://api.fontshare.com/v2/css?f[]=general-sans@300,400,500,600,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap");

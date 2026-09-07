@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/mission-docs-design-system-7384423c-d52c-4f5b-aea6-df1bdbd9d593/styles.css">
+  <script src="_ds/mission-docs-design-system-7384423c-d52c-4f5b-aea6-df1bdbd9d593/_ds_bundle.js"></script>
+</helmet>
+<div ref="{{ rootRef }}" style="margin:0 0 28px;border:1px solid var(--border-card);background:var(--paper-000)">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 10px 6px 14px;background:var(--paper-200);border-bottom:1px solid var(--border-card)">
+    <div style="display:flex;gap:14px;align-items:baseline;min-width:0">
+      <span style="font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.05em;color:var(--navy-800)">{{ file }}</span>
+      <sc-if value="{{ hasCallouts }}" hint-placeholder-val="{{ false }}"><span style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-muted)">NOTE {{ stepLabel }}</span></sc-if>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center">
+      <sc-if value="{{ hasCallouts }}" hint-placeholder-val="{{ false }}">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Button" variant="secondary" size="sm" onClick="{{ prev }}" hint-size="32px,28px">‹</x-import>
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Button" variant="secondary" size="sm" onClick="{{ next }}" hint-size="32px,28px">›</x-import>
+      </sc-if>
+      <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Button" variant="ghost" size="sm" onClick="{{ replay }}" hint-size="60px,28px">{{ typeLabel }}</x-import>
+      <sc-if value="{{ hasOutput }}" hint-placeholder-val="{{ false }}">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Button" variant="primary" size="sm" onClick="{{ run }}" hint-size="48px,28px">Run</x-import>
+      </sc-if>
+    </div>
+  </div>
+  <div style="padding:10px 0;font-family:var(--font-mono);font-size:13px;line-height:1.65;overflow-x:auto">
+    <sc-for list="{{ lines }}" as="l" hint-placeholder-count="3">
+      <div style="display:grid;grid-template-columns:44px 1fr;background:{{ l.bg }};transition:background 180ms">
+        <span style="text-align:right;padding-right:14px;color:{{ l.numColor }};user-select:none;font-size:11px;line-height:21.5px">{{ l.num }}</span>
+        <span style="white-space:pre;padding-right:16px;color:var(--ink-800)"><sc-for list="{{ l.tokens }}" as="tk" hint-placeholder-count="0"><span style="color:{{ tk.c }};font-weight:{{ tk.w }}">{{ tk.t }}</span></sc-for><sc-if value="{{ l.cursor }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;width:7px;height:15px;background:var(--terra-600);vertical-align:-2px"></span></sc-if></span>
+      </div>
+      <sc-if value="{{ l.showCallout }}" hint-placeholder-val="{{ false }}">
+        <div style="margin:4px 16px 8px 44px;padding:8px 12px;background:var(--surface-accent-soft);border-top:2px solid var(--terra-600);font-family:var(--font-body);font-size:12.5px;line-height:1.5;color:var(--ink-700);white-space:normal;max-width:60ch">{{ l.c }}</div>
+      </sc-if>
+    </sc-for>
+  </div>
+  <sc-if value="{{ showOutput }}" hint-placeholder-val="{{ false }}">
+    <div style="background:var(--navy-900);color:var(--paper-100);padding:10px 16px 12px;font-family:var(--font-mono);font-size:12.5px;line-height:1.6">
+      <div style="font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--navy-300);margin-bottom:6px">output</div>
+      <sc-for list="{{ output }}" as="o" hint-placeholder-count="0"><div style="white-space:pre-wrap">{{ o }}</div></sc-for>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:720,&quot;height&quot;:360},&quot;spec&quot;:{&quot;editor&quot;:null,&quot;default&quot;:null,&quot;tsType&quot;:&quot;{file:string,lines:{t:string,c?:string}[],output?:string[]}&quot;},&quot;autoplay&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+const KW = /^(from|import|def|return|while|not|if|else|elif|True|False|None|in|for|break|continue|and|or|class|try|except|finally|as|with|lambda|pass|raise|is|del|global|yield|async|await)\b/;
+const BI = /^(print|input|len|range|str|int|float|list|dict|open|isinstance|round|enumerate|zip)\b/;
+function tokenize(s) {
+  const out = []; let i = 0;
+  while (i < s.length) {
+    const r = s.slice(i); let m;
+    if ((m = r.match(/^#.*/))) { out.push({ t: m[0], c: 'var(--ink-500)', w: 400 }); i += m[0].length; continue; }
+    if ((m = r.match(/^(f?"""[\s\S]*?("""|$)|f?"(?:[^"\\]|\\.)*("|$)|f?'(?:[^'\\]|\\.)*('|$))/))) { out.push({ t: m[0], c: 'var(--terra-700)', w: 400 }); i += m[0].length; continue; }
+    if ((m = r.match(KW))) { out.push({ t: m[0], c: 'var(--navy-700)', w: 600 }); i += m[0].length; continue; }
+    if ((m = r.match(BI))) { out.push({ t: m[0], c: 'var(--navy-500)', w: 500 }); i += m[0].length; continue; }
+    if ((m = r.match(/^[A-Za-z_]\w*/))) { out.push({ t: m[0], c: 'var(--ink-800)', w: 400 }); i += m[0].length; continue; }
+    if ((m = r.match(/^\d+(\.\d+)?/))) { out.push({ t: m[0], c: 'var(--terra-600)', w: 400 }); i += m[0].length; continue; }
+    if ((m = r.match(/^\s+/))) { out.push({ t: m[0], c: 'inherit', w: 400 }); i += m[0].length; continue; }
+    out.push({ t: r[0], c: 'var(--ink-500)', w: 400 }); i += 1;
+  }
+  return out;
+}
+class Component extends DCLogic {
+  state = { typed: 0, typing: false, step: -1, started: false, showOutput: false };
+  rootRef = React.createRef();
+  spec() { return this.props.spec || { file: '', lines: [] }; }
+  total() { return this.spec().lines.reduce((a, l) => a + l.t.length + 1, 0); }
+  componentDidMount() {
+    if (this.props.autoplay === false) { this.setState({ typed: this.total(), started: true }); return; }
+    const el = this.rootRef.current;
+    if (!el || !('IntersectionObserver' in window)) { this.startTyping(); return; }
+    this.io = new IntersectionObserver(es => {
+      if (es.some(e => e.isIntersecting) && !this.state.started) { this.startTyping(); this.io.disconnect(); }
+    }, { threshold: 0.35 });
+    this.io.observe(el);
+  }
+  componentWillUnmount() { clearInterval(this.t); if (this.io) this.io.disconnect(); }
+  startTyping = () => {
+    clearInterval(this.t);
+    this.setState({ typed: 0, typing: true, started: true, step: -1, showOutput: false });
+    const total = this.total();
+    this.t = setInterval(() => {
+      this.setState(s => {
+        const n = s.typed + 2;
+        if (n >= total) { clearInterval(this.t); return { typed: total, typing: false }; }
+        return { typed: n };
+      });
+    }, 16);
+  };
+  finish() { clearInterval(this.t); this.setState({ typed: this.total(), typing: false, started: true }); }
+  replay = () => { if (this.state.typing) this.finish(); else this.startTyping(); };
+  calloutIdx() { return this.spec().lines.map((l, i) => l.c ? i : -1).filter(i => i >= 0); }
+  next = () => { this.finish(); const n = this.calloutIdx().length; this.setState(s => ({ step: n ? (s.step + 1) % n : -1 })); };
+  prev = () => { this.finish(); const n = this.calloutIdx().length; this.setState(s => ({ step: n ? (s.step - 1 + n) % n : -1 })); };
+  run = () => { this.finish(); this.setState({ showOutput: true }); };
+  renderVals() {
+    const spec = this.spec(), { typed, typing, step, showOutput } = this.state;
+    const cIdx = this.calloutIdx();
+    const hiLine = step >= 0 ? cIdx[step] : -1;
+    let acc = 0, cursorPlaced = false;
+    const lines = spec.lines.map((l, i) => {
+      const start = acc; acc += l.t.length + 1;
+      const shown = Math.max(0, Math.min(l.t.length, typed - start));
+      const text = l.t.slice(0, shown);
+      const cursor = typing && !cursorPlaced && typed >= start && typed < acc;
+      if (cursor) cursorPlaced = true;
+      const hi = i === hiLine;
+      return {
+        num: (i + 1 + '').padStart(2, '0'), tokens: tokenize(text), cursor,
+        bg: hi ? 'var(--surface-brand-soft)' : 'transparent',
+        numColor: hi ? 'var(--navy-700)' : 'var(--ink-300)',
+        showCallout: hi && !!l.c, c: l.c || ''
+      };
+    });
+    return {
+      file: spec.file || 'main.py', lines,
+      hasCallouts: cIdx.length > 0,
+      stepLabel: (Math.max(step, -1) + 1 + '').padStart(2, '0') + '_' + (cIdx.length + '').padStart(2, '0'),
+      typeLabel: typing ? 'Show all' : 'Retype',
+      hasOutput: !!(spec.output && spec.output.length), output: spec.output || [],
+      showOutput: showOutput && !!spec.output,
+      rootRef: this.rootRef, prev: this.prev, next: this.next, replay: this.replay, run: this.run
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+:root{
+--font-sans:'General Sans','Helvetica Neue',Helvetica,Arial,sans-serif;
+--font-mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+
+/* Roles */
+--font-display:var(--font-sans);
+--font-body:var(--font-sans);
+--font-tick:var(--font-mono);
+
+/* Weights — General Sans ships 200..700 */
+--fw-light:300; /* @kind font */
+--fw-regular:400; /* @kind font */
+--fw-medium:500; /* @kind font */
+--fw-semibold:600; /* @kind font */
+--fw-bold:700; /* @kind font */
+
+/* Print-first scale. px at 96dpi; pt equivalents in comments */
+--fs-cover:76px;   /* 57pt */
+--fs-display:48px; /* 36pt */
+--fs-h1:31px;      /* 23pt */
+--fs-h2:23px;      /* 17pt */
+--fs-h3:18px;      /* 13.5pt */
+--fs-lede:17px;
+--fs-body:14px;    /* 10.5pt — floor for print */
+--fs-small:12px;
+--fs-caption:10.5px;
+--fs-tick:9px;
+
+/* Line heights */
+--lh-tight:1.02; /* @kind font */
+--lh-heading:1.12; /* @kind font */
+--lh-snug:1.3; /* @kind font */
+--lh-body:1.55; /* @kind font */
+--lh-loose:1.7; /* @kind font */
+
+/* Tracking */
+--ls-cover:-0.02em; /* @kind font */
+--ls-heading:-0.012em; /* @kind font */
+--ls-body:0em; /* @kind font */
+--ls-caption:0.01em; /* @kind font */
+--ls-tick:0.22em; /* @kind font */
+--ls-eyebrow:0.16em; /* @kind font */
+
+/* Measure */
+--measure-narrow:52ch; /* @kind spacing */
+--measure-body:68ch; /* @kind spacing */
+--measure-wide:84ch; /* @kind spacing */
+}

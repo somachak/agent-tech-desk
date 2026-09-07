@@ -169,7 +169,7 @@ Meanwhile the shelf answers most things itself. Open the guide for the book you 
 
 /* ------------------------------------------------------------------ routes */
 
-const PAGES = new Set(["/bookshelf", "/ide", "/tutor", "/agent-walkthrough"]);
+const PAGES = new Set(["/bookshelf", "/ide", "/tutor", "/agent-walkthrough", "/python-constructs"]);
 
 export default {
   async fetch(request, env) {
@@ -216,6 +216,18 @@ export default {
     if (PAGES.has(pathname)) {
       return env.ASSETS.fetch(new Request(new URL(pathname + ".html", url), request));
     }
+    // the Python Constructs course keeps its own file names; these are the tidy ones
+    const chapter = pathname.match(/^\/python-constructs\/chapter-(\d+)$/);
+    if (chapter) {
+      return env.ASSETS.fetch(
+        // the assets layer serves these without the .html extension
+        new Request(new URL(`/python-constructs/Chapter ${chapter[1]}.dc`, url), request)
+      );
+    }
+    if (pathname === "/python-constructs/course") {
+      return env.ASSETS.fetch(new Request(new URL("/python-constructs/Course.dc", url), request));
+    }
+
     if (pathname.startsWith("/guides/") && !/\.[a-z0-9]+$/i.test(pathname)) {
       return env.ASSETS.fetch(new Request(new URL(pathname + ".html", url), request));
     }

@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./dc-siblings.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/mission-docs-design-system-7384423c-d52c-4f5b-aea6-df1bdbd9d593/styles.css">
+  <script src="_ds/mission-docs-design-system-7384423c-d52c-4f5b-aea6-df1bdbd9d593/_ds_bundle.js"></script>
+  <style>
+    html{scroll-behavior:smooth}
+    a{color:var(--text-link);text-decoration:none;border-bottom:1px solid var(--navy-200)}
+    a:hover{color:var(--text-link-hover);border-bottom-color:var(--terra-400)}
+    li::marker{color:var(--terra-600);font-family:var(--font-mono);font-size:11px}
+  </style>
+</helmet>
+<div style="min-height:100vh;background:var(--surface-page);color:var(--text-body);font-family:var(--font-body)">
+  <header style="position:sticky;top:0;z-index:10;background:rgba(251,250,247,0.92);border-bottom:1px solid var(--rule-hairline)">
+    <div style="max-width:1180px;margin:0 auto;padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between;gap:24px">
+      <a href="Course.dc.html" style="border:0;font-weight:600;text-transform:uppercase;letter-spacing:-0.012em;color:var(--navy-800);font-size:14px">Py Constructs</a>
+      <div style="display:flex;align-items:center;gap:24px">
+        <span style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600)">—Chapter 06</span>
+        <span style="font-size:13px;color:var(--text-muted)">Generators — stream & export</span>
+        <span style="font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.22em;color:var(--text-muted)">{{ progressLabel }}</span>
+        <a href="Course.dc.html" style="font-size:13px">Course map</a>
+      </div>
+    </div>
+  </header>
+
+  <div style="max-width:1180px;margin:0 auto;padding:48px 32px 96px;display:grid;grid-template-columns:220px minmax(0,780px);gap:56px;align-items:start">
+    <nav style="position:sticky;top:88px;display:grid;gap:2px;align-content:start">
+      <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px">Contents</div>
+      <sc-for list="{{ rail }}" as="r" hint-placeholder-count="5">
+        <a href="{{ r.href }}" style="border:0;display:grid;grid-template-columns:14px 32px 1fr;gap:6px;align-items:baseline;padding:6px 0;border-top:0.5px solid var(--rule-hairline);color:var(--navy-900);font-size:13px;line-height:1.3">
+          <span style="font-family:var(--font-mono);font-size:11px;color:{{ r.tickColor }}">—</span>
+          <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.08em;color:var(--terra-600)">{{ r.num }}</span>
+          <span>{{ r.title }}</span>
+        </a>
+      </sc-for>
+      <div style="margin-top:24px;padding-top:12px;border-top:2px solid var(--rule-strong);display:grid;gap:6px">
+        <span style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-muted)">Up next</span>
+        <span style="font-size:13px;color:var(--text-faint)">07 Capstone — accept → card → export</span>
+      </div>
+    </nav>
+
+    <article>
+      <div style="margin-bottom:56px">
+        <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600);margin-bottom:16px">Part III — Structure & streams · Chapter 06</div>
+        <h1 style="font-size:48px;font-weight:600;letter-spacing:-0.02em;line-height:1.02;color:var(--navy-900);text-transform:uppercase;margin:0 0 20px;max-width:16ch">Generators — stream & export</h1>
+        <div style="border-top:10px solid var(--navy-800);margin:0 0 24px;width:120px"></div>
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Lede" hint-size="100%,80px">§9.9–9.10 for Formulaite: stream_assistant_tokens for the AI pane, iter_phase_csv_rows for phase CSV export — both consumed with for.</x-import>
+        <p>Lazy iteration matters when replies are long and exports should not materialise every row before writing.</p>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rule-hairline);border:1px solid var(--rule-hairline);margin-top:24px">
+          <div style="background:var(--paper-000);padding:14px 16px"><div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600);margin-bottom:6px">Sections</div><div style="font-size:23px;font-weight:600;color:var(--navy-900);font-family:var(--font-mono)">05</div></div>
+          <div style="background:var(--paper-000);padding:14px 16px"><div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600);margin-bottom:6px">Diagrams</div><div style="font-size:23px;font-weight:600;color:var(--navy-900);font-family:var(--font-mono)">02</div></div>
+          <div style="background:var(--paper-000);padding:14px 16px"><div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600);margin-bottom:6px">Programs</div><div style="font-size:23px;font-weight:600;color:var(--navy-900);font-family:var(--font-mono)">05</div></div>
+        </div>
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="How this page works" tone="quiet" style="{{ mt24 }}" hint-size="100%,90px">Every diagram is a stepped figure: use ‹ › or Play to walk through it. Every program types itself out as you scroll; the ‹ › buttons on a code block step through notes on specific lines, and Run shows its output. Sections are ticked off in the contents rail as you read them.</x-import>
+      </div>
+
+
+      <section id="s1" data-screen-label="6.1 yield pauses a function" style="margin-bottom:72px">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.SectionTitle" index="—6.1" title="yield pauses a function" hint-size="100%,90px"></x-import>
+        <p>Tutorial §9.9–9.10. <code>yield</code> turns a function into a <strong>generator</strong>. Callers iterate values over time instead of receiving one big list.</p>
+        <dc-import name="Flow" spec="{{ flows.yield }}" hint-size="100%,420px"></dc-import>
+        <dc-import name="Code" spec="{{ code.yield_basic }}" hint-size="100%,300px"></dc-import>
+        <div data-sec="s1">
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Section summary" tone="info" hint-size="100%,120px">yield produces a value and pauses. Generators are lazy iterators.</x-import>
+        </div>
+      </section>
+
+      <section id="s2" data-screen-label="6.2 stream_assistant_tokens" style="margin-bottom:72px">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.SectionTitle" index="—6.2" title="stream_assistant_tokens" hint-size="100%,90px"></x-import>
+        <p>Cosmetic AI Assistant streams the reply into the chat pane. Word chunks are a simple stand-in for token streaming — same consumption pattern.</p>
+        <dc-import name="Code" spec="{{ code.stream }}" hint-size="100%,320px"></dc-import>
+        <dc-import name="Trace" spec="{{ trace }}" hint-size="100%,480px"></dc-import>
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Try this" tone="quiet" hint-size="100%,140px"><span>Change the splitter to yield pairs of words (hint: iterate indices).</span></x-import>
+        <div data-sec="s2">
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Section summary" tone="info" hint-size="100%,120px">stream_assistant_tokens(reply) yields split word chunks for the UI.</x-import>
+        </div>
+      </section>
+
+      <section id="s3" data-screen-label="6.3 Consuming with for" style="margin-bottom:72px">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.SectionTitle" index="—6.3" title="Consuming with for" hint-size="100%,90px"></x-import>
+        <p>A <code>for</code> loop is the everyday consumer. <code>next()</code> and <code>list()</code> show the same protocol underneath.</p>
+        <dc-import name="Code" spec="{{ code.consume }}" hint-size="100%,300px"></dc-import>
+        <div data-sec="s3">
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Section summary" tone="info" hint-size="100%,120px">for x in gen: … is the idiomatic consumer; next(gen) pulls one value.</x-import>
+        </div>
+      </section>
+
+      <section id="s4" data-screen-label="6.4 iter_phase_csv_rows" style="margin-bottom:72px">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.SectionTitle" index="—6.4" title="iter_phase_csv_rows" hint-size="100%,90px"></x-import>
+        <p>Export iterator: one CSV-shaped dict per ingredient. Accepts dict phases (tests) or FormulaPhase objects (Chapter 5).</p>
+        <dc-import name="Flow" spec="{{ flows.csv_iter }}" hint-size="100%,400px"></dc-import>
+        <dc-import name="Code" spec="{{ code.csv_rows }}" hint-size="100%,520px"></dc-import>
+        <div data-sec="s4">
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Section summary" tone="info" hint-size="100%,120px">iter_phase_csv_rows(phase) yields {phase, inci, pct, function}.</x-import>
+        </div>
+      </section>
+
+      <section id="s5" data-screen-label="6.5 · Project Project: export phase CSV" style="margin-bottom:72px">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.SectionTitle" index="—6.5 · Project" title="Project: export phase CSV" hint-size="100%,90px"></x-import>
+        <p>Wire the generator to <code>csv.DictWriter</code> via <code>for</code>. Return CSV text (StringIO) so tests need no filesystem.</p>
+        <dc-import name="Code" spec="{{ code.project }}" hint-size="100%,460px"></dc-import>
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Acceptance" tone="quiet" hint-size="100%,120px"><span>Header plus one data row for phase B xanthan.</span></x-import>
+        <div data-sec="s5">
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Section summary" tone="info" hint-size="100%,120px">export_phase_csv consumes iter_phase_csv_rows. Capstone exports after accept.</x-import>
+        </div>
+      </section>
+
+
+
+      <section id="cheat" data-screen-label="Cheat sheet" style="margin-bottom:48px">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.SectionTitle" index="—" title="Cheat sheet" hint-size="100%,90px"></x-import>
+        <div style="border:1px solid var(--rule-hairline);margin-top:8px"><div style="display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;background:var(--paper-000);border-bottom:1px solid var(--rule-hairline)"><strong style="font-size:13px">yield</strong><span style="font-size:13px;color:var(--text-body)">Produce a value; pause the function.</span></div><div style="display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;background:var(--paper-000);border-bottom:1px solid var(--rule-hairline)"><strong style="font-size:13px">generator</strong><span style="font-size:13px;color:var(--text-body)">Iterator returned by a yield function.</span></div><div style="display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;background:var(--paper-000);border-bottom:1px solid var(--rule-hairline)"><strong style="font-size:13px">for</strong><span style="font-size:13px;color:var(--text-body)">Primary consumer of generators.</span></div><div style="display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;background:var(--paper-000);border-bottom:1px solid var(--rule-hairline)"><strong style="font-size:13px">next(g)</strong><span style="font-size:13px;color:var(--text-body)">Pull one value; raises StopIteration when done.</span></div><div style="display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;background:var(--paper-000);border-bottom:1px solid var(--rule-hairline)"><strong style="font-size:13px">stream_assistant_tokens</strong><span style="font-size:13px;color:var(--text-body)">Yield word chunks from a reply string.</span></div><div style="display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;background:var(--paper-000);border-bottom:1px solid var(--rule-hairline)"><strong style="font-size:13px">iter_phase_csv_rows</strong><span style="font-size:13px;color:var(--text-body)">Yield CSV dicts for phase export.</span></div></div>
+        <div data-sec="cheat"></div>
+      </section>
+
+
+      <div style="margin-top:48px;padding-top:24px;border-top:2px solid var(--rule-strong);display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap">
+        <div style="display:grid;gap:4px">
+          <span style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-muted)">{{ doneLabel }}</span>
+          <span style="font-size:13px;color:var(--text-body)">Next: 07 Capstone — accept → card → export</span>
+        </div>
+        <div style="display:flex;gap:8px">
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Button" variant="secondary" onClick="{{ goHub }}" hint-size="110px,36px">Course map</x-import>
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Button" variant="primary" onClick="{{ complete }}" hint-size="180px,36px">{{ completeLabel }}</x-import>
+        </div>
+      </div>
+    </article>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const SECTIONS = [
+  {
+    "id": "s1",
+    "num": "6.1",
+    "title": "yield pauses a function"
+  },
+  {
+    "id": "s2",
+    "num": "6.2",
+    "title": "stream_assistant_tokens"
+  },
+  {
+    "id": "s3",
+    "num": "6.3",
+    "title": "Consuming with for"
+  },
+  {
+    "id": "s4",
+    "num": "6.4",
+    "title": "iter_phase_csv_rows"
+  },
+  {
+    "id": "s5",
+    "num": "6.5",
+    "title": "Project: export phase CSV"
+  },
+  {
+    "id": "cheat",
+    "num": "—",
+    "title": "Cheat sheet"
+  }
+];
+const FLOWS = {
+  "yield": {
+    "fig": "FIG.01",
+    "title": "Generator protocol",
+    "intro": "A function with yield returns a generator object. Each next()/for iteration runs until the next yield, then pauses — state kept between yields.",
+    "nodes": [
+      {
+        "id": "call",
+        "label": "call generator fn"
+      },
+      {
+        "id": "gen",
+        "label": "generator object"
+      },
+      {
+        "id": "yield",
+        "label": "yield value"
+      },
+      {
+        "id": "resume",
+        "label": "resume on next"
+      },
+      {
+        "id": "stop",
+        "label": "StopIteration"
+      }
+    ],
+    "path": [
+      {
+        "id": "call",
+        "note": "stream_assistant_tokens(reply) — does not run the body yet."
+      },
+      {
+        "id": "gen",
+        "note": "You hold an iterator; for loops call next for you."
+      },
+      {
+        "id": "yield",
+        "note": "One word chunk handed to the UI stream."
+      },
+      {
+        "id": "resume",
+        "note": "Body continues after the yield point."
+      },
+      {
+        "id": "stop",
+        "note": "When the function returns, iteration ends."
+      }
+    ]
+  },
+  "csv_iter": {
+    "fig": "FIG.02",
+    "title": "Phase → CSV row dicts",
+    "intro": "Export without building a giant list first: yield one DictWriter-ready row at a time.",
+    "nodes": [
+      {
+        "id": "phase",
+        "label": "FormulaPhase"
+      },
+      {
+        "id": "iter",
+        "label": "iter_phase_csv_rows"
+      },
+      {
+        "id": "row",
+        "label": "yield {phase,inci,pct,function}"
+      },
+      {
+        "id": "write",
+        "label": "csv.DictWriter"
+      }
+    ],
+    "path": [
+      {
+        "id": "phase",
+        "note": "Phase A items after accept."
+      },
+      {
+        "id": "iter",
+        "note": "Generator walks items lazily."
+      },
+      {
+        "id": "row",
+        "note": "Flat dict matching export columns."
+      },
+      {
+        "id": "write",
+        "note": "Consumer writes rows — Capstone wires this."
+      }
+    ]
+  }
+};
+const CODE = {
+  "yield_basic": {
+    "file": "yield_shape.py",
+    "output": [
+      "1",
+      "2",
+      "3"
+    ],
+    "lines": [
+      {
+        "t": "def count_up(n):",
+        "c": "yield makes this a generator function."
+      },
+      {
+        "t": "    i = 1"
+      },
+      {
+        "t": "    while i <= n:"
+      },
+      {
+        "t": "        yield i",
+        "c": "Pause here; hand i to the caller."
+      },
+      {
+        "t": "        i += 1"
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "for x in count_up(3):"
+      },
+      {
+        "t": "    print(x)"
+      }
+    ]
+  },
+  "stream": {
+    "file": "stream_assistant_tokens.py",
+    "output": [
+      "[token] Drafting",
+      "[token] a",
+      "[token] mild",
+      "[token] bodywash",
+      "[token] with",
+      "[token] coco-glucoside…"
+    ],
+    "lines": [
+      {
+        "t": "def stream_assistant_tokens(reply):",
+        "c": "Yield word chunks for the AI pane."
+      },
+      {
+        "t": "    \"\"\"Yield whitespace-separated tokens from reply.\"\"\""
+      },
+      {
+        "t": "    for word in reply.split():"
+      },
+      {
+        "t": "        yield word"
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "text = 'Drafting a mild bodywash with coco-glucoside…'"
+      },
+      {
+        "t": "for token in stream_assistant_tokens(text):"
+      },
+      {
+        "t": "    print('[token]', token)"
+      }
+    ]
+  },
+  "consume": {
+    "file": "consume_next.py",
+    "output": [
+      "first=Drafting",
+      "rest=['a', 'mild', 'bodywash']"
+    ],
+    "lines": [
+      {
+        "t": "def stream_assistant_tokens(reply):"
+      },
+      {
+        "t": "    for word in reply.split():"
+      },
+      {
+        "t": "        yield word"
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "gen = stream_assistant_tokens('Drafting a mild bodywash')"
+      },
+      {
+        "t": "first = next(gen)",
+        "c": "Manual pull — for does this in a loop."
+      },
+      {
+        "t": "rest = list(gen)",
+        "c": "Drain the remainder into a list."
+      },
+      {
+        "t": "print(f'first={first}')"
+      },
+      {
+        "t": "print(f'rest={rest}')"
+      }
+    ]
+  },
+  "csv_rows": {
+    "file": "iter_phase_csv_rows.py",
+    "output": [
+      "{'phase': 'A', 'inci': 'Coco-Glucoside', 'pct': 12.0, 'function': 'surfactant'}",
+      "{'phase': 'A', 'inci': 'Glycerin', 'pct': 3.0, 'function': 'humectant'}"
+    ],
+    "lines": [
+      {
+        "t": "def iter_phase_csv_rows(phase):",
+        "c": "phase: object with .name and .items OR dict shape."
+      },
+      {
+        "t": "    \"\"\"Yield CSV-ready dicts for one Formulaite phase.\"\"\""
+      },
+      {
+        "t": "    name = phase['name'] if isinstance(phase, dict) else phase.name"
+      },
+      {
+        "t": "    items = phase['items'] if isinstance(phase, dict) else phase.items"
+      },
+      {
+        "t": "    for item in items:"
+      },
+      {
+        "t": "        if isinstance(item, dict):"
+      },
+      {
+        "t": "            yield {"
+      },
+      {
+        "t": "                'phase': name,"
+      },
+      {
+        "t": "                'inci': item['inci'],"
+      },
+      {
+        "t": "                'pct': float(item['pct']),"
+      },
+      {
+        "t": "                'function': item.get('function', 'emollient'),"
+      },
+      {
+        "t": "            }"
+      },
+      {
+        "t": "        else:"
+      },
+      {
+        "t": "            yield {"
+      },
+      {
+        "t": "                'phase': name,"
+      },
+      {
+        "t": "                'inci': item.inci,"
+      },
+      {
+        "t": "                'pct': float(item.pct),"
+      },
+      {
+        "t": "                'function': item.function,"
+      },
+      {
+        "t": "            }"
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "phase_a = {"
+      },
+      {
+        "t": "    'name': 'A',"
+      },
+      {
+        "t": "    'items': ["
+      },
+      {
+        "t": "        {'inci': 'Coco-Glucoside', 'pct': 12, 'function': 'surfactant'},"
+      },
+      {
+        "t": "        {'inci': 'Glycerin', 'pct': 3, 'function': 'humectant'},"
+      },
+      {
+        "t": "    ],"
+      },
+      {
+        "t": "}"
+      },
+      {
+        "t": "for row in iter_phase_csv_rows(phase_a):"
+      },
+      {
+        "t": "    print(row)"
+      }
+    ]
+  },
+  "project": {
+    "file": "export_phase_csv.py",
+    "output": [
+      "phase,inci,pct,function",
+      "B,Xanthan Gum,0.4,rheology"
+    ],
+    "lines": [
+      {
+        "t": "import csv"
+      },
+      {
+        "t": "import io"
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "def iter_phase_csv_rows(phase):"
+      },
+      {
+        "t": "    name = phase['name']"
+      },
+      {
+        "t": "    for item in phase['items']:"
+      },
+      {
+        "t": "        yield {"
+      },
+      {
+        "t": "            'phase': name,"
+      },
+      {
+        "t": "            'inci': item['inci'],"
+      },
+      {
+        "t": "            'pct': float(item['pct']),"
+      },
+      {
+        "t": "            'function': item.get('function', 'emollient'),"
+      },
+      {
+        "t": "        }"
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "def export_phase_csv(phase) -> str:"
+      },
+      {
+        "t": "    buf = io.StringIO()"
+      },
+      {
+        "t": "    fields = ['phase', 'inci', 'pct', 'function']"
+      },
+      {
+        "t": "    w = csv.DictWriter(buf, fieldnames=fields)"
+      },
+      {
+        "t": "    w.writeheader()"
+      },
+      {
+        "t": "    for row in iter_phase_csv_rows(phase):",
+        "c": "Consume generator with for."
+      },
+      {
+        "t": "        w.writerow(row)"
+      },
+      {
+        "t": "    return buf.getvalue()"
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "phase_b = {"
+      },
+      {
+        "t": "    'name': 'B',"
+      },
+      {
+        "t": "    'items': [{'inci': 'Xanthan Gum', 'pct': 0.4, 'function': 'rheology'}],"
+      },
+      {
+        "t": "}"
+      },
+      {
+        "t": "print(export_phase_csv(phase_b), end='')"
+      }
+    ]
+  }
+};
+const TRACE = {
+  "fig": "TRACE.01",
+  "title": "stream_assistant_tokens — yield loop",
+  "lines": [
+    "def stream_assistant_tokens(reply):",
+    "    \"\"\"Yield whitespace-separated tokens from reply.\"\"\"",
+    "    for word in reply.split():",
+    "        yield word",
+    "",
+    "text = 'Drafting a mild bodywash with coco-glucoside…'",
+    "for token in stream_assistant_tokens(text):",
+    "    print('[token]', token)"
+  ],
+  "steps": [
+    {
+      "line": 1,
+      "vars": {},
+      "note": "Generator function defined."
+    },
+    {
+      "line": 6,
+      "vars": {
+        "text": "'Drafting a mild…'"
+      },
+      "note": "Reply string from the assistant."
+    },
+    {
+      "line": 7,
+      "vars": {
+        "token": "'Drafting'"
+      },
+      "io": [
+        {
+          "k": "out",
+          "text": "[token] Drafting"
+        }
+      ],
+      "note": "First yield consumed by for."
+    },
+    {
+      "line": 3,
+      "vars": {
+        "token": "'a'"
+      },
+      "note": "Resumed; next word yielded."
+    }
+  ]
+};
+const KEY = 'pyconstructs.progress';
+
+class Component extends DCLogic {
+  state = { seen: {}, done: false };
+  componentDidMount() {
+    try { const all = JSON.parse(localStorage.getItem(KEY) || '{}'); const c = all.ch6 || {}; this.setState({ seen: c.seen || {}, done: !!c.done }); } catch (e) {}
+    if ('IntersectionObserver' in window) {
+      this.io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) this.mark(e.target.getAttribute('data-sec')); }), { threshold: 0.3 });
+      this.obs = setTimeout(() => document.querySelectorAll('[data-sec]').forEach(el => this.io.observe(el)), 1200);
+    }
+  }
+  componentWillUnmount() { clearTimeout(this.obs); if (this.io) this.io.disconnect(); }
+  save() {
+    try { const all = JSON.parse(localStorage.getItem(KEY) || '{}'); all.ch6 = { seen: this.state.seen, done: this.state.done, total: 5 }; localStorage.setItem(KEY, JSON.stringify(all)); } catch (e) {}
+  }
+  mark(id) { if (!id || this.state.seen[id]) return; this.setState(s => ({ seen: { ...s.seen, [id]: true } }), () => this.save()); }
+  complete = () => this.setState(s => ({ done: !s.done }), () => this.save());
+  goHub = () => { window.location.href = 'Course.dc.html'; };
+  renderVals() {
+    const { seen, done } = this.state;
+    const nSeen = SECTIONS.filter(s => s.id.startsWith('s') && seen[s.id]).length;
+    return {
+      flows: FLOWS, code: CODE, trace: TRACE,
+      mt24: { marginTop: '24px' },
+      rail: SECTIONS.map(s => ({ ...s, href: '#' + s.id, tickColor: (s.id === 'cheat' ? done : seen[s.id]) ? 'var(--terra-600)' : 'var(--ink-100)' })),
+      progressLabel: (nSeen + '').padStart(2, '0') + '_05',
+      doneLabel: done ? '—Chapter complete' : '—End of chapter 06',
+      completeLabel: done ? 'Completed (undo)' : 'Mark chapter complete',
+      complete: this.complete, goHub: this.goHub
+    };
+  }
+}
+
+</script>
+</body>
+</html>

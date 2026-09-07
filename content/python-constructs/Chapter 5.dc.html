@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./dc-siblings.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/mission-docs-design-system-7384423c-d52c-4f5b-aea6-df1bdbd9d593/styles.css">
+  <script src="_ds/mission-docs-design-system-7384423c-d52c-4f5b-aea6-df1bdbd9d593/_ds_bundle.js"></script>
+  <style>
+    html{scroll-behavior:smooth}
+    a{color:var(--text-link);text-decoration:none;border-bottom:1px solid var(--navy-200)}
+    a:hover{color:var(--text-link-hover);border-bottom-color:var(--terra-400)}
+    li::marker{color:var(--terra-600);font-family:var(--font-mono);font-size:11px}
+  </style>
+</helmet>
+<div style="min-height:100vh;background:var(--surface-page);color:var(--text-body);font-family:var(--font-body)">
+  <header style="position:sticky;top:0;z-index:10;background:rgba(251,250,247,0.92);border-bottom:1px solid var(--rule-hairline)">
+    <div style="max-width:1180px;margin:0 auto;padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between;gap:24px">
+      <a href="Course.dc.html" style="border:0;font-weight:600;text-transform:uppercase;letter-spacing:-0.012em;color:var(--navy-800);font-size:14px">Py Constructs</a>
+      <div style="display:flex;align-items:center;gap:24px">
+        <span style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600)">—Chapter 05</span>
+        <span style="font-size:13px;color:var(--text-muted)">Classes — formula objects</span>
+        <span style="font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.22em;color:var(--text-muted)">{{ progressLabel }}</span>
+        <a href="Course.dc.html" style="font-size:13px">Course map</a>
+      </div>
+    </div>
+  </header>
+
+  <div style="max-width:1180px;margin:0 auto;padding:48px 32px 96px;display:grid;grid-template-columns:220px minmax(0,780px);gap:56px;align-items:start">
+    <nav style="position:sticky;top:88px;display:grid;gap:2px;align-content:start">
+      <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px">Contents</div>
+      <sc-for list="{{ rail }}" as="r" hint-placeholder-count="5">
+        <a href="{{ r.href }}" style="border:0;display:grid;grid-template-columns:14px 32px 1fr;gap:6px;align-items:baseline;padding:6px 0;border-top:0.5px solid var(--rule-hairline);color:var(--navy-900);font-size:13px;line-height:1.3">
+          <span style="font-family:var(--font-mono);font-size:11px;color:{{ r.tickColor }}">—</span>
+          <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.08em;color:var(--terra-600)">{{ r.num }}</span>
+          <span>{{ r.title }}</span>
+        </a>
+      </sc-for>
+      <div style="margin-top:24px;padding-top:12px;border-top:2px solid var(--rule-strong);display:grid;gap:6px">
+        <span style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-muted)">Up next</span>
+        <span style="font-size:13px;color:var(--text-faint)">06 Generators — stream reply + CSV export</span>
+      </div>
+    </nav>
+
+    <article>
+      <div style="margin-bottom:56px">
+        <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600);margin-bottom:16px">Part III — Structure & streams · Chapter 05</div>
+        <h1 style="font-size:48px;font-weight:600;letter-spacing:-0.02em;line-height:1.02;color:var(--navy-900);text-transform:uppercase;margin:0 0 20px;max-width:16ch">Classes — formula objects</h1>
+        <div style="border-top:10px solid var(--navy-800);margin:0 0 24px;width:120px"></div>
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Lede" hint-size="100%,80px">§9 Classes as Formulaite domain types: Ingredient, FormulaPhase, FormulaDraft with total_pct() and as_recipe_lines().</x-import>
+        <p>Move from dict rows to a small object graph the formulator bench and formulations library can share.</p>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rule-hairline);border:1px solid var(--rule-hairline);margin-top:24px">
+          <div style="background:var(--paper-000);padding:14px 16px"><div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600);margin-bottom:6px">Sections</div><div style="font-size:23px;font-weight:600;color:var(--navy-900);font-family:var(--font-mono)">05</div></div>
+          <div style="background:var(--paper-000);padding:14px 16px"><div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600);margin-bottom:6px">Diagrams</div><div style="font-size:23px;font-weight:600;color:var(--navy-900);font-family:var(--font-mono)">01</div></div>
+          <div style="background:var(--paper-000);padding:14px 16px"><div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600);margin-bottom:6px">Programs</div><div style="font-size:23px;font-weight:600;color:var(--navy-900);font-family:var(--font-mono)">04</div></div>
+        </div>
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="How this page works" tone="quiet" style="{{ mt24 }}" hint-size="100%,90px">Every diagram is a stepped figure: use ‹ › or Play to walk through it. Every program types itself out as you scroll; the ‹ › buttons on a code block step through notes on specific lines, and Run shows its output. Sections are ticked off in the contents rail as you read them.</x-import>
+      </div>
+
+
+      <section id="s1" data-screen-label="5.1 class and __init__" style="margin-bottom:72px">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.SectionTitle" index="—5.1" title="class and __init__" hint-size="100%,90px"></x-import>
+        <p>Tutorial §9. A <strong>class</strong> defines a type; <code>__init__</code> runs when you construct an instance. <code>self</code> is that instance — attributes hang off it.</p>
+        <dc-import name="Code" spec="{{ code.init }}" hint-size="100%,360px"></dc-import>
+        <div data-sec="s1">
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Section summary" tone="info" hint-size="100%,120px">class + __init__(self, …) + self.attr. Methods are functions that take self first.</x-import>
+        </div>
+      </section>
+
+      <section id="s2" data-screen-label="5.2 Ingredient" style="margin-bottom:72px">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.SectionTitle" index="—5.2" title="Ingredient" hint-size="100%,90px"></x-import>
+        <p><code>Ingredient(inci, pct, function)</code> — one shelf / draft row as an object instead of a loose dict.</p>
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.PullQuote" hint-size="100%,80px">Objects beat anonymous dicts once methods and invariants appear.</x-import>
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Try this" tone="quiet" hint-size="100%,140px"><span>Construct Ingredient('Glycerin', 3, 'humectant') and print its pct.</span></x-import>
+        <div data-sec="s2">
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Section summary" tone="info" hint-size="100%,120px">Ingredient holds inci, pct, function — the Formulaite material noun.</x-import>
+        </div>
+      </section>
+
+      <section id="s3" data-screen-label="5.3 FormulaPhase" style="margin-bottom:72px">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.SectionTitle" index="—5.3" title="FormulaPhase" hint-size="100%,90px"></x-import>
+        <p>A named bag of ingredients. Prefer <code>items=None</code> then <code>list(items or [])</code> — never a mutable default argument.</p>
+        <dc-import name="Code" spec="{{ code.phase }}" hint-size="100%,440px"></dc-import>
+        <div data-sec="s3">
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Section summary" tone="info" hint-size="100%,120px">FormulaPhase(name, items) with total_pct() over its ingredients.</x-import>
+        </div>
+      </section>
+
+      <section id="s4" data-screen-label="5.4 FormulaDraft + total_pct" style="margin-bottom:72px">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.SectionTitle" index="—5.4" title="FormulaDraft + total_pct" hint-size="100%,90px"></x-import>
+        <p>The accepted assistant draft: product name plus ordered phases. <code>total_pct()</code> should approach 100 for a finished formula (demo totals are partial water-free sketches).</p>
+        <dc-import name="Flow" spec="{{ flows.compose }}" hint-size="100%,400px"></dc-import>
+        <dc-import name="Code" spec="{{ code.draft }}" hint-size="100%,440px"></dc-import>
+        <div data-sec="s4">
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Section summary" tone="info" hint-size="100%,120px">FormulaDraft(product, phases).total_pct() sums every phase.</x-import>
+        </div>
+      </section>
+
+      <section id="s5" data-screen-label="5.5 · Project Project: as_recipe_lines" style="margin-bottom:72px">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.SectionTitle" index="—5.5 · Project" title="Project: as_recipe_lines" hint-size="100%,90px"></x-import>
+        <p>Flatten the object graph into the same recipe-card strings Chapter 1 produced from dicts.</p>
+        <dc-import name="Code" spec="{{ code.project }}" hint-size="100%,520px"></dc-import>
+        <dc-import name="Trace" spec="{{ trace }}" hint-size="100%,480px"></dc-import>
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Acceptance" tone="quiet" hint-size="100%,120px"><span>Four lines + total=16.2% for the Gentle Wash sample.</span></x-import>
+        <div data-sec="s5">
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Section summary" tone="info" hint-size="100%,120px">as_recipe_lines() is the OO bridge to the recipe card UI and the Capstone.</x-import>
+        </div>
+      </section>
+
+
+
+      <section id="cheat" data-screen-label="Cheat sheet" style="margin-bottom:48px">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.SectionTitle" index="—" title="Cheat sheet" hint-size="100%,90px"></x-import>
+        <div style="border:1px solid var(--rule-hairline);margin-top:8px"><div style="display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;background:var(--paper-000);border-bottom:1px solid var(--rule-hairline)"><strong style="font-size:13px">class</strong><span style="font-size:13px;color:var(--text-body)">Define a new type.</span></div><div style="display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;background:var(--paper-000);border-bottom:1px solid var(--rule-hairline)"><strong style="font-size:13px">__init__</strong><span style="font-size:13px;color:var(--text-body)">Instance constructor; set self.* attributes.</span></div><div style="display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;background:var(--paper-000);border-bottom:1px solid var(--rule-hairline)"><strong style="font-size:13px">self</strong><span style="font-size:13px;color:var(--text-body)">The instance — first param of methods.</span></div><div style="display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;background:var(--paper-000);border-bottom:1px solid var(--rule-hairline)"><strong style="font-size:13px">Ingredient</strong><span style="font-size:13px;color:var(--text-body)">inci, pct, function</span></div><div style="display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;background:var(--paper-000);border-bottom:1px solid var(--rule-hairline)"><strong style="font-size:13px">FormulaPhase</strong><span style="font-size:13px;color:var(--text-body)">name, items[]; total_pct()</span></div><div style="display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;background:var(--paper-000);border-bottom:1px solid var(--rule-hairline)"><strong style="font-size:13px">FormulaDraft</strong><span style="font-size:13px;color:var(--text-body)">product, phases[]; total_pct(), as_recipe_lines()</span></div></div>
+        <div data-sec="cheat"></div>
+      </section>
+
+
+      <div style="margin-top:48px;padding-top:24px;border-top:2px solid var(--rule-strong);display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap">
+        <div style="display:grid;gap:4px">
+          <span style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-muted)">{{ doneLabel }}</span>
+          <span style="font-size:13px;color:var(--text-body)">Next: 06 Generators — stream reply + CSV export</span>
+        </div>
+        <div style="display:flex;gap:8px">
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Button" variant="secondary" onClick="{{ goHub }}" hint-size="110px,36px">Course map</x-import>
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Button" variant="primary" onClick="{{ complete }}" hint-size="180px,36px">{{ completeLabel }}</x-import>
+        </div>
+      </div>
+    </article>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const SECTIONS = [
+  {
+    "id": "s1",
+    "num": "5.1",
+    "title": "class and __init__"
+  },
+  {
+    "id": "s2",
+    "num": "5.2",
+    "title": "Ingredient"
+  },
+  {
+    "id": "s3",
+    "num": "5.3",
+    "title": "FormulaPhase"
+  },
+  {
+    "id": "s4",
+    "num": "5.4",
+    "title": "FormulaDraft + total_pct"
+  },
+  {
+    "id": "s5",
+    "num": "5.5",
+    "title": "Project: as_recipe_lines"
+  },
+  {
+    "id": "cheat",
+    "num": "—",
+    "title": "Cheat sheet"
+  }
+];
+const FLOWS = {
+  "compose": {
+    "fig": "FIG.01",
+    "title": "Draft object graph",
+    "intro": "FormulaDraft owns phases; each FormulaPhase owns Ingredient items. Methods ask the graph questions without scattering dict keys.",
+    "nodes": [
+      {
+        "id": "ing",
+        "label": "Ingredient",
+        "items": [
+          "inci",
+          "pct",
+          "function"
+        ]
+      },
+      {
+        "id": "ph",
+        "label": "FormulaPhase",
+        "items": [
+          "name",
+          "items[]"
+        ]
+      },
+      {
+        "id": "dr",
+        "label": "FormulaDraft",
+        "items": [
+          "product",
+          "phases[]"
+        ]
+      },
+      {
+        "id": "m",
+        "label": "Methods",
+        "items": [
+          "total_pct",
+          "as_recipe_lines"
+        ]
+      }
+    ],
+    "path": [
+      {
+        "id": "ing",
+        "note": "One material row — Coco-Glucoside at 12%."
+      },
+      {
+        "id": "ph",
+        "note": "Phase A/B/C bags on the formulator bench."
+      },
+      {
+        "id": "dr",
+        "note": "Named product draft the assistant accepted."
+      },
+      {
+        "id": "m",
+        "note": "total_pct() sums mass; as_recipe_lines() feeds the card."
+      }
+    ]
+  }
+};
+const CODE = {
+  "init": {
+    "file": "class_init.py",
+    "output": [
+      "Coco-Glucoside @ 12.0% (surfactant)"
+    ],
+    "lines": [
+      {
+        "t": "class Ingredient:",
+        "c": "class statement defines a type."
+      },
+      {
+        "t": "    def __init__(self, inci, pct, function='emollient'):",
+        "c": "Constructor — self is the instance."
+      },
+      {
+        "t": "        self.inci = inci"
+      },
+      {
+        "t": "        self.pct = float(pct)"
+      },
+      {
+        "t": "        self.function = function"
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "    def label(self):"
+      },
+      {
+        "t": "        return f\"{self.inci} @ {self.pct}% ({self.function})\""
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "g = Ingredient('Coco-Glucoside', 12, 'surfactant')"
+      },
+      {
+        "t": "print(g.label())"
+      }
+    ]
+  },
+  "phase": {
+    "file": "formula_phase.py",
+    "output": [
+      "A: 15.0"
+    ],
+    "lines": [
+      {
+        "t": "class Ingredient:"
+      },
+      {
+        "t": "    def __init__(self, inci, pct, function='emollient'):"
+      },
+      {
+        "t": "        self.inci = inci"
+      },
+      {
+        "t": "        self.pct = float(pct)"
+      },
+      {
+        "t": "        self.function = function"
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "class FormulaPhase:"
+      },
+      {
+        "t": "    def __init__(self, name, items=None):"
+      },
+      {
+        "t": "        self.name = name"
+      },
+      {
+        "t": "        self.items = list(items or [])",
+        "c": "Copy — avoid shared default list."
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "    def add(self, ingredient):"
+      },
+      {
+        "t": "        self.items.append(ingredient)"
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "    def total_pct(self):"
+      },
+      {
+        "t": "        return sum(i.pct for i in self.items)"
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "a = FormulaPhase('A', ["
+      },
+      {
+        "t": "    Ingredient('Coco-Glucoside', 12, 'surfactant'),"
+      },
+      {
+        "t": "    Ingredient('Glycerin', 3, 'humectant'),"
+      },
+      {
+        "t": "])"
+      },
+      {
+        "t": "print(f\"{a.name}: {a.total_pct()}\")"
+      }
+    ]
+  },
+  "draft": {
+    "file": "formula_draft.py",
+    "output": [
+      "Gentle Wash total=16.2%"
+    ],
+    "lines": [
+      {
+        "t": "class Ingredient:"
+      },
+      {
+        "t": "    def __init__(self, inci, pct, function='emollient'):"
+      },
+      {
+        "t": "        self.inci, self.pct, self.function = inci, float(pct), function"
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "class FormulaPhase:"
+      },
+      {
+        "t": "    def __init__(self, name, items=None):"
+      },
+      {
+        "t": "        self.name, self.items = name, list(items or [])"
+      },
+      {
+        "t": "    def total_pct(self):"
+      },
+      {
+        "t": "        return sum(i.pct for i in self.items)"
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "class FormulaDraft:"
+      },
+      {
+        "t": "    def __init__(self, product, phases=None):"
+      },
+      {
+        "t": "        self.product = product"
+      },
+      {
+        "t": "        self.phases = list(phases or [])"
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "    def total_pct(self):",
+        "c": "Sum across all phases."
+      },
+      {
+        "t": "        return sum(p.total_pct() for p in self.phases)"
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "draft = FormulaDraft('Gentle Wash', ["
+      },
+      {
+        "t": "    FormulaPhase('A', [Ingredient('Coco-Glucoside', 12, 'surfactant'), Ingredient('Glycerin', 3)]),"
+      },
+      {
+        "t": "    FormulaPhase('B', [Ingredient('Xanthan Gum', 0.4, 'rheology')]),"
+      },
+      {
+        "t": "    FormulaPhase('C', [Ingredient('Phenoxyethanol', 0.8, 'preservative')]),"
+      },
+      {
+        "t": "])"
+      },
+      {
+        "t": "print(f\"{draft.product} total={draft.total_pct()}%\")"
+      }
+    ]
+  },
+  "project": {
+    "file": "as_recipe_lines.py",
+    "output": [
+      "Coco-Glucoside 12.0%",
+      "Glycerin 3.0%",
+      "Xanthan Gum 0.4%",
+      "Phenoxyethanol 0.8%",
+      "total=16.2%"
+    ],
+    "lines": [
+      {
+        "t": "class Ingredient:"
+      },
+      {
+        "t": "    def __init__(self, inci, pct, function='emollient'):"
+      },
+      {
+        "t": "        self.inci, self.pct, self.function = inci, float(pct), function"
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "class FormulaPhase:"
+      },
+      {
+        "t": "    def __init__(self, name, items=None):"
+      },
+      {
+        "t": "        self.name, self.items = name, list(items or [])"
+      },
+      {
+        "t": "    def total_pct(self):"
+      },
+      {
+        "t": "        return sum(i.pct for i in self.items)"
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "class FormulaDraft:"
+      },
+      {
+        "t": "    def __init__(self, product, phases=None):"
+      },
+      {
+        "t": "        self.product, self.phases = product, list(phases or [])"
+      },
+      {
+        "t": "    def total_pct(self):"
+      },
+      {
+        "t": "        return sum(p.total_pct() for p in self.phases)"
+      },
+      {
+        "t": "    def as_recipe_lines(self):",
+        "c": "Flatten phases → card lines."
+      },
+      {
+        "t": "        lines = []"
+      },
+      {
+        "t": "        for phase in self.phases:"
+      },
+      {
+        "t": "            for item in phase.items:"
+      },
+      {
+        "t": "                lines.append(f\"{item.inci} {item.pct:.1f}%\")"
+      },
+      {
+        "t": "        return lines"
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "draft = FormulaDraft('Gentle Wash', ["
+      },
+      {
+        "t": "    FormulaPhase('A', [Ingredient('Coco-Glucoside', 12, 'surfactant'), Ingredient('Glycerin', 3)]),"
+      },
+      {
+        "t": "    FormulaPhase('B', [Ingredient('Xanthan Gum', 0.4, 'rheology')]),"
+      },
+      {
+        "t": "    FormulaPhase('C', [Ingredient('Phenoxyethanol', 0.8, 'preservative')]),"
+      },
+      {
+        "t": "])"
+      },
+      {
+        "t": "for line in draft.as_recipe_lines():"
+      },
+      {
+        "t": "    print(line)"
+      },
+      {
+        "t": "print(f\"total={draft.total_pct()}%\")"
+      }
+    ]
+  }
+};
+const TRACE = {
+  "fig": "TRACE.01",
+  "title": "as_recipe_lines — walk the graph",
+  "lines": [
+    "class Ingredient:",
+    "    def __init__(self, inci, pct, function='emollient'):",
+    "        self.inci, self.pct, self.function = inci, float(pct), function",
+    "",
+    "class FormulaPhase:",
+    "    def __init__(self, name, items=None):",
+    "        self.name, self.items = name, list(items or [])",
+    "    def total_pct(self):",
+    "        return sum(i.pct for i in self.items)",
+    "",
+    "class FormulaDraft:",
+    "    def __init__(self, product, phases=None):",
+    "        self.product, self.phases = product, list(phases or [])",
+    "    def total_pct(self):",
+    "        return sum(p.total_pct() for p in self.phases)",
+    "    def as_recipe_lines(self):",
+    "        lines = []",
+    "        for phase in self.phases:",
+    "            for item in phase.items:",
+    "                lines.append(f\"{item.inci} {item.pct:.1f}%\")",
+    "        return lines",
+    "",
+    "draft = FormulaDraft('Gentle Wash', [",
+    "    FormulaPhase('A', [Ingredient('Coco-Glucoside', 12, 'surfactant'), Ingredient('Glycerin', 3)]),",
+    "    FormulaPhase('B', [Ingredient('Xanthan Gum', 0.4, 'rheology')]),",
+    "    FormulaPhase('C', [Ingredient('Phenoxyethanol', 0.8, 'preservative')]),",
+    "])",
+    "for line in draft.as_recipe_lines():",
+    "    print(line)",
+    "print(f\"total={draft.total_pct()}%\")"
+  ],
+  "steps": [
+    {
+      "line": 14,
+      "vars": {},
+      "note": "as_recipe_lines defined on FormulaDraft."
+    },
+    {
+      "line": 16,
+      "vars": {
+        "lines": "[]"
+      },
+      "note": "Accumulate across phases."
+    },
+    {
+      "line": 22,
+      "vars": {
+        "draft": "Gentle Wash"
+      },
+      "note": "Three phases constructed."
+    },
+    {
+      "line": 28,
+      "vars": {},
+      "io": [
+        {
+          "k": "out",
+          "text": "Coco-Glucoside 12.0%"
+        }
+      ],
+      "note": "Card lines match Chapter 1 formatter."
+    }
+  ]
+};
+const KEY = 'pyconstructs.progress';
+
+class Component extends DCLogic {
+  state = { seen: {}, done: false };
+  componentDidMount() {
+    try { const all = JSON.parse(localStorage.getItem(KEY) || '{}'); const c = all.ch5 || {}; this.setState({ seen: c.seen || {}, done: !!c.done }); } catch (e) {}
+    if ('IntersectionObserver' in window) {
+      this.io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) this.mark(e.target.getAttribute('data-sec')); }), { threshold: 0.3 });
+      this.obs = setTimeout(() => document.querySelectorAll('[data-sec]').forEach(el => this.io.observe(el)), 1200);
+    }
+  }
+  componentWillUnmount() { clearTimeout(this.obs); if (this.io) this.io.disconnect(); }
+  save() {
+    try { const all = JSON.parse(localStorage.getItem(KEY) || '{}'); all.ch5 = { seen: this.state.seen, done: this.state.done, total: 5 }; localStorage.setItem(KEY, JSON.stringify(all)); } catch (e) {}
+  }
+  mark(id) { if (!id || this.state.seen[id]) return; this.setState(s => ({ seen: { ...s.seen, [id]: true } }), () => this.save()); }
+  complete = () => this.setState(s => ({ done: !s.done }), () => this.save());
+  goHub = () => { window.location.href = 'Course.dc.html'; };
+  renderVals() {
+    const { seen, done } = this.state;
+    const nSeen = SECTIONS.filter(s => s.id.startsWith('s') && seen[s.id]).length;
+    return {
+      flows: FLOWS, code: CODE, trace: TRACE,
+      mt24: { marginTop: '24px' },
+      rail: SECTIONS.map(s => ({ ...s, href: '#' + s.id, tickColor: (s.id === 'cheat' ? done : seen[s.id]) ? 'var(--terra-600)' : 'var(--ink-100)' })),
+      progressLabel: (nSeen + '').padStart(2, '0') + '_05',
+      doneLabel: done ? '—Chapter complete' : '—End of chapter 05',
+      completeLabel: done ? 'Completed (undo)' : 'Mark chapter complete',
+      complete: this.complete, goHub: this.goHub
+    };
+  }
+}
+
+</script>
+</body>
+</html>

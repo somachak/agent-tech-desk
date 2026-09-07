@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./dc-siblings.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/mission-docs-design-system-7384423c-d52c-4f5b-aea6-df1bdbd9d593/styles.css">
+  <script src="_ds/mission-docs-design-system-7384423c-d52c-4f5b-aea6-df1bdbd9d593/_ds_bundle.js"></script>
+  <style>
+    html{scroll-behavior:smooth}
+    a{color:var(--text-link);text-decoration:none;border-bottom:1px solid var(--navy-200)}
+    a:hover{color:var(--text-link-hover);border-bottom-color:var(--terra-400)}
+    li::marker{color:var(--terra-600);font-family:var(--font-mono);font-size:11px}
+  </style>
+</helmet>
+<div style="min-height:100vh;background:var(--surface-page);color:var(--text-body);font-family:var(--font-body)">
+  <header style="position:sticky;top:0;z-index:10;background:rgba(251,250,247,0.92);border-bottom:1px solid var(--rule-hairline)">
+    <div style="max-width:1180px;margin:0 auto;padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between;gap:24px">
+      <a href="Course.dc.html" style="border:0;font-weight:600;text-transform:uppercase;letter-spacing:-0.012em;color:var(--navy-800);font-size:14px">Py Constructs</a>
+      <div style="display:flex;align-items:center;gap:24px">
+        <span style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600)">—Chapter 02</span>
+        <span style="font-size:13px;color:var(--text-muted)">Keyword args, *args, **kwargs</span>
+        <span style="font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.22em;color:var(--text-muted)">{{ progressLabel }}</span>
+        <a href="Course.dc.html" style="font-size:13px">Course map</a>
+      </div>
+    </div>
+  </header>
+
+  <div style="max-width:1180px;margin:0 auto;padding:48px 32px 96px;display:grid;grid-template-columns:220px minmax(0,780px);gap:56px;align-items:start">
+    <nav style="position:sticky;top:88px;display:grid;gap:2px;align-content:start">
+      <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px">Contents</div>
+      <sc-for list="{{ rail }}" as="r" hint-placeholder-count="5">
+        <a href="{{ r.href }}" style="border:0;display:grid;grid-template-columns:14px 32px 1fr;gap:6px;align-items:baseline;padding:6px 0;border-top:0.5px solid var(--rule-hairline);color:var(--navy-900);font-size:13px;line-height:1.3">
+          <span style="font-family:var(--font-mono);font-size:11px;color:{{ r.tickColor }}">—</span>
+          <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.08em;color:var(--terra-600)">{{ r.num }}</span>
+          <span>{{ r.title }}</span>
+        </a>
+      </sc-for>
+      <div style="margin-top:24px;padding-top:12px;border-top:2px solid var(--rule-strong);display:grid;gap:6px">
+        <span style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-muted)">Up next</span>
+        <span style="font-size:13px;color:var(--text-faint)">03 lambda — sort shelf / rank candidates</span>
+      </div>
+    </nav>
+
+    <article>
+      <div style="margin-bottom:56px">
+        <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600);margin-bottom:16px">Part I — Callable contracts · Chapter 02</div>
+        <h1 style="font-size:48px;font-weight:600;letter-spacing:-0.02em;line-height:1.02;color:var(--navy-900);text-transform:uppercase;margin:0 0 20px;max-width:16ch">Keyword args, *args, **kwargs</h1>
+        <div style="border-top:10px solid var(--navy-800);margin:0 0 24px;width:120px"></div>
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Lede" hint-size="100%,80px">§4.9 / 4.9.2 / 4.9.4 for Formulaite: keyword-only pct on add_to_phase, and log_assistant_event for Glass Box traces.</x-import>
+        <p>Phases A/B/C on the formulator bench; assistant events in the Glass Box. Same language features as the Tutorial — product nouns instead of toy demos.</p>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rule-hairline);border:1px solid var(--rule-hairline);margin-top:24px">
+          <div style="background:var(--paper-000);padding:14px 16px"><div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600);margin-bottom:6px">Sections</div><div style="font-size:23px;font-weight:600;color:var(--navy-900);font-family:var(--font-mono)">05</div></div>
+          <div style="background:var(--paper-000);padding:14px 16px"><div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600);margin-bottom:6px">Diagrams</div><div style="font-size:23px;font-weight:600;color:var(--navy-900);font-family:var(--font-mono)">02</div></div>
+          <div style="background:var(--paper-000);padding:14px 16px"><div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra-600);margin-bottom:6px">Programs</div><div style="font-size:23px;font-weight:600;color:var(--navy-900);font-family:var(--font-mono)">04</div></div>
+        </div>
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="How this page works" tone="quiet" style="{{ mt24 }}" hint-size="100%,90px">Every diagram is a stepped figure: use ‹ › or Play to walk through it. Every program types itself out as you scroll; the ‹ › buttons on a code block step through notes on specific lines, and Run shows its output. Sections are ticked off in the contents rail as you read them.</x-import>
+      </div>
+
+
+      <section id="s1" data-screen-label="2.1 Keyword-only with *" style="margin-bottom:72px">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.SectionTitle" index="—2.1" title="Keyword-only with *" hint-size="100%,90px"></x-import>
+        <p>Tutorial §4.9. After a <code>*</code> in the parameter list, callers <strong>must</strong> pass those arguments by keyword. That prevents silent swaps — e.g. treating a percent as a function label.</p>
+        <dc-import name="Flow" spec="{{ flows.kwonly }}" hint-size="100%,400px"></dc-import>
+        <div data-sec="s1">
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Section summary" tone="info" hint-size="100%,120px">Keyword-only parameters make dangerous arguments explicit at the call site.</x-import>
+        </div>
+      </section>
+
+      <section id="s2" data-screen-label="2.2 add_to_phase — pct must be named" style="margin-bottom:72px">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.SectionTitle" index="—2.2" title="add_to_phase — pct must be named" hint-size="100%,90px"></x-import>
+        <p>Formulator bench helper: build a phase row. <code>pct</code> is keyword-only; <code>function</code> defaults to <code>'emollient'</code>.</p>
+        <dc-import name="Code" spec="{{ code.kwonly }}" hint-size="100%,400px"></dc-import>
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Call rule" tone="accent" hint-size="100%,120px"><span>add_to_phase('A', 'Glycerin', pct=3) works. Passing 3 positionally after ingredient raises TypeError.</span></x-import>
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Try this" tone="quiet" hint-size="100%,140px"><span>Call add_to_phase for Phenoxyethanol in phase C at 0.8% with function='preservative'.</span></x-import>
+        <div data-sec="s2">
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Section summary" tone="info" hint-size="100%,120px">add_to_phase(phase, ingredient, *, pct, function='emollient') — callers must write pct=.</x-import>
+        </div>
+      </section>
+
+      <section id="s3" data-screen-label="2.3 *args for tags" style="margin-bottom:72px">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.SectionTitle" index="—2.3" title="*args for tags" hint-size="100%,90px"></x-import>
+        <p><code>*args</code> (any name after *) collects extra positional arguments into a tuple. Useful when the number of tags varies per event.</p>
+        <dc-import name="Code" spec="{{ code.args }}" hint-size="100%,240px"></dc-import>
+        <div data-sec="s3">
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Section summary" tone="info" hint-size="100%,120px">*tags packs zero-or-more positionals into a tuple — no manual list building at the call site.</x-import>
+        </div>
+      </section>
+
+      <section id="s4" data-screen-label="2.4 **kwargs for Glass Box meta" style="margin-bottom:72px">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.SectionTitle" index="—2.4" title="**kwargs for Glass Box meta" hint-size="100%,90px"></x-import>
+        <p><code>**kwargs</code> collects leftover keyword arguments into a dict. Open-ended metadata without changing the signature every sprint.</p>
+        <dc-import name="Code" spec="{{ code.kwargs }}" hint-size="100%,240px"></dc-import>
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.PullQuote" hint-size="100%,80px">Glass Box traces: kind is fixed; tags and meta flex with the event.</x-import>
+        <div data-sec="s4">
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Section summary" tone="info" hint-size="100%,120px">**meta is the open bag for product=, phase=, latency_ms=, and future fields.</x-import>
+        </div>
+      </section>
+
+      <section id="s5" data-screen-label="2.5 · Project Project: log_assistant_event" style="margin-bottom:72px">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.SectionTitle" index="—2.5 · Project" title="Project: log_assistant_event" hint-size="100%,90px"></x-import>
+        <p>Combine: required <code>kind</code>, variable <code>*tags</code>, open <code>**meta</code>. Return a single event dict the Glass Box panel can append.</p>
+        <dc-import name="Flow" spec="{{ flows.glass }}" hint-size="100%,400px"></dc-import>
+        <dc-import name="Code" spec="{{ code.project }}" hint-size="100%,420px"></dc-import>
+        <dc-import name="Trace" spec="{{ trace }}" hint-size="100%,480px"></dc-import>
+        <div data-sec="s5">
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Callout" title="Section summary" tone="info" hint-size="100%,120px">log_assistant_event(kind, *tags, **meta) → {kind, tags, meta}. Capstone logs accept_draft before building the card.</x-import>
+        </div>
+      </section>
+
+
+
+      <section id="cheat" data-screen-label="Cheat sheet" style="margin-bottom:48px">
+        <x-import component-from-global-scope="MissionDocsDesignSystem_738442.SectionTitle" index="—" title="Cheat sheet" hint-size="100%,90px"></x-import>
+        <div style="border:1px solid var(--rule-hairline);margin-top:8px"><div style="display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;background:var(--paper-000);border-bottom:1px solid var(--rule-hairline)"><strong style="font-size:13px">*</strong><span style="font-size:13px;color:var(--text-body)">Barrier: following params are keyword-only.</span></div><div style="display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;background:var(--paper-000);border-bottom:1px solid var(--rule-hairline)"><strong style="font-size:13px">*args</strong><span style="font-size:13px;color:var(--text-body)">Tuple of extra positional arguments.</span></div><div style="display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;background:var(--paper-000);border-bottom:1px solid var(--rule-hairline)"><strong style="font-size:13px">**kwargs</strong><span style="font-size:13px;color:var(--text-body)">Dict of extra keyword arguments.</span></div><div style="display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;background:var(--paper-000);border-bottom:1px solid var(--rule-hairline)"><strong style="font-size:13px">add_to_phase</strong><span style="font-size:13px;color:var(--text-body)">phase, ingredient, *, pct, function=…</span></div><div style="display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;background:var(--paper-000);border-bottom:1px solid var(--rule-hairline)"><strong style="font-size:13px">log_assistant_event</strong><span style="font-size:13px;color:var(--text-body)">kind, *tags, **meta → Glass Box dict.</span></div><div style="display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;background:var(--paper-000);border-bottom:1px solid var(--rule-hairline)"><strong style="font-size:13px">Default args</strong><span style="font-size:13px;color:var(--text-body)">function='emollient' evaluated at def time for immutables.</span></div></div>
+        <div data-sec="cheat"></div>
+      </section>
+
+
+      <div style="margin-top:48px;padding-top:24px;border-top:2px solid var(--rule-strong);display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap">
+        <div style="display:grid;gap:4px">
+          <span style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-muted)">{{ doneLabel }}</span>
+          <span style="font-size:13px;color:var(--text-body)">Next: 03 lambda — sort shelf / rank candidates</span>
+        </div>
+        <div style="display:flex;gap:8px">
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Button" variant="secondary" onClick="{{ goHub }}" hint-size="110px,36px">Course map</x-import>
+          <x-import component-from-global-scope="MissionDocsDesignSystem_738442.Button" variant="primary" onClick="{{ complete }}" hint-size="180px,36px">{{ completeLabel }}</x-import>
+        </div>
+      </div>
+    </article>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const SECTIONS = [
+  {
+    "id": "s1",
+    "num": "2.1",
+    "title": "Keyword-only with *"
+  },
+  {
+    "id": "s2",
+    "num": "2.2",
+    "title": "add_to_phase — pct must be named"
+  },
+  {
+    "id": "s3",
+    "num": "2.3",
+    "title": "*args for tags"
+  },
+  {
+    "id": "s4",
+    "num": "2.4",
+    "title": "**kwargs for Glass Box meta"
+  },
+  {
+    "id": "s5",
+    "num": "2.5",
+    "title": "Project: log_assistant_event"
+  },
+  {
+    "id": "cheat",
+    "num": "—",
+    "title": "Cheat sheet"
+  }
+];
+const FLOWS = {
+  "kwonly": {
+    "fig": "FIG.01",
+    "title": "Positional vs keyword-only",
+    "intro": "A bare * in the parameter list forces every following parameter to be passed by name — callers cannot rely on position.",
+    "nodes": [
+      {
+        "id": "pos",
+        "label": "phase, ingredient",
+        "items": [
+          "positional OK"
+        ]
+      },
+      {
+        "id": "star",
+        "label": "*",
+        "items": [
+          "barrier"
+        ]
+      },
+      {
+        "id": "kw",
+        "label": "pct, function",
+        "items": [
+          "must name"
+        ]
+      },
+      {
+        "id": "row",
+        "label": "phase row dict"
+      }
+    ],
+    "path": [
+      {
+        "id": "pos",
+        "note": "Phase letter and INCI stay easy to pass in order."
+      },
+      {
+        "id": "star",
+        "note": "Everything after * is keyword-only (§4.9)."
+      },
+      {
+        "id": "kw",
+        "note": "pct=12 — not a silent third positional that could be confused with function."
+      },
+      {
+        "id": "row",
+        "note": "Returned dict joins the phase list on the formulator bench."
+      }
+    ]
+  },
+  "glass": {
+    "fig": "FIG.02",
+    "title": "Glass Box event shape",
+    "intro": "Assistant observability: kind + tags + meta. *args collects tags; **kwargs collects arbitrary metadata.",
+    "nodes": [
+      {
+        "id": "kind",
+        "label": "kind: str"
+      },
+      {
+        "id": "tags",
+        "label": "*tags → tuple"
+      },
+      {
+        "id": "meta",
+        "label": "**meta → dict"
+      },
+      {
+        "id": "evt",
+        "label": "event dict"
+      }
+    ],
+    "path": [
+      {
+        "id": "kind",
+        "note": "e.g. 'accept_draft', 'stream_token', 'banned_hit'."
+      },
+      {
+        "id": "tags",
+        "note": "Zero or more string tags without inventing a list param."
+      },
+      {
+        "id": "meta",
+        "note": "product=, phase=, latency_ms= — open schema."
+      },
+      {
+        "id": "evt",
+        "note": "{'kind', 'tags', 'meta'} — what the Glass Box panel stores."
+      }
+    ]
+  }
+};
+const CODE = {
+  "kwonly": {
+    "file": "add_to_phase.py",
+    "output": [
+      "{'phase': 'A', 'inci': 'Coco-Glucoside', 'pct': 12.0, 'function': 'surfactant'}",
+      "{'phase': 'B', 'inci': 'Xanthan Gum', 'pct': 0.4, 'function': 'rheology'}"
+    ],
+    "lines": [
+      {
+        "t": "def add_to_phase(phase, ingredient, *, pct, function='emollient'):",
+        "c": "* forces pct= and function= by name."
+      },
+      {
+        "t": "    \"\"\"Append-ready row for a Formulaite phase list.\"\"\""
+      },
+      {
+        "t": "    return {"
+      },
+      {
+        "t": "        'phase': phase,"
+      },
+      {
+        "t": "        'inci': ingredient,"
+      },
+      {
+        "t": "        'pct': float(pct),"
+      },
+      {
+        "t": "        'function': function,"
+      },
+      {
+        "t": "    }"
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "print(add_to_phase('A', 'Coco-Glucoside', pct=12, function='surfactant'))"
+      },
+      {
+        "t": "print(add_to_phase('B', 'Xanthan Gum', pct=0.4, function='rheology'))"
+      },
+      {
+        "t": "# add_to_phase('A', 'Glycerin', 3)  # TypeError: missing pct"
+      }
+    ]
+  },
+  "args": {
+    "file": "star_args_tags.py",
+    "output": [
+      "('accept', 'bodywash', 'uk')"
+    ],
+    "lines": [
+      {
+        "t": "def collect_tags(*tags):",
+        "c": "*tags packs extra positionals into a tuple."
+      },
+      {
+        "t": "    return tags"
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "print(collect_tags('accept', 'bodywash', 'uk'))"
+      }
+    ]
+  },
+  "kwargs": {
+    "file": "star_star_kwargs.py",
+    "output": [
+      "{'product': 'bodywash', 'phase': 'A', 'latency_ms': 42}"
+    ],
+    "lines": [
+      {
+        "t": "def collect_meta(**meta):",
+        "c": "**meta packs keyword leftovers into a dict."
+      },
+      {
+        "t": "    return meta"
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "print(collect_meta(product='bodywash', phase='A', latency_ms=42))"
+      }
+    ]
+  },
+  "project": {
+    "file": "log_assistant_event.py",
+    "output": [
+      "{'kind': 'accept_draft', 'tags': ('bodywash', 'uk'), 'meta': {'product': 'Gentle Wash', 'phases': 3}}",
+      "{'kind': 'banned_hit', 'tags': ('preservative',), 'meta': {'inci': 'Methylisothiazolinone'}}"
+    ],
+    "lines": [
+      {
+        "t": "def log_assistant_event(kind, *tags, **meta):",
+        "c": "Glass Box-style event builder."
+      },
+      {
+        "t": "    \"\"\"Return {kind, tags, meta} for the assistant event stream.\"\"\""
+      },
+      {
+        "t": "    return {"
+      },
+      {
+        "t": "        'kind': kind,"
+      },
+      {
+        "t": "        'tags': tags,"
+      },
+      {
+        "t": "        'meta': meta,"
+      },
+      {
+        "t": "    }"
+      },
+      {
+        "t": ""
+      },
+      {
+        "t": "print(log_assistant_event("
+      },
+      {
+        "t": "    'accept_draft', 'bodywash', 'uk',"
+      },
+      {
+        "t": "    product='Gentle Wash', phases=3,"
+      },
+      {
+        "t": "))"
+      },
+      {
+        "t": "print(log_assistant_event("
+      },
+      {
+        "t": "    'banned_hit', 'preservative',"
+      },
+      {
+        "t": "    inci='Methylisothiazolinone',"
+      },
+      {
+        "t": "))"
+      }
+    ]
+  }
+};
+const TRACE = {
+  "fig": "TRACE.01",
+  "title": "log_assistant_event — pack tags + meta",
+  "lines": [
+    "def log_assistant_event(kind, *tags, **meta):",
+    "    \"\"\"Return {kind, tags, meta} for the assistant event stream.\"\"\"",
+    "    return {",
+    "        'kind': kind,",
+    "        'tags': tags,",
+    "        'meta': meta,",
+    "    }",
+    "",
+    "print(log_assistant_event(",
+    "    'accept_draft', 'bodywash', 'uk',",
+    "    product='Gentle Wash', phases=3,",
+    "))",
+    "print(log_assistant_event(",
+    "    'banned_hit', 'preservative',",
+    "    inci='Methylisothiazolinone',",
+    "))"
+  ],
+  "steps": [
+    {
+      "line": 1,
+      "vars": {},
+      "note": "Signature: kind, then *tags, then **meta."
+    },
+    {
+      "line": 8,
+      "vars": {
+        "kind": "'accept_draft'",
+        "tags": "('bodywash','uk')"
+      },
+      "note": "Extra positionals landed in tags."
+    },
+    {
+      "line": 10,
+      "vars": {
+        "meta": "{product, phases}"
+      },
+      "note": "Named leftovers landed in meta."
+    },
+    {
+      "line": 11,
+      "vars": {},
+      "io": [
+        {
+          "k": "out",
+          "text": "{'kind': 'accept_draft', ...}"
+        }
+      ],
+      "note": "One Glass Box event dict."
+    }
+  ]
+};
+const KEY = 'pyconstructs.progress';
+
+class Component extends DCLogic {
+  state = { seen: {}, done: false };
+  componentDidMount() {
+    try { const all = JSON.parse(localStorage.getItem(KEY) || '{}'); const c = all.ch2 || {}; this.setState({ seen: c.seen || {}, done: !!c.done }); } catch (e) {}
+    if ('IntersectionObserver' in window) {
+      this.io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) this.mark(e.target.getAttribute('data-sec')); }), { threshold: 0.3 });
+      this.obs = setTimeout(() => document.querySelectorAll('[data-sec]').forEach(el => this.io.observe(el)), 1200);
+    }
+  }
+  componentWillUnmount() { clearTimeout(this.obs); if (this.io) this.io.disconnect(); }
+  save() {
+    try { const all = JSON.parse(localStorage.getItem(KEY) || '{}'); all.ch2 = { seen: this.state.seen, done: this.state.done, total: 5 }; localStorage.setItem(KEY, JSON.stringify(all)); } catch (e) {}
+  }
+  mark(id) { if (!id || this.state.seen[id]) return; this.setState(s => ({ seen: { ...s.seen, [id]: true } }), () => this.save()); }
+  complete = () => this.setState(s => ({ done: !s.done }), () => this.save());
+  goHub = () => { window.location.href = 'Course.dc.html'; };
+  renderVals() {
+    const { seen, done } = this.state;
+    const nSeen = SECTIONS.filter(s => s.id.startsWith('s') && seen[s.id]).length;
+    return {
+      flows: FLOWS, code: CODE, trace: TRACE,
+      mt24: { marginTop: '24px' },
+      rail: SECTIONS.map(s => ({ ...s, href: '#' + s.id, tickColor: (s.id === 'cheat' ? done : seen[s.id]) ? 'var(--terra-600)' : 'var(--ink-100)' })),
+      progressLabel: (nSeen + '').padStart(2, '0') + '_05',
+      doneLabel: done ? '—Chapter complete' : '—End of chapter 02',
+      completeLabel: done ? 'Completed (undo)' : 'Mark chapter complete',
+      complete: this.complete, goHub: this.goHub
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,316 @@
+#!/usr/bin/env python3
+"""Chapter 7 — Capstone: accept draft → recipe card → export phase CSV."""
+from common import *
+
+SECTIONS = [
+  {"id": "s1", "num": "7.1", "title": "Product brief"},
+  {"id": "s2", "num": "7.2", "title": "Wire the domain objects"},
+  {"id": "s3", "num": "7.3", "title": "Accept → log → card"},
+  {"id": "s4", "num": "7.4", "title": "Export phase CSV"},
+  {"id": "s5", "num": "7.5", "title": "Project: stitch the script"},
+  {"id": "cheat", "num": "—", "title": "Cheat sheet"},
+]
+
+FLOWS = {
+  "pipeline": {
+    "fig": "FIG.01",
+    "title": "Accept draft pipeline",
+    "intro": "One Formulaite path: assistant accept → Glass Box event → recipe card lines → optional phase CSV export.",
+    "nodes": [
+      {"id": "draft", "label": "FormulaDraft"},
+      {"id": "log", "label": "log_assistant_event"},
+      {"id": "card", "label": "as_recipe_lines / build_recipe_card"},
+      {"id": "csv", "label": "iter_phase_csv_rows"},
+    ],
+    "path": [
+      {"id": "draft", "note": "Gentle Wash with phases A/B/C from Chapter 5."},
+      {"id": "log", "note": "Glass Box: kind='accept_draft', tags, meta."},
+      {"id": "card", "note": "Recipe card text for the UI / notebook."},
+      {"id": "csv", "note": "Export phase A (or each phase) as CSV rows."},
+    ],
+  },
+}
+
+CODE = {
+  "brief": {
+    "file": "capstone_brief.py",
+    "output": [
+      "goal=accept→card→export",
+      "product=Gentle Wash",
+    ],
+    "lines": [
+      {"t": "GOAL = 'accept→card→export'"},
+      {"t": "PRODUCT = 'Gentle Wash'"},
+      {"t": "print(f'goal={GOAL}')"},
+      {"t": "print(f'product={PRODUCT}')"},
+    ],
+  },
+  "domain": {
+    "file": "capstone_domain.py",
+    "output": [
+      "phases=3 total=16.2",
+    ],
+    "lines": [
+      {"t": "class Ingredient:"},
+      {"t": "    def __init__(self, inci, pct, function='emollient'):"},
+      {"t": "        self.inci, self.pct, self.function = inci, float(pct), function"},
+      {"t": ""},
+      {"t": "class FormulaPhase:"},
+      {"t": "    def __init__(self, name, items=None):"},
+      {"t": "        self.name, self.items = name, list(items or [])"},
+      {"t": "    def total_pct(self):"},
+      {"t": "        return sum(i.pct for i in self.items)"},
+      {"t": ""},
+      {"t": "class FormulaDraft:"},
+      {"t": "    def __init__(self, product, phases=None):"},
+      {"t": "        self.product, self.phases = product, list(phases or [])"},
+      {"t": "    def total_pct(self):"},
+      {"t": "        return sum(p.total_pct() for p in self.phases)"},
+      {"t": "    def as_recipe_lines(self):"},
+      {"t": "        return [f\"{i.inci} {i.pct:.1f}%\" for p in self.phases for i in p.items]"},
+      {"t": ""},
+      {"t": "def build_draft():"},
+      {"t": "    return FormulaDraft('Gentle Wash', ["},
+      {"t": "        FormulaPhase('A', [Ingredient('Coco-Glucoside', 12, 'surfactant'), Ingredient('Glycerin', 3, 'humectant')]),"},
+      {"t": "        FormulaPhase('B', [Ingredient('Xanthan Gum', 0.4, 'rheology')]),"},
+      {"t": "        FormulaPhase('C', [Ingredient('Phenoxyethanol', 0.8, 'preservative')]),"},
+      {"t": "    ])"},
+      {"t": ""},
+      {"t": "d = build_draft()"},
+      {"t": "print(f'phases={len(d.phases)} total={d.total_pct()}')"},
+    ],
+  },
+  "accept": {
+    "file": "accept_to_card.py",
+    "output": [
+      "event={'kind': 'accept_draft', 'tags': ('bodywash', 'uk'), 'meta': {'product': 'Gentle Wash', 'total_pct': 16.2}}",
+      "Coco-Glucoside 12.0%",
+      "Glycerin 3.0%",
+      "Xanthan Gum 0.4%",
+      "Phenoxyethanol 0.8%",
+    ],
+    "lines": [
+      {"t": "# assumes Ingredient, FormulaPhase, FormulaDraft, build_draft from domain"},
+      {"t": "def log_assistant_event(kind, *tags, **meta):"},
+      {"t": "    return {'kind': kind, 'tags': tags, 'meta': meta}"},
+      {"t": ""},
+      {"t": "def format_inci_line(name, pct):"},
+      {"t": "    return f\"{name} {float(pct):.1f}%\""},
+      {"t": ""},
+      {"t": "def build_recipe_card_lines(ingredients):"},
+      {"t": "    return [format_inci_line(r['inci'], r['pct']) for r in ingredients]"},
+      {"t": ""},
+      {"t": "def accept_draft(draft):"},
+      {"t": "    event = log_assistant_event("},
+      {"t": "        'accept_draft', 'bodywash', 'uk',"},
+      {"t": "        product=draft.product, total_pct=draft.total_pct(),"},
+      {"t": "    )"},
+      {"t": "    # flatten for the Ch1 helper (or use draft.as_recipe_lines())"},
+      {"t": "    flat = [{'inci': i.inci, 'pct': i.pct} for p in draft.phases for i in p.items]"},
+      {"t": "    card = build_recipe_card_lines(flat)"},
+      {"t": "    return event, card"},
+      {"t": ""},
+      {"t": "event, card = accept_draft(build_draft())"},
+      {"t": "print('event=' + str(event))"},
+      {"t": "for line in card:"},
+      {"t": "    print(line)"},
+    ],
+  },
+  "export": {
+    "file": "export_after_accept.py",
+    "output": [
+      "phase,inci,pct,function",
+      "A,Coco-Glucoside,12.0,surfactant",
+      "A,Glycerin,3.0,humectant",
+    ],
+    "lines": [
+      {"t": "import csv, io"},
+      {"t": ""},
+      {"t": "def iter_phase_csv_rows(phase):"},
+      {"t": "    for item in phase.items:"},
+      {"t": "        yield {"},
+      {"t": "            'phase': phase.name,"},
+      {"t": "            'inci': item.inci,"},
+      {"t": "            'pct': float(item.pct),"},
+      {"t": "            'function': item.function,"},
+      {"t": "        }"},
+      {"t": ""},
+      {"t": "def export_phase_csv(phase) -> str:"},
+      {"t": "    buf = io.StringIO()"},
+      {"t": "    w = csv.DictWriter(buf, fieldnames=['phase', 'inci', 'pct', 'function'])"},
+      {"t": "    w.writeheader()"},
+      {"t": "    for row in iter_phase_csv_rows(phase):"},
+      {"t": "        w.writerow(row)"},
+      {"t": "    return buf.getvalue()"},
+      {"t": ""},
+      {"t": "draft = build_draft()  # from domain module"},
+      {"t": "print(export_phase_csv(draft.phases[0]), end='')"},
+    ],
+  },
+  "project": {
+    "file": "formulaite_accept_pipeline.py",
+    "output": [
+      "GLASSBOX {'kind': 'accept_draft', 'tags': ('bodywash', 'uk'), 'meta': {'product': 'Gentle Wash', 'total_pct': 16.2}}",
+      "CARD",
+      "Coco-Glucoside 12.0%",
+      "Glycerin 3.0%",
+      "Xanthan Gum 0.4%",
+      "Phenoxyethanol 0.8%",
+      "CSV_PHASE_A",
+      "phase,inci,pct,function",
+      "A,Coco-Glucoside,12.0,surfactant",
+      "A,Glycerin,3.0,humectant",
+    ],
+    "lines": [
+      {"t": "\"\"\"Capstone: accept draft → recipe card → export phase CSV.\"\"\""},
+      {"t": "import csv, io"},
+      {"t": ""},
+      {"t": "class Ingredient:"},
+      {"t": "    def __init__(self, inci, pct, function='emollient'):"},
+      {"t": "        self.inci, self.pct, self.function = inci, float(pct), function"},
+      {"t": ""},
+      {"t": "class FormulaPhase:"},
+      {"t": "    def __init__(self, name, items=None):"},
+      {"t": "        self.name, self.items = name, list(items or [])"},
+      {"t": "    def total_pct(self):"},
+      {"t": "        return sum(i.pct for i in self.items)"},
+      {"t": ""},
+      {"t": "class FormulaDraft:"},
+      {"t": "    def __init__(self, product, phases=None):"},
+      {"t": "        self.product, self.phases = product, list(phases or [])"},
+      {"t": "    def total_pct(self):"},
+      {"t": "        return sum(p.total_pct() for p in self.phases)"},
+      {"t": "    def as_recipe_lines(self):"},
+      {"t": "        return [f\"{i.inci} {i.pct:.1f}%\" for p in self.phases for i in p.items]"},
+      {"t": ""},
+      {"t": "def log_assistant_event(kind, *tags, **meta):"},
+      {"t": "    return {'kind': kind, 'tags': tags, 'meta': meta}"},
+      {"t": ""},
+      {"t": "def iter_phase_csv_rows(phase):"},
+      {"t": "    for item in phase.items:"},
+      {"t": "        yield {'phase': phase.name, 'inci': item.inci,"},
+      {"t": "               'pct': float(item.pct), 'function': item.function}"},
+      {"t": ""},
+      {"t": "def export_phase_csv(phase) -> str:"},
+      {"t": "    buf = io.StringIO()"},
+      {"t": "    w = csv.DictWriter(buf, fieldnames=['phase', 'inci', 'pct', 'function'])"},
+      {"t": "    w.writeheader()"},
+      {"t": "    for row in iter_phase_csv_rows(phase):"},
+      {"t": "        w.writerow(row)"},
+      {"t": "    return buf.getvalue()"},
+      {"t": ""},
+      {"t": "def run_accept_pipeline():"},
+      {"t": "    draft = FormulaDraft('Gentle Wash', ["},
+      {"t": "        FormulaPhase('A', [Ingredient('Coco-Glucoside', 12, 'surfactant'),"},
+      {"t": "                           Ingredient('Glycerin', 3, 'humectant')]),"},
+      {"t": "        FormulaPhase('B', [Ingredient('Xanthan Gum', 0.4, 'rheology')]),"},
+      {"t": "        FormulaPhase('C', [Ingredient('Phenoxyethanol', 0.8, 'preservative')]),"},
+      {"t": "    ])"},
+      {"t": "    event = log_assistant_event("},
+      {"t": "        'accept_draft', 'bodywash', 'uk',"},
+      {"t": "        product=draft.product, total_pct=draft.total_pct())"},
+      {"t": "    card = draft.as_recipe_lines()"},
+      {"t": "    csv_a = export_phase_csv(draft.phases[0])"},
+      {"t": "    return event, card, csv_a"},
+      {"t": ""},
+      {"t": "event, card, csv_a = run_accept_pipeline()"},
+      {"t": "print('GLASSBOX', event)"},
+      {"t": "print('CARD')"},
+      {"t": "for line in card:"},
+      {"t": "    print(line)"},
+      {"t": "print('CSV_PHASE_A')"},
+      {"t": "print(csv_a, end='')"},
+    ],
+  },
+}
+
+TRACE = {
+  "fig": "TRACE.01",
+  "title": "run_accept_pipeline — end to end",
+  "lines": [ln["t"] for ln in CODE["project"]["lines"] if ln["t"] or True][:40],
+  "steps": [
+    {"line": 36, "vars": {}, "note": "Build Gentle Wash draft with three phases."},
+    {"line": 43, "vars": {"event": "accept_draft"}, "note": "Glass Box event logged."},
+    {"line": 46, "vars": {"card": "4 lines"}, "note": "Recipe card from as_recipe_lines."},
+    {"line": 47, "vars": {"csv_a": "header+2 rows"}, "note": "Phase A CSV via generator."},
+    {"line": 50, "vars": {}, "io": [{"k": "out", "text": "GLASSBOX {...}"}], "note": "Pipeline complete."},
+  ],
+}
+
+s1 = section(
+  "s1", "7.1", "Product brief",
+  "\n".join([
+    p("Ship one stdlib-only script that mirrors Formulaite after the user accepts an AI bodywash draft: log a Glass Box event, render the recipe card, export phase A as CSV."),
+    flow("pipeline", "400px"),
+    code("brief", "200px"),
+    callout("App", "Surfaces: formulator bench, AI assistant, recipe cards, formulations library — https://cosmetic-ai-assistant.web.app/", "quiet"),
+  ]),
+  summary="Capstone stitches Chapters 1–6 into one accept → card → export path.",
+)
+
+s2 = section(
+  "s2", "7.2", "Wire the domain objects",
+  "\n".join([
+    p("Reuse Ingredient / FormulaPhase / FormulaDraft. List comprehension inside <code>as_recipe_lines</code> is encouraged."),
+    code("domain", "480px"),
+  ]),
+  summary="build_draft() returns the Gentle Wash sample (16.2% actives sketch).",
+)
+
+s3 = section(
+  "s3", "7.3", "Accept → log → card",
+  "\n".join([
+    p("On accept: <code>log_assistant_event</code> then recipe-card lines. Prefer <code>draft.as_recipe_lines()</code>; the dict helper from Chapter 1 remains valid."),
+    code("accept", "480px"),
+  ]),
+  summary="accept_draft returns (event, card_lines).",
+  exercise="Add a banned-filter comprehension before building card lines.",
+)
+
+s4 = section(
+  "s4", "7.4", "Export phase CSV",
+  "\n".join([
+    p("Consume <code>iter_phase_csv_rows</code> with <code>for</code> and <code>csv.DictWriter</code>."),
+    code("export", "400px"),
+  ]),
+  summary="Phase A export: coco-glucoside + glycerin rows.",
+)
+
+s5 = section(
+  "s5", "7.5 · Project", "Project: stitch the script",
+  "\n".join([
+    p("Single module <code>formulaite_accept_pipeline.py</code> (or package per LLM-BUILD.md). Run prints Glass Box event, CARD block, and CSV_PHASE_A."),
+    code("project", "560px"),
+    trace("480px"),
+    callout("Acceptance", "See LLM-BUILD.md tests A1–A8. Stdlib only. No network.", "accent"),
+  ]),
+  summary="run_accept_pipeline() is the Phase 1.2 deliverable for an implementing LLM.",
+)
+
+cheat = cheat_sheet([
+  ("Pipeline", "draft → log_assistant_event → card → export_phase_csv"),
+  ("Classes", "Ingredient, FormulaPhase, FormulaDraft"),
+  ("Card", "as_recipe_lines() or build_recipe_card_lines"),
+  ("Glass Box", "log_assistant_event('accept_draft', *tags, **meta)"),
+  ("Export", "iter_phase_csv_rows + DictWriter"),
+  ("Contract", "LLM-BUILD.md acceptance suite"),
+])
+
+html = chapter_shell(
+  ch_num=7,
+  title="Capstone — accept → card → export",
+  part_label="Part IV — Capstone",
+  lede="Stitch every mini-program into one Formulaite path: accept draft → Glass Box log → recipe card → export phase CSV.",
+  intro_paras=[
+    "This is the implementation target for LLM-BUILD.md. Dense, stdlib-only, product-shaped.",
+  ],
+  stats={"sections": "05", "diagrams": "01", "programs": "05"},
+  sections_html=s1 + s2 + s3 + s4 + s5,
+  cheat_html=cheat,
+  next_label="Course map — mark complete",
+  sections=SECTIONS,
+  flows=FLOWS,
+  code=CODE,
+  trace=TRACE,
+)
+write("Chapter 7.dc.html", html)

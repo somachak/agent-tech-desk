@@ -1,0 +1,52 @@
+:root{
+/* Paper — the printed sheet */
+--paper-000:#FBFAF7;--paper-100:#F2F0EA;--paper-200:#E8E5DC;--paper-300:#DCD8CC;--paper-400:#C9C4B5;
+
+/* Ink — black through grays (body copy) */
+--ink-000:#0B0B0C;--ink-800:#232426;--ink-700:#3A3B3D;--ink-500:#6A6C70;--ink-300:#9A9CA1;--ink-100:#C7C9CD;
+
+/* Navy — primary brand, headings and rules */
+--navy-900:#1B3355;--navy-800:#20406A;--navy-700:#274B77;--navy-500:#3C6394;--navy-300:#8CA3C0;--navy-200:#B9C7D8;--navy-050:#E7EDF4;
+
+/* Slate — the cool backdrop the book sits on */
+--slate-700:#4E5D72;--slate-500:#6B7C93;--slate-300:#98A6B8;--slate-100:#D3DAE3;
+
+/* Terracotta — accent: patterns, ticks, figure numbers */
+--terra-800:#7E3418;--terra-700:#9E401F;--terra-600:#C8562B;--terra-500:#D9703F;--terra-400:#E4A183;--terra-100:#F6E3D8;
+
+/* Semantic — text */
+--text-primary:var(--ink-000);
+--text-body:var(--ink-700);
+--text-muted:var(--ink-500);
+--text-faint:var(--ink-300);
+--text-heading:var(--navy-700);
+--text-heading-strong:var(--navy-900);
+--text-accent:var(--terra-600);
+--text-inverse:var(--paper-000);
+--text-link:var(--navy-700);
+--text-link-hover:var(--terra-600);
+
+/* Semantic — surfaces */
+--surface-page:var(--paper-100);
+--surface-card:var(--paper-000);
+--surface-sunken:var(--paper-200);
+--surface-desk:var(--slate-500);
+--surface-inverse:var(--navy-900);
+--surface-brand-soft:var(--navy-050);
+--surface-accent-soft:var(--terra-100);
+
+/* Semantic — rules, borders, marks */
+--rule-hairline:#D8D3C6;
+--rule-mid:var(--paper-400);
+--rule-strong:var(--navy-700);
+--rule-accent:var(--terra-600);
+--rule-ink:var(--ink-000);
+--border-card:#DEDACE;
+--focus-ring:var(--navy-500);
+
+/* Semantic — status (sparingly, print-safe) */
+--status-info:var(--navy-700);
+--status-warn:var(--terra-600);
+--status-good:#3F6B52;
+--status-bad:var(--terra-800);
+}

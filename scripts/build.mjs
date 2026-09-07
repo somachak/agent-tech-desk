@@ -22,6 +22,7 @@ const NAV = [
   ["/bookshelf", "Bookshelf"],
   ["/ide", "Python IDE"],
   ["/tutor", "Tutor"],
+  ["/python-constructs", "Python constructs"],
   ["/agent-walkthrough", "Agent walkthrough"],
 ];
 
@@ -145,6 +146,7 @@ function homePage(phases) {
   <a class="tile" href="/bookshelf"><b>Bookshelf — ${total} book guides</b><span>Build ladder → chapter map → concept cards by level → printable cheat sheet, per book.</span></a>
   <a class="tile" href="/ide"><b>Python IDE</b><span>Write and run Python in the browser. Nothing to install; your snippets stay on this device.</span></a>
   <a class="tile" href="/tutor"><b>Tutor</b><span>Ask about anything on the shelf. Answers in plain British English, numbered, with the code.</span></a>
+  <a class="tile" href="/python-constructs"><b>Python constructs — 7 chapters</b><span>The Python Tutorial §4.8–§9.10, every example a Formulaite mini-programme, ending in a capstone.</span></a>
   <a class="tile" href="/agent-walkthrough"><b>How a request becomes a filled drawer</b><span>Replay four real runs of the agent step by step; cheat sheets for every Python construct in the code.</span></a>
   <a class="tile" href="/downloads/Formulaite-Agent-Lab-source.zip"><b>Download the Agent Lab source (zip)</b><span>agent_lab/ package, tests, gate scripts, docs. Run: python3 -m agent_lab Glycerin</span></a>
   <a class="tile" href="/downloads/book-guides-and-cheatsheets.zip"><b>Download all guides + cheat sheets (zip)</b><span>The same pages as static files, for offline use.</span></a>
@@ -392,6 +394,128 @@ body>main:first-of-type{padding-top:18px}
   );
 }
 
+/* ------------------------------------------- python constructs course */
+
+const CHAPTER_FILE = /^Chapter (\d+)\.dc\.html$/;
+
+/** Plain text from a fragment of the Mission Docs HTML. */
+function plain(fragment) {
+  return fragment
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/** Read the seven chapters straight out of the course's own files. */
+async function parsePythonConstructs() {
+  const dir = path.join(CONTENT, "python-constructs");
+  const files = (await readdir(dir)).filter((f) => CHAPTER_FILE.test(f));
+  const chapters = [];
+  for (const f of files) {
+    const html = await readFile(path.join(dir, f), "utf8");
+    const n = Number(f.match(CHAPTER_FILE)[1]);
+    const eyebrow = plain((html.match(/>(Part\s+[IVX]+[^<]*)</) || [, ""])[1]);
+    const title = plain((html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/) || [, f])[1]);
+    const lede = plain((html.match(/<x-import[^>]*Lede[^>]*>([\s\S]*?)<\/x-import>/) || [, ""])[1]);
+    const part = (eyebrow.split("·")[0] || "").replace(/^Part\s*/, "").trim();
+    chapters.push({ n, file: f, eyebrow, title, lede, part });
+  }
+  chapters.sort((a, b) => a.n - b.n);
+  if (chapters.length < 7) throw new Error(`only ${chapters.length} Python Constructs chapters found`);
+  return chapters;
+}
+
+function pythonConstructsPage(chapters) {
+  const parts = [];
+  for (const c of chapters) {
+    const key = c.part || "Chapters";
+    const last = parts[parts.length - 1];
+    if (last && last.name === key) last.chapters.push(c);
+    else parts.push({ name: key, chapters: [c] });
+  }
+  const sections = parts
+    .map((p) => {
+      const rows = p.chapters
+        .map(
+          (c) => `<a class="ch" href="/python-constructs/chapter-${c.n}">
+<div class="n">${String(c.n).padStart(2, "0")}</div>
+<div><b>${esc(c.title)}</b><span class="lede">${esc(c.lede)}</span></div>
+<div class="go">Open →</div></a>`
+        )
+        .join("");
+      return `<section class="part"><span class="eyebrow">Part ${esc(p.name)}</span><div class="chs">${rows}</div></section>`;
+    })
+    .join("");
+  return page({
+    title: "Python Constructs",
+    current: "/python-constructs",
+    body: `
+<span class="eyebrow">Python constructs · Mission Docs</span>
+<h1>The seven chapters, taught through Formulaite</h1>
+<p>The official Python Tutorial, §4.8 to §9.10, rewritten so every example is a Formulaite mini-program — recipe cards, phases, Glass Box events, the ingredients shelf, draft lines, CSV export. It ends in a capstone: accept → recipe card → phase CSV, in plain Python, standard library only.</p>
+
+<div class="callout"><strong>How to drive this section.</strong><ol>
+<li>Start with the <a href="/python-constructs/course">course map</a> — it shows all seven chapters and tracks what you have finished.</li>
+<li>Work down the chapters in order. Each one names the Tutorial section it covers.</li>
+<li>Paste anything you want to try into the <a href="/ide">Python IDE</a> and run it.</li>
+</ol></div>
+
+<div class="mapcard">
+  <a class="btn go" href="/python-constructs/course">Open the course map</a>
+  <span class="small">These pages carry their own Mission Docs design, so they look different from the rest of the desk. That is deliberate — they came from a separate build.</span>
+</div>
+
+${sections}
+
+<section>
+  <h2>What the capstone needs</h2>
+  <p>The chapters build towards one pipeline. These are the pieces it calls, in the order you meet them:</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Piece</th><th>Chapter</th></tr></thead>
+    <tbody>
+      <tr><td class="t">format_inci_line(name, pct) · build_recipe_card_lines(ingredients)</td><td>01</td></tr>
+      <tr><td class="t">add_to_phase(phase, ingredient, *, pct, function="emollient")</td><td>02</td></tr>
+      <tr><td class="t">log_assistant_event(kind, *tags, **meta)</td><td>02</td></tr>
+      <tr><td class="t">sorted(rows, key=lambda r: (-r["pct"], r["inci"]))</td><td>03</td></tr>
+      <tr><td class="t">phase comprehensions — names, keepers, draft lines</td><td>04</td></tr>
+      <tr><td class="t">Ingredient · FormulaPhase · FormulaDraft (total_pct, as_recipe_lines)</td><td>05</td></tr>
+      <tr><td class="t">stream_assistant_tokens(reply) · iter_phase_csv_rows(phase)</td><td>06</td></tr>
+      <tr><td class="t">the whole pipeline, stitched</td><td>07</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">Source: the course's own README. Progress is stored in your browser under <code>pyconstructs.progress</code>, so ticking a chapter off is remembered on this device only.</p>
+</section>
+`,
+    head: `<style>
+.callout{border-left:3px solid var(--accent);background:var(--surface-2);border-radius:0 12px 12px 0;padding:12px 16px;margin:16px 0}
+.callout ol{margin:6px 0 0 18px;padding:0}.callout li{margin:4px 0}
+.mapcard{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:18px 0 8px}
+.mapcard .small{max-width:60ch}
+.part{margin-top:32px}
+.chs{display:grid;gap:10px;margin-top:10px}
+.ch{display:grid;grid-template-columns:52px 1fr auto;gap:14px;align-items:center;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:14px 18px;text-decoration:none;color:var(--ink)}
+.ch:hover{border-color:var(--accent)}
+.ch .n{font-family:var(--font-head);font-size:26px;font-weight:600;color:var(--ink-3);line-height:1}
+.ch b{font-family:var(--font-head);font-size:17px;display:block;margin-bottom:2px}
+.ch .lede{font-size:15px;color:var(--ink-2);display:block}
+.ch .go{font-family:var(--font-head);font-size:13px;color:var(--ink-3);white-space:nowrap}
+.ch:hover .go{color:var(--ink)}
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin:8px 0 12px}
+th{font-family:var(--font-head);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:7px 8px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+td.t{font-family:var(--font-mono);font-size:12.5px;color:var(--ink)}
+.tablewrap{overflow-x:auto}
+@media(max-width:640px){.ch{grid-template-columns:40px 1fr}.ch .go{display:none}}
+</style>`,
+  });
+}
+
 /* ------------------------------------------------- cheat sheets as pages */
 
 const esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
@@ -562,6 +686,14 @@ async function build() {
     }
   }
 
+  // the Python Constructs course, served as it was built
+  const constructs = await parsePythonConstructs();
+  await cp(path.join(CONTENT, "python-constructs"), path.join(OUT, "python-constructs"), {
+    recursive: true,
+    filter: (src) => !src.includes("__pycache__"),
+  });
+  await writeFile(path.join(OUT, "python-constructs.html"), pythonConstructsPage(constructs));
+
   // the agent walkthrough
   const walk = await readFile(path.join(CONTENT, "visual-guide.html"), "utf8");
   await writeFile(path.join(OUT, "agent-walkthrough.html"), withSiteBar(walk));
@@ -575,7 +707,7 @@ async function build() {
   }
 
   const count = phases.reduce((a, p) => a + p.books.length, 0);
-  console.log(`built public/ — ${count} books, ${files.length - 1} guide files, 4 site pages`);
+  console.log(`built public/ — ${count} books, ${files.length - 1} guide files, ${constructs.length} construct chapters, 5 site pages`);
 }
 
 if (!existsSync(path.join(CONTENT, "book-guides", "index.html"))) {

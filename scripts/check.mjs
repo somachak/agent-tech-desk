@@ -203,13 +203,49 @@ async function checkIde() {
   console.log(`  ${EXAMPLES.length} examples ran in Pyodide ${version} (CPython ${py.runPython("import sys; sys.version.split()[0]")}) with the expected output`);
 }
 
-const modes = { build: checkBuild, order: checkOrder, serve: checkServe, secrets: checkSecrets, ide: checkIde };
+/** The Python Constructs course must be served whole, and its index must list every chapter. */
+async function checkConstructs() {
+  const dir = path.join(OUT, "python-constructs");
+  const files = existsSync(dir) ? await readdir(dir) : [];
+  const chapters = files.filter((f) => /^Chapter \d+\.dc\.html$/.test(f));
+  if (chapters.length !== 7) bad(`expected 7 chapter files, found ${chapters.length}`);
+  for (const f of ["Course.dc.html", "support.js", "dc-siblings.js", "Code.dc.html", "Flow.dc.html", "Trace.dc.html"]) {
+    if (!files.includes(f)) bad(`python-constructs is missing ${f}`);
+  }
+  const ds = path.join(dir, "_ds");
+  if (!existsSync(ds)) bad("python-constructs is missing its _ds design system");
+  else {
+    const inner = (await readdir(ds))[0];
+    for (const f of ["styles.css", "_ds_bundle.js"]) {
+      if (!existsSync(path.join(ds, inner, f))) bad(`_ds is missing ${f}`);
+    }
+  }
+  if (existsSync(path.join(dir, "_gen", "__pycache__"))) bad("__pycache__ was copied into the site");
+
+  const index = await readFile(path.join(OUT, "python-constructs.html"), "utf8");
+  for (let n = 1; n <= 7; n++) {
+    if (!index.includes(`/python-constructs/chapter-${n}`)) bad(`the index does not link chapter ${n}`);
+  }
+  if (!index.includes("/python-constructs/course")) bad("the index does not link the course map");
+  // every chapter's real title must appear on the index
+  for (const f of chapters.sort()) {
+    const html = await readFile(path.join(dir, f), "utf8");
+    const title = (html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/) || [, ""])[1]
+      .replace(/<[^>]*>/g, " ").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
+    const onIndex = title.replace(/&/g, "&amp;");
+    if (title && !index.includes(onIndex)) bad(`the index does not show the title of ${f}: ${title}`);
+  }
+  console.log(`  7 chapters + course map + design system served; index links and titles all match`);
+}
+
+const modes = { build: checkBuild, order: checkOrder, serve: checkServe, secrets: checkSecrets, ide: checkIde, constructs: checkConstructs };
 const tokens = {
   build: "build verification passed",
   order: "order verification passed",
   serve: "serve verification passed",
   secrets: "secrets verification passed",
   ide: "ide verification passed",
+  constructs: "constructs verification passed",
 };
 
 const mode = process.argv[2] || "all";

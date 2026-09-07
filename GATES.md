@@ -37,3 +37,8 @@ Scope: a Cloudflare Workers site serving the attached knowledge base in its own 
 
 - [x] G8: deployed to Cloudflare Workers and the live site serves every route
   EVIDENCE: 2026-09-07 `npm run deploy` uploaded 51 assets, version 59cfe2cf-cbd0-4c50-9347-3732a9c9ca84, live at https://agent-tech-desk.pixelartinc.workers.dev — /, /bookshelf, /ide, /tutor, /agent-walkthrough, a guide, a cheat sheet and the source zip all return 200; /api/tutor/health reports the mock engine (no key set yet); /private-do-not-upload/* and /books-md/* return 404.
+
+- [x] G9: the Python Constructs course is a section of the site — all seven chapters, the course map and its design system, reachable by tidy URLs
+  CHECK: node scripts/check.mjs constructs
+  EXPECT: constructs verification passed
+  EVIDENCE: 2026-09-07 checked locally, then deployed as version 254e5bca-9c9f-4554-bc33-8f02d68ac55d. Live: /python-constructs and all seven /python-constructs/chapter-N plus /python-constructs/course return 200; chapter 2 was opened in a browser and rendered fully (contents rail, stepped figures, lede). The chapter pages load React and Babel from unpkg.com — the only third-party runtime dependency on the site.
