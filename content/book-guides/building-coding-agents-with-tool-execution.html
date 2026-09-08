@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Building Coding Agents with Tool Execution</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>:root{color-scheme:light;
+ --surface:#faf9f5;--surface-2:#f2f0e9;--surface-3:#e8e6dc;--line:#d9d7cc;--line-soft:#e8e6dc;
+ --ink:#141413;--ink-2:#5c5b57;--ink-3:#6b6a65;--on-ink:#faf9f5;
+ --accent:#d97757;--accent-2:#6a9bcc;--accent-3:#788c5d;
+ --font-head:"Poppins",Arial,sans-serif;--font-body:"Lora",Georgia,serif;--font-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--surface);color:var(--ink-2);font-family:var(--font-body);font-size:17px;line-height:1.7}
+main{max-width:1080px;margin:0 auto;padding:30px 22px 90px}
+h1,h2,h3,h4{font-family:var(--font-head);color:var(--ink);line-height:1.2;margin:0 0 10px;text-wrap:balance}
+h1{font-size:38px;letter-spacing:-.02em;font-weight:600}
+h2{font-size:24px;font-weight:600}
+h3{font-size:18px;font-weight:600}
+p{margin:0 0 12px;max-width:70ch}
+strong{color:var(--ink)}
+a{color:var(--ink);text-decoration-color:var(--accent);text-underline-offset:3px}
+code,.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+code{font-size:.86em;background:var(--surface-3);padding:1px 5px;border-radius:5px;color:var(--ink)}
+.small{font-size:14px;color:var(--ink-3)}
+.eyebrow{font-family:var(--font-mono);color:var(--ink-3);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase}
+.who{font-family:var(--font-mono);font-size:13.5px;color:var(--ink-3);margin-bottom:16px}
+.btn{font-family:var(--font-head);font-weight:600;font-size:13.5px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:10px;padding:8px 14px;cursor:pointer;text-decoration:none;display:inline-block}
+.btn:hover{border-color:var(--accent)}
+button:focus-visible,a:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+
+/* ── tabs ── */
+.tabbar{position:sticky;top:44px;z-index:30;display:flex;gap:4px;overflow-x:auto;padding:10px 0 0;margin:22px 0 0;
+  background:linear-gradient(180deg,var(--surface) 70%,transparent);scrollbar-width:thin}
+.tabbar button{flex:0 0 auto;font-family:var(--font-head);font-size:13.5px;font-weight:600;color:var(--ink-3);
+  background:transparent;border:0;border-bottom:2px solid transparent;padding:9px 13px;cursor:pointer;white-space:nowrap}
+.tabbar button:hover{color:var(--ink)}
+.tabbar button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tabbar .num{font-family:var(--font-mono);font-size:11px;color:var(--ink-3);margin-left:5px;font-weight:400}
+.panel{padding-top:26px;border-top:1px solid var(--line);animation:fade .25s ease;scroll-margin-top:120px}
+figure{scroll-margin-top:120px}
+.panel[hidden]{display:none!important}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ── figures: white plates, pinned ink, both themes ── */
+figure{margin:0 0 20px;background:#FFFFFF;color:#1A1A18;border:1px solid rgba(25,25,23,.15);border-radius:14px;overflow:hidden}
+figure svg{display:block;width:100%;height:auto;background:#FFFFFF}
+.fig-cap{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:start;padding:14px 18px;
+  border-top:1px solid rgba(25,25,23,.15);background:#FFFFFF}
+@media(max-width:720px){.fig-cap{grid-template-columns:1fr}}
+.fig-nav{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-bottom:2px}
+.dot{width:26px;height:26px;border-radius:999px;border:1px solid rgba(25,25,23,.22);background:transparent;
+  font-family:var(--font-mono);font-size:11px;cursor:pointer;color:#686256;padding:0}
+.dot:hover{border-color:#C4633C;color:#A34A28}
+.dot[aria-current="true"]{background:#1A1A18;border-color:#1A1A18;color:#fff}
+.dot.seen{border-color:#C4633C}
+.langtoggle{margin-left:auto;display:flex;border:1px solid rgba(25,25,23,.22);border-radius:999px;overflow:hidden}
+.langtoggle button{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+  padding:6px 12px;border:0;background:transparent;cursor:pointer;color:#686256;white-space:nowrap}
+.langtoggle button+button{border-left:1px solid rgba(25,25,23,.22)}
+.langtoggle button[aria-pressed="true"]{background:#1A1A18;color:#fff}
+.fig-kick{font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#8C857A;display:block}
+.fig-text h4{font-family:var(--font-head);font-size:18px;margin:3px 0 5px;color:#1A1A18}
+.fig-text p{font-size:15.5px;color:#3B3833;max-width:72ch;margin:0}
+.fig-text p em{color:#A34A28;font-style:normal;font-weight:600}
+.fig-text .tj{display:block;margin-top:9px;padding-top:8px;border-top:1px dashed rgba(25,25,23,.18);font-size:14.5px;color:#686256}
+.fig-text .tj::before{content:"In code: ";font-family:var(--font-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#8C857A}
+.fig-ctrl{display:flex;gap:6px;align-items:flex-start}
+.fig-ctrl button{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  padding:7px 12px;border:1px solid rgba(25,25,23,.22);background:transparent;border-radius:8px;cursor:pointer;color:#3B3833;white-space:nowrap}
+.fig-ctrl button:hover{border-color:#C4633C;color:#A34A28}
+.fig-ctrl button.go{background:#1A1A18;border-color:#1A1A18;color:#fff}
+.fig-ctrl button.go:hover{background:#A34A28;border-color:#A34A28}
+.fig-ctrl button:disabled{opacity:.35;cursor:default}
+.fig-note{padding:12px 18px;border-top:1px solid rgba(25,25,23,.09);background:#FBFAF8;font-size:13.5px;color:#686256}
+.fig-note a{color:#A34A28}
+.sc{transition:opacity .45s ease}
+
+/* ── content ── */
+.callout{background:var(--surface-2);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:12px;padding:14px 18px;margin:16px 0}
+.callout.green{border-left-color:var(--accent-3)}
+.callout.blue{border-left-color:var(--accent-2)}
+.note{background:var(--surface-3);border-radius:12px;padding:13px 18px;margin:16px 0;font-size:15.5px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:760px){.two{grid-template-columns:1fr}}
+.two .callout{margin:0}
+.concept{border:1px solid var(--line);border-radius:14px;margin:12px 0;overflow:hidden;background:var(--surface-2)}
+.chead{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;padding:12px 18px;border-bottom:1px solid var(--line)}
+.chead .idx{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-3)}
+.chead .t{font-family:var(--font-head);font-weight:600;color:var(--ink);font-size:16.5px;flex:1;min-width:220px}
+.chip{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.04em;padding:2px 8px;border-radius:999px;background:var(--surface-3);color:var(--ink-3);white-space:nowrap}
+.chip.foundation{background:#e6ece0;color:#4c6440}
+.chip.intermediate{background:#e2eaf3;color:#3f5f80}
+.chip.advanced{background:#f5e3da;color:#9a4d2c}
+.cbody{padding:14px 18px;background:var(--surface)}
+.cbody p{margin:0 0 10px}.cbody p:last-child{margin:0}
+.got{font-size:15.5px}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 14px;margin:0;font-size:15.5px}
+.kv dt{font-family:var(--font-mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);padding-top:3px}
+.kv dd{margin:0}
+@media(max-width:640px){.kv{grid-template-columns:1fr}}
+.tablewrap{overflow-x:auto;margin:14px 0}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th{font-family:var(--font-head);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);text-align:left;padding:7px 9px;border-bottom:1px solid var(--line)}
+td{padding:9px 9px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+.plainline{display:block;margin-top:6px;padding-left:10px;border-left:2px solid var(--line);font-size:14px;color:var(--ink-3)}
+ol.anti,ol.story{padding-left:22px;max-width:74ch}
+ol.anti li{margin:6px 0}
+ol.story li{margin:0 0 16px}
+.incode{display:block;margin-top:7px;padding-top:6px;border-top:1px dashed var(--line);font-size:14.5px;color:var(--ink-3)}
+ul{padding-left:22px;max-width:74ch}ul li{margin:5px 0}
+.tierhead{margin-top:26px;font-size:17px;color:var(--ink)}
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 14px}
+.filters button{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;padding:6px 11px;
+  border:1px solid var(--line);background:transparent;border-radius:999px;cursor:pointer;color:var(--ink-3)}
+.filters button:hover{border-color:var(--accent);color:var(--ink)}
+.filters button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--on-ink)}
+.concept.hide{display:none}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.fig-text .tj[data-lbl]::before{content:attr(data-lbl) ": "}
+pre.code{background:var(--surface-2);border:1px solid var(--line);border-left:3px solid var(--accent-2);
+  border-radius:6px;padding:12px 14px;overflow-x:auto;font-family:var(--font-mono);font-size:12.5px;
+  line-height:1.55;margin:12px 0;color:var(--ink)}
+pre.code b{font-weight:700;color:var(--accent)}
+.stepcard{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:14px 0;background:var(--surface-2)}
+.stepcard>.n{font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.stepcard>h3{margin:3px 0 6px;font-size:17px}
+.stepcard .proves{display:block;margin-top:9px;padding-top:8px;border-top:1px dashed var(--line);font-size:14.5px;color:var(--ink-3)}
+.stepcard .proves::before{content:"What it proves: ";font-family:var(--font-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.runbox{border:1px dashed var(--line);border-radius:8px;padding:11px 14px;margin:14px 0;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-2)}
+td.nw{white-space:nowrap}
+.flow{font-family:var(--font-mono);font-size:12.5px;line-height:1.5;white-space:pre;overflow-x:auto;
+  background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:14px;margin:14px 0}
+.stepcard pre.code{background:#fff}
+.dl{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.dl a{font-family:var(--font-mono);font-size:12px;letter-spacing:.04em;text-decoration:none;
+  border:1px solid var(--line);border-radius:999px;padding:7px 13px;color:var(--ink-2);background:#fff}
+.dl a:hover{border-color:var(--accent);color:var(--ink)}
+</style>
+</head>
+<body>
+<main>
+<span class="eyebrow">Guide 17 · course, with a hands-on lab</span>
+<h1>Building Coding Agents with Tool Execution</h1>
+<p class="who">DeepLearning.AI × E2B · 10 lessons · ~67 min · six-step Python exercise, no API key</p>
+<p>An ordinary agent can only do what somebody wrote a function for. This course gives the model one tool — <strong>run this code</strong> — which removes the list entirely, and then spends half its length on the consequence: code you did not write, running somewhere. <strong>Start on the Walkthrough</strong> for the idea in plain English, then go to <strong>Build it yourself</strong> and run the forty lines on your own machine.</p>
+<div class="tabbar" role="tablist" aria-label="Guide sections"><button type="button" role="tab" data-tab="walkthrough" aria-selected="true">Walkthrough</button><button type="button" role="tab" data-tab="build" aria-selected="false">Build it yourself<span class="num">6</span></button><button type="button" role="tab" data-tab="howitworks" aria-selected="false">Under the hood</button><button type="button" role="tab" data-tab="lessons" aria-selected="false">Lessons<span class="num">10</span></button><button type="button" role="tab" data-tab="isolation" aria-selected="false">Isolation<span class="num">4</span></button><button type="button" role="tab" data-tab="context" aria-selected="false">Context<span class="num">5</span></button><button type="button" role="tab" data-tab="verified" aria-selected="false">Verified<span class="num">8</span></button><button type="button" role="tab" data-tab="pitfalls" aria-selected="false">Pitfalls<span class="num">10</span></button><button type="button" role="tab" data-tab="sources" aria-selected="false">Sources</button></div>
+<section class="panel" id="panel-walkthrough" role="tabpanel">
+<h2>A question nobody wrote a function for</h2>
+<p>Every agent you have read about so far has a fixed list of things it can do. Someone decided in advance: it can search, it can send an email, it can look up an order. Ask it something outside the list and it is stuck.</p>
+<p>This course's whole idea is one tool that removes the list. The model is allowed to <strong>write a small program</strong>, hand it to your code, and read back what it printed. Nobody has to anticipate the question.</p>
+<p>Step through it below. It runs in <strong>plain English</strong> by default and there is a toggle in the corner for the technical names. Eight frames, then the whole loop at once.</p>
+<figure>
+<svg id="loopSvg" viewBox="0 0 1000 420" role="img" aria-label="Eight frames: a question with no matching function, the model writing code, your registry running it, the result going back, and the loop closing.">
+  <defs>
+    <marker id="a17" viewBox="0 0 8 8" refX="6.4" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0.6 0.9 L7 4 L0.6 7.1 z" fill="#8C857A"/></marker>
+  </defs>
+  <rect x="0" y="0" width="1000" height="420" fill="#FFFFFF"/>
+  <g id="loopQ" style="transition:opacity .45s ease"></g>
+  <g id="loopModel" style="transition:opacity .45s ease"></g>
+  <g id="loopTools" style="transition:opacity .45s ease"></g>
+  <g id="loopArrows"></g><g id="loopMsgs"></g><g id="loopExit"></g><g id="loopNote"></g>
+</svg>
+<div class="fig-cap">
+  <div class="fig-nav" id="loopNav" role="tablist" aria-label="Walkthrough steps"></div>
+  <div class="fig-text"><span class="fig-kick" id="loopKick">Step 1 of 8</span><h4 id="loopTitle">Loading…</h4><p id="loopBody"></p></div>
+  <div class="fig-ctrl"><button id="loopPrev" type="button">Back</button><button id="loopPlay" class="go" type="button">Play</button><button id="loopNext" type="button">Next</button></div>
+</div>
+<div class="fig-note">The question and the answer are real: <code>(71000 + 68000 + 74500) / 3 = 71,166.67</code>, which you can check against the nine rows on the Build tab. The messages panel is drawn for a two-tool-call run so the growth is visible — the actual exercise finishes this one in fewer turns. The shape is the course's definition of an agent: <em>an LLM calling tools in a loop with context</em>.</div>
+</figure>
+<h3>The definition, and why it is worth memorising</h3>
+<p>The course gives one sentence: <em>an agent is an LLM calling tools in a loop with context</em>. Four nouns, and each one is a place where things go wrong.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>The noun</th><th>What it is in code</th><th>Where it goes wrong</th></tr></thead>
+<tbody>
+<tr><td><strong>LLM</strong></td><td>One function that takes messages and returns a reply</td><td>Picked for the wrong reason — cost, speed and tool-calling reliability are three different axes</td></tr>
+<tr><td><strong>Tools</strong></td><td>A dict of <code>name → function</code>, plus a JSON schema per tool that the model is shown</td><td>A tool per question, instead of one that can be composed</td></tr>
+<tr><td><strong>Loop</strong></td><td>A <code>while</code> with a hard <code>max_steps</code></td><td>No maximum. The course sets 5; any number beats none</td></tr>
+<tr><td><strong>Context</strong></td><td>A list of messages that only ever grows</td><td>Fat tool results and full stack traces — see the Context tab</td></tr>
+</tbody></table></div>
+<div class="callout"><p><strong>What is new here versus every other guide on this shelf.</strong> Guides 1–14 build agents from fixed tools. This one gives the model a <em>code interpreter</em> as its tool, which is a different bargain: far more capable, and far less containable. That is why half the course is about where the code runs, and why this guide has an isolation tab at all.</p></div>
+</section>
+<section class="panel" id="panel-build" role="tabpanel" hidden>
+<h2>Six steps, no API key, no sandbox, no install</h2>
+<p>The course's own notebooks need an API key, an E2B account and a paid model. This is the same mechanism stripped to plain Python 3, so you can run it on your laptop tonight and read every line. The model is <strong>faked</strong> — a scripted list of replies — because the point of these steps is the machinery around the model, not the model.</p>
+<div class="dl"><a href="agent_lab.py" download>agent_lab.py — the exercise</a><a href="people.csv" download>people.csv — the nine rows</a></div>
+<div class="runbox">$ python3 agent_lab.py        <span class="small">← all six steps, in order</span><br>$ python3 agent_lab.py 3      <span class="small">← just step 3</span></div>
+<p>The data is nine people, three grades, one small CSV. Small enough that you can check every answer the agent gives you by eye — which is the point. If you cannot check it, you cannot tell a working agent from a confident one.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>name</th><th>grade</th><th>salary</th><th>years</th></tr></thead>
+<tbody><tr><td>Ade</td><td>G3</td><td class="mono">41000</td><td class="mono">2</td></tr>
+<tr><td>Bea</td><td>G4</td><td class="mono">52000</td><td class="mono">5</td></tr>
+<tr><td>Cai</td><td>G3</td><td class="mono">39500</td><td class="mono">1</td></tr>
+<tr><td>Dev</td><td>G5</td><td class="mono">71000</td><td class="mono">9</td></tr>
+<tr><td>Eve</td><td>G4</td><td class="mono">55000</td><td class="mono">6</td></tr>
+<tr><td>Fin</td><td>G3</td><td class="mono">40250</td><td class="mono">3</td></tr>
+<tr><td>Gus</td><td>G5</td><td class="mono">68000</td><td class="mono">8</td></tr>
+<tr><td>Hana</td><td>G4</td><td class="mono">50750</td><td class="mono">4</td></tr>
+<tr><td>Ira</td><td>G5</td><td class="mono">74500</td><td class="mono">11</td></tr></tbody></table></div>
+
+<div class="stepcard"><div class="n">Step 1</div><h3>A tool is a function plus a description of itself</h3>
+<p>You write an ordinary Python function. Then you write a second thing — a JSON object describing that function in English — because the model never sees your code, only the description. The two are joined by a dictionary.</p>
+<pre class="code">def mean_salary(grade):
+    rows = [r for r in ROWS if r["grade"] == grade]
+    return sum(r["salary"] for r in rows) / len(rows)
+
+<b>SCHEMA</b> = {"name": "mean_salary",
+          "description": "Mean salary for one grade, e.g. 'G5'.",
+          "parameters": {"grade": "string"}}
+
+<b>TOOLS</b> = {"mean_salary": mean_salary}      # name → the actual function</pre>
+<span class="proves">The registry and the schema are two separate objects. Change the description and the model behaves differently without a line of logic changing.</span></div>
+
+<div class="stepcard"><div class="n">Step 2</div><h3>The loop, with a model you can read</h3>
+<p>The model here is a hard-coded list of replies, so the loop is completely deterministic. You see the messages list grow, the tool get called, the result get appended, and the loop exit — with no network and nothing hidden.</p>
+<pre class="code">while step &lt; <b>MAX_STEPS</b>:
+    reply = fake_model(messages)
+    if reply["type"] == "text":          # <b>the exit condition</b>
+        break
+    result = TOOLS[reply["name"]](**reply["args"])
+    messages.append({"role": "tool", "content": str(result)})</pre>
+<span class="proves">The exit condition is “the model stopped asking for tools”, not “the task is done”. Those are different, and confusing them is how agents loop forever.</span></div>
+
+<div class="stepcard"><div class="n">Step 3</div><h3>One tool to replace all the others</h3>
+<p>Now delete <code>mean_salary</code> and give the model <code>execute_code(code)</code> instead — <code>exec()</code> with stdout captured. The same question is answered by code the model wrote on the spot, and so are questions you never anticipated.</p>
+<pre class="code">def execute_code(code):
+    buf = io.StringIO()
+    try:
+        with contextlib.<b>redirect_stdout</b>(buf):
+            exec(code, {"ROWS": ROWS})
+    except Exception as e:
+        return f"<b>{type(e).__name__}: {e}</b>"      # short. structured. not a traceback
+    return buf.getvalue().strip()</pre>
+<span class="proves">Capturing stdout is what turns “run some code” into “a tool that returns a value”. And the <code>except</code> line is the whole error philosophy in one place — the model reads this string, so it must be short enough to act on.</span></div>
+
+<div class="stepcard"><div class="n">Step 4</div><h3>Why this is dangerous — demonstrated, not asserted</h3>
+<p>The registry contains exactly one tool. No file tool. No shell tool. Then the step asks the model for something innocuous, and the code it writes imports <code>os</code> and prints your username and operating system.</p>
+<pre class="code">TOOLS = {"execute_code": execute_code}    # <b>one tool. no file access. supposedly.</b>
+
+{'result': "['agent_lab.py', 'people.csv']", 'error': None}
+{'result': '<b>somapym Darwin</b>', 'error': None}</pre>
+<p class="small">It listed the folder and named you. It could as easily have written, moved or deleted. Nothing here was malicious — the point is that <strong>nothing stopped it</strong>.</p>
+<span class="proves">Not registering a file tool does not mean the agent cannot touch files — <code>open</code> is reachable through <code>execute_code</code>. This is the entire security argument of lesson 4, and you produce the evidence yourself instead of believing a slide. The Isolation tab is what to do about it.</span></div>
+
+<div class="stepcard"><div class="n">Step 5</div><h3>Watch the context grow</h3>
+<p>The step prints, per turn, how much the messages list is carrying and how much that turn added. Turns 0 and 1 each dumped the whole table into the context — about 550 characters apiece. Turn 2 returned the answer only: fourteen characters. <strong>Same question, roughly forty times less context.</strong></p>
+<pre class="code">turn     added   total   ~tok   this turn added
+0          551     576    144   <b>██████████████████████</b>
+1          551    1127    281   <b>██████████████████████</b>
+2           14    1141    285</pre>
+<span class="proves">Nothing is ever removed from a messages list, so growth is the default state and tool results are the cause. The fix, in order of what it buys you: return the <em>answer</em> rather than the data it came from; clip logs and repeated errors; paginate anything that lists files or rows. Compression, on the Context tab, is what you do when all three are already true.</span></div>
+
+<div class="stepcard"><div class="n">Step 6</div><h3>The whole agent, in about forty lines</h3>
+<p>Everything above assembled into one function, printed to the screen so you can read it in one sitting. This is the same shape as the course's lesson-3 agent and the same shape as the lesson-7 one; the difference between them is which environment the code runs in and what the system prompt says.</p>
+<span class="proves">There is no framework in here. Once you have seen the forty lines, every agent framework becomes a question of what it adds on top — which is the right way to evaluate one.</span></div>
+
+<div class="callout"><p><strong>The two changes to make afterwards.</strong> Swap <code>fake_model</code> for a real API call and the file becomes a working agent. Swap <code>exec</code> for a sandbox's <code>run_code</code> and it becomes the course's lesson-5 agent. Those are one line each, which is the strongest argument the course makes: <em>the shape does not change</em>.</p></div>
+</section>
+<section class="panel" id="panel-howitworks" role="tabpanel" hidden>
+<h2>What is in the files they hand you</h2>
+<p>By lesson 7 the lab has a <code>lib/</code> folder you did not write. The notebooks are not reproduced here — this is the map, so you can read their code, or skip it, knowing what each piece is for.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>File</th><th>What it holds</th><th>Why it is pre-written</th></tr></thead>
+<tbody>
+<tr><td class="mono nw">lib/sbx_tools.py</td><td><code>list_directory</code>, <code>read_file</code>, <code>write_file</code>, <code>search_file_content</code>, a replace-in-file tool, <code>glob</code>, execute-bash — plus the <code>ToolError</code> exception and a pagination helper</td><td>Seven tools with error handling is an hour of typing that teaches nothing after the first one</td></tr>
+<tr><td class="mono nw">lib/prompts.py</td><td><code>SYSTEM_PROMPT_WEB_DEV</code> — how to think, how the project was scaffolded, the tech stack, how to call the tools. “Heavily inspired by Gemini CLI's system prompt”</td><td>It is long, and prompt-writing is not the lesson being taught</td></tr>
+<tr><td class="mono nw">lib/ui.py</td><td>The Gradio chat, and the <strong>Context Stack</strong> panel: message height proportional to token count, colour by role</td><td>Interface plumbing</td></tr>
+<tr><td class="mono nw">docs.md</td><td>A condensed summary of the whole course, attached to every prompt in the project lab</td><td>Not plumbing — see below</td></tr>
+</tbody></table></div>
+<p><strong>The one worth noticing is <code>docs.md</code>.</strong> The project asks you to attach it to every prompt so the assistant works from the course's conventions rather than its general knowledge. That is the course quietly making you practise context engineering on itself — and it is the trick to copy into your own projects.</p>
+
+<h3>The flow, end to end</h3>
+<div class="flow">your question
+      │
+      ▼
+  messages[]  ──────────────►  the model  ──── "call execute_code(code=…)"
+      ▲                                                    │
+      │                                                    ▼
+      │                                          look the name up in TOOLS
+      │                                                    │
+      │                                                    ▼
+      └──── append the result ◄──────────  run it (locally, or in the sandbox)
+                                                           │
+                    stop when: the model stops asking  ◄────┘
+                            or max_steps is hit</div>
+<p>Everything else in the course is a variation on that diagram, and the variations are smaller than they look:</p>
+<ul>
+<li><strong>Lesson 3</strong> builds it with <code>exec()</code> running on your own machine.</li>
+<li><strong>Lesson 5</strong> changes exactly one line — <code>execute_code</code> passes the code to the sandbox's <code>run_code</code> instead of to <code>exec</code>. Nothing else about the shape changes.</li>
+<li><strong>Lesson 6</strong> changes <em>only the system prompt</em> to make a data analyst. No new tools; pandas arrives through <code>execute_code</code> like everything else.</li>
+<li><strong>Lesson 7</strong> adds the file tools and <em>copies them into the sandbox</em>, so they run there rather than on your machine.</li>
+</ul>
+
+<h3>The three ideas actually worth taking</h3>
+<div class="concept"><div class="chead"><span class="t">The registry and the schema are separate things</span><span class="chip">design</span></div>
+<div class="cbody"><p>The function does the work; the JSON schema is what the model is shown. A tool is those two things plus a line in a dict. Keeping them separate is what lets you change how the model understands a tool without touching what it does.</p></div></div>
+<div class="concept"><div class="chead"><span class="t">Errors are structured and short</span><span class="chip">context</span></div>
+<div class="cbody"><p>Their <code>ToolError</code> exists so a missing file produces <code>"file does not exist"</code> rather than forty lines of traceback. The error goes into the context, and context is the scarce resource. A model can act on one line; it cannot act on a stack trace, and the stack trace costs you room you will want later.</p></div></div>
+<div class="concept"><div class="chead"><span class="t">Runtime summarisation</span><span class="chip">the portable one</span></div>
+<div class="cbody"><p>The one algorithm here worth lifting whole into your own code: pick a ceiling, compress the oldest turns when you hit it, re-inject the summary as a normal-looking pair of messages. About thirty lines. The <a href="#context">Context tab</a> walks through it frame by frame.</p></div></div>
+</section>
+<section class="panel" id="panel-lessons" role="tabpanel" hidden>
+<h2>What is in each one, and what it is worth</h2>
+<p>Roughly an hour of video plus notebooks. The density is very uneven: lesson 2 carries most of the conceptual content and lesson 7 carries most of the code worth keeping.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>#</th><th>Lesson</th><th>Kind</th><th>Length</th><th>What is in it</th></tr></thead>
+<tbody><tr><td class="nw mono small">1</td><td><strong>Introduction</strong></td><td class="nw small">Video</td><td class="nw mono small">3m</td><td>Andrew Ng frames the premise and tells two stories against himself: an agentic tool deleted a colleague's project files; another ran a flawed migration that deleted production data. “Thankfully, we had backups.”</td></tr><tr><td class="nw mono small">2</td><td><strong>Inside a Coding Agent</strong></td><td class="nw small">Video</td><td class="nw mono small">8m</td><td>The definition, the model-choice criteria, context rot and three mitigations, the exit condition, and the environment trade-offs. The densest lesson by far.</td></tr><tr><td class="nw mono small">3</td><td><strong>Your First Coding Agent</strong></td><td class="nw small">Video + code</td><td class="nw mono small">10m</td><td>Built from nothing: an <code>llm()</code> helper, <code>execute_code</code> using <code>exec</code> with stdout captured, a JSON schema, a tools registry, <code>execute_tool</code>, then the loop with <code>max_steps=5</code>. Read/write file tools and a custom <code>ToolError</code>.</td></tr><tr><td class="nw mono small">4</td><td><strong>Tool Execution Environments</strong></td><td class="nw small">Video</td><td class="nw mono small">5m</td><td>Local vs container vs gVisor vs microVM, then managed providers. The sponsorship lesson — see the Verified tab.</td></tr><tr><td class="nw mono small">5</td><td><strong>Running Code in the Cloud</strong></td><td class="nw small">Video + code</td><td class="nw mono small">7m</td><td>The E2B SDK: <code>Sandbox</code>, <code>run_code</code>, an <code>Execution</code> object with logs and results, multi-language, sandbox filesystem, metadata queries, a create-or-reconnect helper. One line changes to move execution off your machine.</td></tr><tr><td class="nw mono small">6</td><td><strong>Data Analyst Agent</strong></td><td class="nw small">Video + code</td><td class="nw mono small">4m</td><td>Same agent, new system prompt. No new tools — pandas arrives through <code>execute_code</code>. Adds the Gradio context-stack panel.</td></tr><tr><td class="nw mono small">7</td><td><strong>Full Stack Agent</strong></td><td class="nw small">Video + code</td><td class="nw mono small">8m</td><td>File tools copied <em>into</em> the sandbox, a Gemini-CLI-inspired system prompt, and runtime summarisation — the one portable algorithm here.</td></tr><tr><td class="nw mono small">8</td><td><strong>Hands-On Project Introduction</strong></td><td class="nw small">Video</td><td class="nw mono small">6m</td><td>JupyterLab and Jupyter AI plumbing. Its one good idea: a <code>docs.md</code> you attach to every prompt.</td></tr><tr><td class="nw mono small">9</td><td><strong>Hands-On Project</strong></td><td class="nw small">Code</td><td class="nw mono small">15m</td><td>A lab. Three steps: specify tools, implement the loop, deploy to a sandbox.</td></tr><tr><td class="nw mono small">10</td><td><strong>Conclusion</strong></td><td class="nw small">Video</td><td class="nw mono small">1m</td><td>“From a single snippet to a full web application.”</td></tr></tbody></table></div>
+<div class="callout"><p><strong>If you have one hour.</strong> Watch lesson 2 for the vocabulary, read lesson 7's summarisation code, then run the six steps on the Build tab. Lessons 3, 5 and 6 are the same agent three times with one thing changed each time — the Under-the-hood tab tells you which thing, which is most of what watching them gives you.</p></div>
+</section>
+<section class="panel" id="panel-isolation" role="tabpanel" hidden>
+<h2>Four answers, and the arrow that tells the truth</h2>
+<p>Step 4 of the exercise proves that an agent with no file tools can still read your files. So the question stops being “what tools did I register” and becomes “where does the generated code actually run”. The course gives four answers, each better and more expensive than the last.</p>
+<figure>
+<svg id="envSvg" viewBox="0 0 1000 244" role="img" aria-label="Four isolation levels stacked over your machine: nothing, container, gVisor, microVM — and how far the generated code can reach in each.">
+  <defs>
+    <marker id="a17b" viewBox="0 0 8 8" refX="6.4" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0.6 0.9 L7 4 L0.6 7.1 z" fill="#8C857A"/></marker>
+  </defs>
+  <rect x="0" y="0" width="1000" height="244" fill="#FFFFFF"/>
+  <g id="envLayer"></g>
+</svg>
+<div class="fig-cap">
+  <div class="fig-nav" id="envNav" role="tablist" aria-label="Isolation levels"></div>
+  <div class="fig-text"><span class="fig-kick" id="envKick">Level 1 of 4</span><h4 id="envTitle">Loading…</h4><p id="envBody"></p></div>
+  <div class="fig-ctrl"><button id="envPrev" type="button">Back</button><button id="envPlay" class="go" type="button">Play</button><button id="envNext" type="button">Next</button></div>
+</div>
+<div class="fig-note">Lesson 4. The arrow is the honest part of the picture: it shows how far the generated code gets, not how safe the label sounds. Step&nbsp;4 of the exercise makes you produce the level-one evidence on your own laptop rather than take it on trust.</div>
+</figure>
+<h3>Reading this honestly</h3>
+<p>Two things are true at once, and it is worth holding both.</p>
+<p>The <strong>technical steps are sound</strong>. Containers really do share the host kernel. gVisor really does intercept syscalls in user space, at a real performance cost, with real compatibility gaps. Firecracker really does give each microVM its own guest kernel, and really does run AWS Lambda and Fargate. None of that is marketing; it is the mainstream position, and I checked it independently — see the Verified tab.</p>
+<p>The <strong>last step is commercial</strong>. The chain ends “…self-hosting microVMs is operationally heavy, therefore use a managed sandbox provider”, and the course is taught by E2B, who sell one. The operational burden is genuine and widely reported. Whether it justifies buying rather than building is a decision about your team, not a fact about kernels — and it is the one step in the argument where the teacher has an interest.</p>
+<div class="callout"><p><strong>What to actually do, for the size of thing you are building.</strong> For an agent operating on files you already have and code you would have written anyway, running locally is a considered choice, not negligence — that is what Claude Code and Cursor do. The moment the agent runs code from somewhere you did not read, or acts on data you did not write, you need a boundary, and a container is not one.</p></div>
+</section>
+<section class="panel" id="panel-context" role="tabpanel" hidden>
+<h2>Context rot, and the thirty lines that fix it</h2>
+<p>The messages list only ever grows. Every tool result is appended and nothing is removed, and tool results are the fat ones — file listings, compiler output, error stacks. Past some point the model gets measurably worse at using what it has: the course calls this <strong>context rot</strong>, and names three mitigations — keep tool results small, keep errors short and structured, and compress at runtime.</p>
+<p>The first two are discipline. The third is an algorithm, and it is the single most portable thing in the course.</p>
+<figure>
+<svg id="sumSvg" viewBox="0 0 1000 350" role="img" aria-label="Runtime summarisation: turns pile up to a ceiling, the oldest seventy per cent are compressed and re-injected as two short messages, and the loop continues.">
+  <rect x="0" y="0" width="1000" height="350" fill="#FFFFFF"/>
+  <g id="sumLayer"></g>
+</svg>
+<div class="fig-cap">
+  <div class="fig-nav" id="sumNav" role="tablist" aria-label="Summarisation steps"></div>
+  <div class="fig-text"><span class="fig-kick" id="sumKick">Step 1 of 5</span><h4 id="sumTitle">Loading…</h4><p id="sumBody"></p></div>
+  <div class="fig-ctrl"><button id="sumPrev" type="button">Back</button><button id="sumPlay" class="go" type="button">Play</button><button id="sumNext" type="button">Next</button></div>
+</div>
+<div class="fig-note">Lesson 7. The two numbers — a 40,000-token ceiling and the oldest 70% — are one tool's defaults, not derived constants. The <em>shape</em> is what travels: detect, select oldest, compress, re-inject as a normal-looking pair of messages.</div>
+</figure>
+<h3>The numbers, and how much to trust them</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>Number</th><th>Where it comes from</th><th>How to treat it</th></tr></thead>
+<tbody>
+<tr><td class="nw"><strong>40,000 tokens</strong></td><td>The course picks it</td><td>A decision, not a law. What matters is that a ceiling <em>exists</em> — it turns “the agent got slow and stupid” into a condition you can detect in code</td></tr>
+<tr><td class="nw"><strong>the oldest 70%</strong></td><td>Taken from Gemini CLI</td><td>A borrowed default. Oldest-first is the principled part; 70% is a knob</td></tr>
+<tr><td class="nw"><strong>~30,000 tokens</strong></td><td>Lesson 2, attributed only to “research”</td><td><strong>Uncited.</strong> No source is named and I could not tie it to a paper. A rule of thumb someone found useful — not a threshold</td></tr>
+</tbody></table></div>
+<div class="callout"><p><strong>The detail that makes it work.</strong> The summary is re-injected as a <em>synthetic user message plus an assistant acknowledgement</em>, not as a system note. The conversation therefore still has the alternating shape the model expects, so nothing above the compression layer has to know it happened. That is the bit people get wrong when they reimplement it.</p></div>
+</section>
+<section class="panel" id="panel-verified" role="tabpanel" hidden>
+<h2>Every load-bearing claim, checked</h2>
+<p>The course is sponsored by E2B, whose product is the answer to one of its questions. That is not a reason to dismiss it — it is a reason to check the claims separately, which is what this table is. Two of the eight need a note; the rest hold up.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Claim</th><th>What was said</th><th>Verdict</th></tr></thead>
+<tbody><tr><td><strong>An agent is “an LLM calling Tools in a Loop with Context”</strong><span class="plainline">Source: the course</span></td><td>A definition, not a measurement.</td><td><b>Stands.</b> It matches how every agent in this corpus is actually built, and the exercise on the Build-it-yourself tab implements it in about forty lines.</td></tr><tr><td><strong>gVisor is a Google user-space kernel that intercepts syscalls</strong><span class="plainline">Source: the course</span></td><td>Described as a “middleman” between the container and the host kernel, with performance overhead, compatibility gaps, and residual risk because it still depends on the host kernel.</td><td><b>Checked and accurate</b>, including the caveats — which the course states rather than hides. Independent write-ups agree that gVisor reduces but does not eliminate host exposure.</td></tr><tr><td><strong>Containers share the host kernel, so one compromise can reach the host</strong><span class="plainline">Source: the course</span></td><td>The standard argument for why a container is not a security boundary.</td><td><b>Checked and accurate.</b> This is the mainstream position, not a vendor talking point.</td></tr><tr><td><strong>Firecracker powers AWS Lambda and Fargate; each microVM runs its own guest kernel</strong><span class="plainline">Source: the course</span></td><td>Cited as the widely used microVM implementation.</td><td><b>Checked and accurate.</b></td></tr><tr><td><strong>“Around 30k tokens of context is the first point where agents can reliably handle real-world tasks”</strong><span class="plainline">Source: the course, attributed only to “research”</span></td><td>Stated in lesson 2 with no citation, alongside “40 to 50 pages of text, like a medium-sized GitHub repo”.</td><td><b>Unverified.</b> No source is named and I could not tie it to a specific paper. Treat 30k as a rule of thumb someone found useful, not a measured threshold.</td></tr><tr><td><strong>SWE-bench tests whether a model can patch a real GitHub issue and pass the repo's tests</strong><span class="plainline">Source: the course</span></td><td>Described as “one of the most widely used” coding benchmarks. The leaderboard shown is dated <b>October 2025</b>.</td><td><b>Accurate as a description</b>, and the course itself says “this is just one possible metric”. Note the leaderboard is a year old at time of writing — do not read the standings off it.</td></tr><tr><td><strong>Runtime summarisation: 40k ceiling, compress the oldest 70%</strong><span class="plainline">Source: the course, “following Gemini CLI”</span></td><td>Presented as a concrete recipe with a named source for the 70% figure.</td><td><b>Implementable as stated</b>, and the most portable thing in the course. The two numbers are one tool's choices, not derived constants — treat them as defaults to tune.</td></tr><tr><td><strong>Therefore use a managed sandbox provider</strong><span class="plainline">Source: <b>E2B, who taught the course</b></span></td><td>The argument runs local → Docker → gVisor → microVM → “operational overhead makes adoption harder for most teams” → providers. E2B, Deno and Modal are named.</td><td><b>The technical steps stand; the last step is commercial.</b> The operational burden of self-hosting microVMs is real and widely reported. Whether that justifies a provider is a build-vs-buy decision, and the people making the argument sell the buy. Nothing dishonest — just worth naming, since the same lesson would read differently from a neutral author.</td></tr></tbody></table></div>
+<div class="fig-note">Checked 8 September 2026 against sources outside the course. “Stands” means the claim is either definitional or independently corroborated; “unverified” means I could not find the source, not that the claim is false.</div>
+</section>
+<section class="panel" id="panel-pitfalls" role="tabpanel" hidden>
+<h2>Ten ways to get this wrong</h2>
+<p>Most of these are things the course demonstrates and then does not name. They are ordered roughly by how quickly they will bite you.</p>
+<ol class="anti"><li>Assuming that not registering a file tool means the agent cannot touch files. It reaches <code>open</code> through <code>execute_code</code>. Lesson 5 demonstrates this without quite saying it.</li><li>Returning raw tool output into the context. A full table where a single number would do is the fastest way to context rot.</li><li>Returning stack traces to the model. Short structured errors are what let it recover; forty lines of traceback just spend context.</li><li>Writing a loop with no maximum step count. The course sets 5. Any number is better than none.</li><li>Treating a container as a security boundary. It shares the host kernel.</li><li>Reading the SWE-bench standings off a leaderboard screenshot dated October 2025.</li><li>Taking “~30k tokens” as a measured threshold. It is uncited in the course.</li><li>Building a tool for every question. One <code>execute_code</code> answers the questions you did not anticipate — which is the entire premise.</li><li>Skipping the system prompt. Lesson 6 changes <em>only</em> the prompt to turn a generic agent into a data analyst.</li><li>Letting a build-vs-buy decision be made for you by the people selling one side of it.</li></ol>
+<div class="callout"><p><strong>The one to tattoo somewhere.</strong> Number 1. An agent with a code interpreter has every capability the interpreter has, regardless of what else you did or did not register. Your tool list is a description of what you <em>expect</em> it to do, not a boundary on what it <em>can</em> do. The boundary is the environment, and only the environment.</p></div>
+</section>
+<section class="panel" id="panel-sources" role="tabpanel" hidden>
+<h2>Where this came from</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Item</th><th>Detail</th></tr></thead>
+<tbody>
+<tr><td class="nw"><strong>Course</strong></td><td>Building Coding Agents with Tool Execution — DeepLearning.AI short course</td></tr>
+<tr><td class="nw"><strong>Taught by</strong></td><td>E2B, with the introduction and conclusion by Andrew Ng</td></tr>
+<tr><td class="nw"><strong>Shape</strong></td><td>10 lessons · roughly 67 minutes of video · notebooks for lessons 3, 5, 6, 7 and a hands-on project</td></tr>
+<tr><td class="nw"><strong>Captured</strong></td><td>8 September 2026 — lesson transcripts and the architecture of the provided <code>lib/</code> code</td></tr>
+<tr><td class="nw"><strong>Not included</strong></td><td>The course notebooks. They are the platform's material and are not reproduced here; the Under-the-hood tab describes what they do so you can read them in place, or not at all</td></tr>
+<tr><td class="nw"><strong>Written for this guide</strong></td><td><code>agent_lab.py</code> and <code>people.csv</code> — original, plain Python 3, no dependencies, no API key. Same mechanism, different data, small enough to check by eye</td></tr>
+</tbody></table></div>
+<h3>Independent checks</h3>
+<p>The gVisor, container-kernel and Firecracker claims on the Verified tab were checked against sources outside the course on 8 September 2026. The “~30k tokens” claim could not be traced to a named source and is marked unverified rather than false. The SWE-bench leaderboard shown in lesson 2 is dated October 2025; the standings on it are a year old and should not be read as current.</p>
+<div class="callout"><p><strong>Related guides on this shelf.</strong> Guide 2 builds the agent loop with fixed tools — read it first if the walkthrough moved too fast. Guide 13 covers the production controls this course does not: budgets, retries, traces and gates. Guide 12 is the one on keeping token spend under control, which is the economic half of the context problem.</p></div>
+</section>
+</main>
+<script>
+(function(){
+const NS = "http://www.w3.org/2000/svg";
+const mk = (n, a) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); return e; };
+const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const SWAP = [];
+let LANG = (() => { try { return localStorage.getItem("bca.lang") === "tech" ? "tech" : "plain"; } catch (e) { return "plain"; } })();
+const isP = () => LANG === "plain";
+function label(layer, x, y, tech, plain, fill, size, weight, anchor){
+  const t = mk("text", { x, y, "font-family":"var(--font-mono)", "font-size":size||"11", fill,
+    "letter-spacing":"1.2", "font-weight":weight||"400", "text-anchor":anchor||"start" });
+  t.textContent = isP() ? plain : tech; SWAP.push({ el:t, tech, plain }); layer.appendChild(t); return t;
+}
+function applyLang(){ SWAP.forEach(o => o.el.textContent = isP() ? o.plain : o.tech); }
+
+function stepper(o){
+  const nav = document.getElementById(o.navId);
+  let cur = -1, playing = false, timer = null, tmo = [];
+  const clear = () => { while (tmo.length) clearTimeout(tmo.pop()); };
+  o.steps.forEach((_, i) => {
+    const b = document.createElement("button");
+    b.className = "dot"; b.type = "button"; b.textContent = i + 1;
+    b.setAttribute("role","tab"); b.setAttribute("aria-label","Step " + (i+1));
+    b.addEventListener("click", () => { stop(); go(i); }); nav.appendChild(b);
+  });
+  function go(i){
+    clear(); cur = (i + o.steps.length) % o.steps.length;
+    const s = o.steps[cur], p = isP() && s.ek;
+    document.getElementById(o.kickId).textContent = (p ? s.ek : s.k) + " · " + (cur+1) + " of " + o.steps.length;
+    document.getElementById(o.titleId).textContent = p ? s.et : s.t;
+    document.getElementById(o.bodyId).innerHTML = p ? s.eb : s.b;
+    [...nav.querySelectorAll(".dot")].forEach((d,n) => { d.setAttribute("aria-current", n===cur); d.classList.toggle("seen", n<=cur); });
+    document.getElementById(o.prevId).disabled = cur === 0;
+    o.apply(cur, (fn, ms) => tmo.push(setTimeout(fn, ms)));
+  }
+  function stop(){ playing = false; clearTimeout(timer); document.getElementById(o.playId).textContent = "Play"; }
+  function play(){ playing = true; document.getElementById(o.playId).textContent = "Pause";
+    const t = () => { if(!playing) return; if(cur >= o.steps.length-1){ stop(); return; } go(cur+1); timer = setTimeout(t, o.dwell); };
+    timer = setTimeout(t, o.dwell); }
+  document.getElementById(o.nextId).addEventListener("click", () => { stop(); go(cur+1); });
+  document.getElementById(o.prevId).addEventListener("click", () => { stop(); go(cur-1); });
+  document.getElementById(o.playId).addEventListener("click", () => { if(playing) stop(); else { if(cur>=o.steps.length-1) go(0); play(); } });
+  go(0);
+  return { redraw: () => go(cur) };
+}
+
+/* ═══ A · the loop ═══ */
+const loopFig = (() => {
+  const L = id => document.getElementById(id);
+  const gQ = L("loopQ"), gM = L("loopModel"), gT = L("loopTools"), gMsg = L("loopMsgs"),
+        gArrow = L("loopArrows"), gExit = L("loopExit"), gNote = L("loopNote");
+  const box = (g, x, y, w, h, fill, stroke) => { g.appendChild(mk("rect", { x, y, width:w, height:h, rx:8,
+    fill, stroke, "stroke-width":1.6, style:"transition:opacity .4s ease,fill .4s ease" })); };
+
+  box(gQ, 40, 40, 250, 54, "#F4F2EC", "#C4633C");
+  label(gQ, 56, 62, "THE QUESTION", "WHAT YOU ASKED", "#A34A28", "10", "700");
+  label(gQ, 56, 80, "mean salary in grade G5?", "what do G5 people earn?", "#1A1A18", "12.5");
+
+  box(gM, 380, 40, 240, 54, "#FFFFFF", "#46606F");
+  label(gM, 396, 62, "THE MODEL", "THE MODEL", "#46606F", "10", "700");
+  label(gM, 396, 80, "reads · decides · asks", "can only read and ask", "#1A1A18", "12.5");
+
+  box(gT, 710, 40, 250, 54, "#FFFFFF", "#3F7050");
+  label(gT, 726, 62, "TOOLS  { name → fn }", "YOUR CODE", "#3F7050", "10", "700");
+  label(gT, 726, 80, "execute_code(code)", "the bit that actually runs", "#1A1A18", "12.5");
+
+  label(gMsg, 40, 132, "messages[]  — nothing is ever removed", "everything so far — nothing gets thrown away", "#8C857A", "10.5");
+  gMsg.appendChild(mk("rect", { x:36, y:140, width:928, height:184, rx:8, fill:"#FCFBF7",
+    stroke:"#D9D7CC", "stroke-width":1.4, "stroke-dasharray":"5 5" }));
+  const emptyTxt = label(gMsg, 500, 238, "empty", "nothing in it yet", "#B9B4A8", "12", "400", "middle");
+  const msgs = [];
+  for (let i = 0; i < 6; i++){
+    const g = mk("g", { opacity:"0", style:"transition:opacity .45s ease" });
+    g.appendChild(mk("rect", { x:40, y:146 + i*30, width:0, height:22, rx:4, fill:"#E7E2D6", stroke:"#C9C2B4" }));
+    const t = mk("text", { x:52, y:161 + i*30, "font-family":"var(--font-mono)", "font-size":"11", fill:"#3B3833" });
+    g.appendChild(t); gMsg.appendChild(g); msgs.push({ g, r:g.firstChild, t });
+  }
+  const MSG = [
+    ["user · the question", 210, "#F3E3DA"],
+    ["model · call execute_code(…)", 300, "#EAF0F3"],
+    ["tool · {'result': '71166.67'}", 320, "#E2EBE2"],
+    ["model · call execute_code(…)", 300, "#EAF0F3"],
+    ["tool · {'result': '3 people'}", 300, "#E2EBE2"],
+    ["model · “Mean G5 salary is 71,166.67.”", 400, "#EAF0F3"],
+  ];
+  const arrow = (x1,y1,x2,y2,col) => { const l = mk("path", { d:`M${x1} ${y1} L${x2} ${y2}`, stroke:col,
+    "stroke-width":2, fill:"none", "marker-end":"url(#a17)", opacity:"0", style:"transition:opacity .4s ease" });
+    gArrow.appendChild(l); return l; };
+  const aQM = arrow(295, 67, 372, 67, "#C4633C");
+  const aMT = arrow(625, 67, 702, 67, "#46606F");
+  const aTM = arrow(702, 84, 625, 84, "#3F7050");
+  box(gExit, 340, 330, 320, 46, "#FFFFFF", "#9A6F20");
+  label(gExit, 356, 350, "EXIT CONDITION", "WHEN DOES IT STOP?", "#9A6F20", "10", "700");
+  const exitTxt = label(gExit, 356, 367, "…", "…", "#1A1A18", "12");
+  gExit.setAttribute("opacity", "0"); gExit.setAttribute("style", "transition:opacity .4s ease");
+  const noteTxt = label(gNote, 40, 400, "", "", "#686256", "11.5");
+
+  const show = (el, v) => el.style.opacity = v;
+  const empty = (v) => emptyTxt.setAttribute("opacity", v);
+  const steps = [
+    { k:"The question", t:"You ask something nobody wrote a function for",
+      b:"A question arrives that no predefined tool answers. In a classic tool-calling agent that is the end of the road — you get whatever the fixed function list can produce.",
+      ek:"The question", et:"You ask something nobody planned for",
+      eb:"You ask a question about a spreadsheet you didn't build. Nobody wrote a button for this exact question. In an ordinary assistant, that's where it stops.",
+      run(i, later){ [gQ,gM,gT].forEach(g => show(g,.25)); show(gQ,1);
+        msgs.forEach(m => show(m.g,0)); [aQM,aMT,aTM].forEach(a => show(a,0)); gExit.style.opacity=0; empty(1);
+        noteTxt.textContent = isP() ? "Nothing has happened yet." : "messages[] is empty."; } },
+    { k:"What the model can do", t:"The model cannot run anything — it can only ask",
+      b:"This is the part people skip. The model never executes. It is shown a list of JSON schemas — names, descriptions, argument shapes — and its entire power is to <em>name one</em> and supply arguments.",
+      ek:"What the model can do", et:"The model can't do anything — it can only ask",
+      eb:"This is the bit worth slowing down for. The model never runs anything itself. It's handed a list of what's available, like a menu, and all it can do is <em>point at one</em> and say what it wants.",
+      run(i, later){ show(gQ,1); show(gM,1); show(gT,.35); show(aQM,1); empty(1); msgs.forEach(m => show(m.g,0));
+        noteTxt.textContent = isP() ? "It's read your question. Now it points at the menu." : "The schemas are in the prompt. The model returns a name and arguments."; } },
+    { k:"It asks", t:"It names a tool and supplies arguments",
+      b:"<code>execute_code(code=\"print(sum(...)/3)\")</code>. That is a <em>request</em>, expressed as data. Nothing has run.",
+      ek:"It asks", et:"It points at one and says what it wants",
+      eb:"“Run this Python for me.” That's a request, not an action. Still nothing has actually happened.",
+      run(i, later){ show(gQ,1); show(gM,1); show(gT,1); show(aQM,1); show(aMT,1); empty(1); msgs.forEach(m => show(m.g,0));
+        noteTxt.textContent = isP() ? "A request. Nothing has run." : "A function_call part, not a side effect."; } },
+    { k:"Your code runs it", t:"You look the name up and call the function",
+      b:"Your registry — a plain dict — maps the name to a Python function. <code>TOOLS[name](**args)</code>. <strong>Every consequence in the system happens on this line</strong>, in your code, not the model's.",
+      ek:"Your code runs it", et:"Your code looks it up and does the work",
+      eb:"Your program finds that name in a list and calls the matching function. <strong>Everything that actually happens, happens here</strong> — in your code, not the model's.",
+      run(i, later){ [gQ,gM,gT].forEach(g=>show(g,1)); show(aQM,1); show(aMT,1); later(()=>show(aTM,1), 400); empty(1); msgs.forEach(m => show(m.g,0)); gExit.style.opacity=0;
+        noteTxt.textContent = isP() ? "This is the only line that can break anything." : "TOOLS[name](**args) — the only place side effects occur."; } },
+    { k:"The result comes back", t:"The result is appended, and the context grows",
+      b:"The tool's return value is appended to <code>messages[]</code> as a new turn. Nothing is ever removed. Every loop makes the next call bigger, slower and dearer — this is where context rot begins.",
+      ek:"The result comes back", et:"The answer gets added to the pile — and the pile never shrinks",
+      eb:"Whatever the tool returned is added to the running conversation. Nothing is ever taken out. Every trip round makes the next one bigger and slower.",
+      run(i, later){ [gQ,gM,gT].forEach(g=>show(g,1)); [aQM,aMT,aTM].forEach(a=>show(a,1));
+        empty(0);
+        MSG.slice(0,3).forEach(([txt,w,col], n) => later(() => { const m = msgs[n];
+          m.r.setAttribute("width", w); m.r.setAttribute("fill", col); m.t.textContent = txt; show(m.g,1); }, 150 + n*280));
+        noteTxt.textContent = isP() ? "Three entries already, for one question." : "3 turns in messages[] after one tool call."; } },
+    { k:"Round two", t:"The model sees the result and decides again",
+      b:"Same call, longer input. It may ask for another tool, or it may have what it needs. The loop is nothing more sophisticated than repeating steps 2 to 5.",
+      ek:"Round two", et:"It reads the answer and decides what next",
+      eb:"The same thing happens again, with more to read. Maybe it asks for something else; maybe it's done. That's all a “loop” means here.",
+      run(i, later){ [gQ,gM,gT].forEach(g=>show(g,1)); [aQM,aMT,aTM].forEach(a=>show(a,1));
+        empty(0);
+        MSG.forEach(([txt,w,col], n) => { const m = msgs[n];
+          if (n < 5){ m.r.setAttribute("width", w); m.r.setAttribute("fill", col); m.t.textContent = txt; show(m.g,1); } else show(m.g,0); });
+        noteTxt.textContent = isP() ? "Five entries. Still one question." : "5 turns. The input to every call keeps growing."; } },
+    { k:"Stopping", t:"Two exit conditions, and you need both",
+      b:"<strong>It stops asking</strong> — the model returns a message instead of a tool call, so the task is done. <strong>Or the step limit is hit</strong> — the course uses <code>max_steps=5</code> — so the task is stuck. Without the second, a confused agent retries forever.",
+      ek:"Stopping", et:"Two ways to stop, and you need both",
+      eb:"<strong>It stops asking</strong> — it just answers, so it's finished. <strong>Or it's had its allowed number of goes</strong> — five, in the course — so you stop it. Without that second rule, a confused agent tries forever and you pay for every attempt.",
+      run(i, later){ [gQ,gM,gT].forEach(g=>show(g,1)); [aQM,aMT,aTM].forEach(a=>show(a,1));
+        empty(0);
+        MSG.forEach(([txt,w,col], n) => { const m = msgs[n];
+          m.r.setAttribute("width", w); m.r.setAttribute("fill", col); m.t.textContent = txt; show(m.g,1); });
+        gExit.style.opacity = 1;
+        exitTxt.textContent = isP() ? "no tool wanted  ·  or 5 goes used" : "no function_call  ·  or max_steps";
+        const sw = SWAP.find(o => o.el === exitTxt); if (sw){ sw.plain = "no tool wanted  ·  or 5 goes used"; sw.tech = "no function_call  ·  or max_steps"; }
+        noteTxt.textContent = isP() ? "Done — six entries for one question." : "6 turns, 2 tool calls, then a message."; } },
+    { k:"That's the whole thing", t:"Nothing above changes when it moves to a sandbox",
+      b:"Lesson 5 of the course swaps <code>exec()</code> for a sandbox's <code>run_code</code> — <em>one line</em>. Lesson 6 changes only the system prompt to make a data analyst. Lesson 7 adds file tools. Three variations on this diagram; the diagram does not move.",
+      ek:"That's the whole thing", et:"Nothing here changes when it gets fancier",
+      eb:"Running the code somewhere safe instead of on your laptop changes <em>one line</em>. Turning it into a data analyst changes only the instructions you give it. Everything in this picture stays exactly where it is.",
+      run(i, later){ [gQ,gM,gT].forEach(g=>show(g,1)); [aQM,aMT,aTM].forEach(a=>show(a,1));
+        empty(0);
+        MSG.forEach(([txt,w,col], n) => { const m = msgs[n];
+          m.r.setAttribute("width", w); m.r.setAttribute("fill", col); m.t.textContent = txt; show(m.g,1); });
+        gExit.style.opacity = 1;
+        noteTxt.textContent = isP() ? "Same shape, every time." : "One loop. Three lessons of variation."; } },
+  ];
+  const s = stepper({ navId:"loopNav", kickId:"loopKick", titleId:"loopTitle", bodyId:"loopBody",
+    prevId:"loopPrev", playId:"loopPlay", nextId:"loopNext", dwell:7600, steps,
+    apply:(i,later) => steps[i].run(i,later) });
+  return s;
+})();
+
+/* ═══ B · execution environments ═══ */
+(() => {
+  const g = document.getElementById("envLayer");
+  const draw = (n) => {
+    while (g.firstChild) g.removeChild(g.firstChild);
+    const W = 320, X = 170, BASE = 162, SLOT = 44, ROWS = 3;
+    g.appendChild(mk("rect", { x:X, y:BASE + 18, width:W, height:52, rx:8, fill:"#F4F2EC", stroke:"#1A1A18", "stroke-width":1.8 }));
+    const h = mk("text", { x:X+W/2, y:BASE + 49, "text-anchor":"middle", "font-family":"var(--font-mono)", "font-size":"12.5", fill:"#1A1A18" });
+    h.textContent = "YOUR MACHINE  ·  your files, your keys"; g.appendChild(h);
+    const real = [
+      ["the generated code"],
+      ["container  ·  namespaces", "the generated code"],
+      ["container  ·  namespaces", "gVisor  ·  intercepts syscalls", "the generated code"],
+      ["microVM  ·  its own guest kernel", "container", "the generated code"],
+    ][n];
+    const cols = ["#9C3B2E", "#9A6F20", "#46606F", "#3F7050"];
+    const pad = ROWS - real.length;
+    const rows = Array(pad).fill(null).concat(real);
+    let y = BASE - ROWS * SLOT;
+    const yOf = [];
+    rows.forEach((txt, i) => {
+      const inset = 14 * Math.max(0, i - pad);
+      yOf.push(y);
+      if (txt === null){
+        g.appendChild(mk("rect", { x:X + 14*i, y:y, width:W - 28*i, height:38, rx:7, fill:"none",
+          stroke:"#DDD9CE", "stroke-width":1.4, "stroke-dasharray":"5 6" }));
+        if (n === 0 && i === ROWS - 2){
+          const nt = mk("text", { x:X + W/2, y:y+24, "text-anchor":"middle", "font-family":"var(--font-mono)",
+            "font-size":"11.5", fill:"#C4633C" }); nt.textContent = "no boundary here at all"; g.appendChild(nt);
+        }
+      } else {
+        g.appendChild(mk("rect", { x:X + inset, y:y, width:W - 2*inset, height:38, rx:7,
+          fill: i === ROWS-1 ? "#FFFFFF" : "#FAF9F6", stroke:cols[n], "stroke-width":1.6 }));
+        const t = mk("text", { x:X + W/2, y:y+24, "text-anchor":"middle", "font-family":"var(--font-mono)",
+          "font-size":"11.5", fill:"#3B3833" }); t.textContent = txt; g.appendChild(t);
+      }
+      y += SLOT;
+    });
+    const reach = [
+      ["everything on your machine", "#9C3B2E", BASE + 44],
+      ["the shared host kernel", "#9A6F20", BASE + 44],
+      ["gVisor, and no further without a kernel bug", "#46606F", yOf[1] + 19],
+      ["its own kernel, and stops there", "#3F7050", yOf[0] + 19],
+    ][n];
+    const top = yOf[ROWS-1] + 19;
+    g.appendChild(mk("path", { d:`M${X+W+16} ${top} L${X+W+16} ${reach[2]} L${X+W-6} ${reach[2]}`,
+      stroke:reach[1], "stroke-width":2, fill:"none", "marker-end":"url(#a17b)" }));
+    const rt = mk("text", { x:X+W+26, y:reach[2] + 4, "font-family":"var(--font-mono)", "font-size":"11.5", fill:reach[1] });
+    rt.textContent = (n < 3 ? "reaches: " : "stops at: ") + reach[0]; g.appendChild(rt);
+  };
+  stepper({ navId:"envNav", kickId:"envKick", titleId:"envTitle", bodyId:"envBody",
+    prevId:"envPrev", playId:"envPlay", nextId:"envNext", dwell:6400,
+    steps: [
+      { k:"Local", t:"Straight onto your machine",
+        b:"What Cursor and Claude Code do by default, and what step 4 of the exercise on the Build-it-yourself tab demonstrates on your own laptop. <em>No isolation at all</em> — the generated code reaches everything you reach. Fine for code you'd have written anyway; not fine for code you haven't read." },
+      { k:"Container", t:"Namespaces separate the processes — but not the kernel",
+        b:"Docker gives operating-system-level isolation: separate processes, separate filesystem view. Better than nothing, and genuinely useful. <em>But every container shares the host kernel</em>, and syscalls go straight to it. One kernel bug is a path to the host — which is why “put it in Docker” is not a security answer." },
+      { k:"gVisor", t:"A middleman in front of the kernel",
+        b:"Google's user-space kernel implements much of the Linux syscall interface itself and intercepts calls, so the container talks to gVisor rather than the host. The course is honest about the price: <em>performance overhead, compatibility gaps, different debugging tools</em> — and gVisor still depends on the host kernel, so it narrows the attack surface without closing it." },
+      { k:"MicroVM", t:"Its own kernel, and that's where it stops",
+        b:"A stripped-down virtual machine — Firecracker, QEMU, Cloud Hypervisor — with <em>its own guest kernel</em>, booting fast enough to be disposable. Firecracker is what runs AWS Lambda and Fargate. This is the isolation the course is arguing for. <span class=\"tj\" data-lbl=\"The catch\">You now run VM infrastructure. Harder to set up, smaller ecosystem, no Docker Hub, and updates and orchestration are yours. That operational burden is the real argument the sponsor makes — see the Verified tab.</span>" },
+    ],
+    apply:(i) => draw(i) });
+})();
+
+/* ═══ C · runtime summarisation ═══ */
+(() => {
+  const g = document.getElementById("sumLayer");
+  const draw = (n, later) => {
+    while (g.firstChild) g.removeChild(g.firstChild);
+    const X = 300, W = 400, BASE = 300;
+    g.appendChild(mk("line", { x1:X-30, y1:70, x2:X+W+30, y2:70, stroke:"#9C3B2E", "stroke-width":2, "stroke-dasharray":"6 4" }));
+    const ct = mk("text", { x:X+W+36, y:74, "font-family":"var(--font-mono)", "font-size":"11.5", fill:"#9C3B2E" });
+    ct.textContent = "40,000 token ceiling"; g.appendChild(ct);
+    const blocks = n === 0 ? 4 : n === 1 ? 8 : 8;
+    const kept = Math.ceil(8 * 0.3);
+    let y = BASE;
+    for (let i = 0; i < blocks; i++){
+      const old = (n >= 2) && i < blocks - kept;
+      if (n >= 3 && old) continue;
+      const hgt = 24;
+      y -= hgt + 4;
+      g.appendChild(mk("rect", { x:X, y:y, width:W, height:hgt, rx:4,
+        fill: old ? "#F3E3DA" : "#EAF0F3", stroke: old ? "#C4633C" : "#9DB6C6", "stroke-width": old ? 2 : 1.2 }));
+      const t = mk("text", { x:X+12, y:y+16, "font-family":"var(--font-mono)", "font-size":"10.5", fill:"#3B3833" });
+      t.textContent = old ? "older turn — selected for compression" : "recent turn — kept as is"; g.appendChild(t);
+    }
+    if (n >= 3){
+      [["synthetic user message · the snapshot", "#F3E3DA", "#C4633C"],
+       ["assistant · “understood”", "#F3E3DA", "#C4633C"]].forEach((b, i) => {
+        const yy = BASE - (kept + 2 - i) * 28 - 4;
+        g.appendChild(mk("rect", { x:X, y:yy, width:W, height:24, rx:4, fill:b[1], stroke:b[2], "stroke-width":2 }));
+        const t = mk("text", { x:X+12, y:yy+16, "font-family":"var(--font-mono)", "font-size":"10.5", fill:"#A34A28" });
+        t.textContent = b[0]; g.appendChild(t);
+      });
+    }
+    if (n >= 4){
+      const kt = Math.ceil(8 * 0.3);
+      for (let j = 0; j < 2; j++){
+        const yy = BASE - (kt + 3 + j) * 28 - 4;
+        g.appendChild(mk("rect", { x:X, y:yy, width:W, height:24, rx:4, fill:"#E2EBE2", stroke:"#3F7050", "stroke-width":1.4 }));
+        const t = mk("text", { x:X+12, y:yy+16, "font-family":"var(--font-mono)", "font-size":"10.5", fill:"#3F7050" });
+        t.textContent = "new turn — the loop carried on, none the wiser"; g.appendChild(t);
+      }
+    }
+    const cap = mk("text", { x:X, y:BASE+26, "font-family":"var(--font-mono)", "font-size":"11", fill:"#8C857A" });
+    cap.textContent = ["4 turns · plenty of room", "8 turns · at the ceiling",
+      "the oldest 70% selected", "replaced by two short messages", "room again · the loop continues"][n];
+    g.appendChild(cap);
+  };
+  stepper({ navId:"sumNav", kickId:"sumKick", titleId:"sumTitle", bodyId:"sumBody",
+    prevId:"sumPrev", playId:"sumPlay", nextId:"sumNext", dwell:6200,
+    steps: [
+      { k:"The problem", t:"Every turn adds; nothing subtracts",
+        b:"A web-app task takes tens of loops. Each one appends a tool result, and tool results are the fat ones — file listings, compiler output, error stacks. The context climbs towards the ceiling on its own." },
+      { k:"The ceiling", t:"Pick a number and defend it",
+        b:"The course fixes a budget: <strong>40,000 tokens</strong>. Not a law — a decision. Having any ceiling is what turns “the agent got slow and stupid” into a condition you can detect in code." },
+      { k:"The selection", t:"Take the oldest 70%, keep recent turns untouched",
+        b:"<strong>Oldest-first</strong>, because recent turns are what the model is actually working from. The 70% figure is taken from Gemini CLI — a borrowed default, not a derived constant. Tune it." },
+      { k:"The compression", t:"Summarise, and re-inject as two messages",
+        b:"The selected turns go to a model with a prompt written for <em>snapshotting a conversation</em>. What comes back is packaged as a <strong>synthetic user message carrying the snapshot, plus an assistant message acknowledging it</strong> — so the shape of the conversation still looks normal to the model." },
+      { k:"Why it's clever", t:"The loop never knows it happened",
+        b:"Nothing above the compression layer changes. The agent keeps calling tools; the messages list is simply shorter than it was. This is the one algorithm in the course worth lifting whole — it costs about thirty lines and it is the difference between an agent that finishes a long task and one that degrades halfway through." },
+    ],
+    apply:(i, later) => draw(i, later) });
+})();
+
+/* ═══ language toggle (figure A only) ═══ */
+(() => {
+  const box = document.createElement("div");
+  box.className = "langtoggle";
+  box.innerHTML = '<button type="button" data-lang="plain">Plain English</button><button type="button" data-lang="tech">Technical</button>';
+  document.getElementById("loopNav").appendChild(box);
+  const mark = () => box.querySelectorAll("[data-lang]").forEach(b => b.setAttribute("aria-pressed", b.dataset.lang === LANG));
+  box.addEventListener("click", e => {
+    const b = e.target.closest("[data-lang]"); if (!b) return;
+    LANG = b.dataset.lang;
+    try { localStorage.setItem("bca.lang", LANG); } catch (err) {}
+    applyLang(); mark(); loopFig.redraw();
+  });
+  mark();
+})();
+
+
+(function(){
+  const bar = document.querySelector(".tabbar");
+  const select = (id, push) => {
+    bar.querySelectorAll("[data-tab]").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === id));
+    document.querySelectorAll(".panel").forEach(p => { p.hidden = p.id !== "panel-" + id; });
+    if (push) history.replaceState(null, "", "#" + id);
+  };
+  bar.addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if (!b) return;
+    select(b.dataset.tab, true); window.scrollTo({ top: bar.offsetTop - 90, behavior: reduce ? "auto" : "smooth" }); });
+  bar.addEventListener("keydown", e => {
+    const btns = [...bar.querySelectorAll("[data-tab]")];
+    const i = btns.findIndex(b => b.getAttribute("aria-selected") === "true");
+    if (e.key === "ArrowRight" || e.key === "ArrowLeft"){
+      const n = (i + (e.key === "ArrowRight" ? 1 : -1) + btns.length) % btns.length;
+      btns[n].focus(); select(btns[n].dataset.tab, true); e.preventDefault();
+    }
+  });
+  document.addEventListener("click", e => {
+    const a = e.target.closest('a[href^="#"]'); if (!a) return;
+    const id = a.getAttribute("href").slice(1);
+    if (document.getElementById("panel-" + id)){ e.preventDefault(); select(id, true);
+      window.scrollTo({ top: bar.offsetTop - 90, behavior: reduce ? "auto" : "smooth" }); }
+  });
+  const initial = location.hash.replace("#", "");
+  if (initial && document.getElementById("panel-" + initial)) select(initial, false);
+})();
+
+})();
+</script>
+</body>
+</html>
