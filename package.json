@@ -9,7 +9,7 @@
     "check": "node scripts/check.mjs all",
     "dev": "npm run build && wrangler dev",
     "deploy": "npm run build && wrangler deploy",
-    "secret": "wrangler secret put GROQ_API_KEY"
+    "secret": "wrangler secret put MODEL_API_KEY"
   },
   "devDependencies": {
     "pyodide": "^0.28.3",

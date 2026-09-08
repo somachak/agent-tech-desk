@@ -97,8 +97,9 @@ async function checkServe() {
   if (!alreadyUp) {
     server = spawn(
       path.join(ROOT, "node_modules", ".bin", "wrangler"),
-      ["dev", "--port", String(port), "--ip", "127.0.0.1", "--local", "--log-level", "error"],
-      { cwd: ROOT, stdio: ["ignore", "pipe", "pipe"], env: { ...process.env, GROQ_API_KEY: "" } }
+      // --var beats .dev.vars, so the mock path is forced even on a machine that has a real key
+      ["dev", "--port", String(port), "--ip", "127.0.0.1", "--local", "--log-level", "error", "--var", "MODEL_API_KEY:"],
+      { cwd: ROOT, stdio: ["ignore", "pipe", "pipe"], env: { ...process.env, MODEL_API_KEY: "" } }
     );
     server.stdout.on("data", (d) => (log += d));
     server.stderr.on("data", (d) => (log += d));
@@ -147,6 +148,18 @@ async function checkServe() {
   }
 }
 
+/** Key shapes that must never reach a tracked file. */
+const KEY_SHAPES = [
+  { name: "Groq-shaped", re: /gsk_[A-Za-z0-9]{20,}/ },          // legacy, kept so old keys stay caught
+  { name: "Meta-shaped", re: /LLM_[0-9]+_[A-Za-z0-9_]{16,}/ },   // Meta Model API: LLM_<digits>_<base62>
+];
+
+function scanForKeys(text, f) {
+  for (const { name, re } of KEY_SHAPES) {
+    if (re.test(text)) bad(`a ${name} key appears in ${f}`);
+  }
+}
+
 async function checkSecrets() {
   const ignore = await readFile(path.join(ROOT, ".gitignore"), "utf8");
   for (const rule of ["public/", ".dev.vars", "node_modules/", ".wrangler/"]) {
@@ -157,11 +170,11 @@ async function checkSecrets() {
     if (/^\.dev\.vars$/.test(f) || f.startsWith("public/") || f.startsWith("node_modules/")) bad(`tracked but should not be: ${f}`);
     if (f.endsWith(".zip") || f.endsWith(".html") || f.endsWith(".md") || f.endsWith(".json")) continue;
     const text = await readFile(path.join(ROOT, f), "utf8").catch(() => "");
-    if (/gsk_[A-Za-z0-9]{20,}/.test(text)) bad(`a Groq-shaped key appears in ${f}`);
+    scanForKeys(text, f);
   }
   for (const f of tracked.filter((f) => /\.(js|mjs|jsonc|json|md)$/.test(f))) {
     const text = await readFile(path.join(ROOT, f), "utf8").catch(() => "");
-    if (/gsk_[A-Za-z0-9]{20,}/.test(text)) bad(`a Groq-shaped key appears in ${f}`);
+    scanForKeys(text, f);
   }
   console.log(`  ${tracked.length} tracked files, no key-shaped strings, ignores cover public/ and .dev.vars`);
 }

@@ -3,12 +3,12 @@
  *
  * Static pages come from the assets binding. This script handles two things:
  *   1. tidy URLs (/bookshelf, /ide, /guides/<slug>) and readable .md cheat sheets
- *   2. /api/tutor — Groq first, Workers AI if bound, and a local mock otherwise,
+ *   2. /api/tutor — the model API first, Workers AI if bound, and a local mock otherwise,
  *      so the site is fully usable before any key exists.
  */
 
-const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
-const GROQ_MODEL = "llama-3.1-8b-instant";
+const MODEL_URL = "https://api.meta.ai/v1/chat/completions";
+const MODEL_NAME = "muse-spark-1.3";
 const WORKERS_AI_MODEL = "@cf/meta/llama-3.1-8b-instruct";
 
 const SYSTEM_PROMPT = `You are the tutor on Soma Pym's Agent Tech and Python desk.
@@ -36,7 +36,7 @@ const json = (data, status = 200) =>
   });
 
 function engineFor(env) {
-  if (env.GROQ_API_KEY) return "groq:" + GROQ_MODEL;
+  if (env.MODEL_API_KEY) return "meta:" + MODEL_NAME;
   if (env.AI) return "workers-ai:" + WORKERS_AI_MODEL;
   return "mock";
 }
@@ -55,18 +55,21 @@ function buildMessages({ messages, book, code }) {
 
 /* --------------------------------------------------------------- the engines */
 
-async function askGroq(env, messages) {
-  const res = await fetch(GROQ_URL, {
+async function askModel(env, messages) {
+  const res = await fetch(MODEL_URL, {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      authorization: `Bearer ${env.GROQ_API_KEY}`,
+      authorization: `Bearer ${env.MODEL_API_KEY}`,
     },
-    body: JSON.stringify({ model: GROQ_MODEL, messages, temperature: 0.3, max_tokens: 900 }),
+    // Muse Spark is a reasoning model: its hidden reasoning tokens are drawn from this
+    // same max_tokens budget. Too low and the reasoning consumes the lot — finish_reason
+    // comes back "length" and the content is an empty string. Keep this generous.
+    body: JSON.stringify({ model: MODEL_NAME, messages, temperature: 0.3, max_tokens: 6000 }),
   });
   if (!res.ok) {
     const detail = (await res.text()).slice(0, 300);
-    throw new Error(`Groq replied ${res.status}: ${detail}`);
+    throw new Error(`The model API replied ${res.status}: ${detail}`);
   }
   const data = await res.json();
   return data.choices?.[0]?.message?.content ?? "";
@@ -160,9 +163,9 @@ function mockReply(question) {
   if (hit) return hit.reply;
   return `The full tutor is not connected yet, so this is the offline stand-in.
 
-1. Set a key: \`npx wrangler secret put GROQ_API_KEY\` (free at console.groq.com).
+1. Set a key: \`npx wrangler secret put MODEL_API_KEY\`.
 2. Restart the dev server, or redeploy.
-3. Ask again — answers then come from Llama 3.1 8B Instant.
+3. Ask again — answers then come from Muse Spark 1.3.
 
 Meanwhile the shelf answers most things itself. Open the guide for the book you are on and use its cheat sheet: vocabulary, the pattern, rules of thumb, skeletons, decisions, and a "before you ship" list. Every skeleton runs as-is in the IDE.`;
 }
@@ -192,8 +195,8 @@ export default {
       const question = [...(body.messages || [])].reverse().find((m) => m.role === "user")?.content || "";
       const engine = engineFor(env);
       try {
-        if (engine.startsWith("groq")) {
-          return json({ reply: await askGroq(env, messages), engine });
+        if (engine.startsWith("meta")) {
+          return json({ reply: await askModel(env, messages), engine });
         }
         if (engine.startsWith("workers-ai")) {
           return json({ reply: await askWorkersAI(env, messages), engine });
@@ -201,7 +204,7 @@ export default {
         return json({
           reply: mockReply(question),
           engine: "mock",
-          note: "Offline mock tutor — no GROQ_API_KEY is set, so this answer is a stored one, not a live model.",
+          note: "Offline mock tutor — no MODEL_API_KEY is set, so this answer is a stored one, not a live model.",
         });
       } catch (err) {
         return json({

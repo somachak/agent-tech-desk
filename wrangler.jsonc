@@ -9,7 +9,7 @@
     "binding": "ASSETS",
     "not_found_handling": "404-page"
   }
-  // After deploy, to use Cloudflare's own Llama instead of Groq, add:
+  // After deploy, to use Cloudflare's own Llama instead of the Meta Model API, add:
   //   "ai": { "binding": "AI" }
-  // The worker prefers GROQ_API_KEY, then AI, then the offline mock.
+  // The worker prefers MODEL_API_KEY, then AI, then the offline mock.
 }

@@ -1,5 +1,5 @@
-/* The tutor page. Talks to /api/tutor, which calls Groq (or Workers AI after
-   deploy) and falls back to a local mock when no key is configured. */
+/* The tutor page. Talks to /api/tutor, which calls the Meta Model API (or Workers AI
+   after deploy) and falls back to a local mock when no key is configured. */
 (() => {
   const $ = (id) => document.getElementById(id);
   const thread = $("thread");

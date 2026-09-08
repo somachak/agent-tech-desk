@@ -23,16 +23,16 @@ npm run deploy
 ### The tutor's key
 
 ```bash
-npx wrangler secret put GROQ_API_KEY     # paste the key when prompted
+npx wrangler secret put MODEL_API_KEY     # paste the key when prompted
 ```
 
-A free key comes from [console.groq.com](https://console.groq.com) → API Keys. The secret lives in Cloudflare, never in the repo. For local development put it in `.dev.vars` instead (copy `.dev.vars.example`); that file is git-ignored.
+The key is issued from Meta's Model API console. The secret lives in Cloudflare, never in the repo. For local development put it in `.dev.vars` instead (copy `.dev.vars.example`); that file is git-ignored.
 
 The Worker picks its engine in this order:
 
 | Order | Engine | When |
 |---|---|---|
-| 1 | Groq — `llama-3.1-8b-instant` | `GROQ_API_KEY` is set |
+| 1 | Meta Model API — `muse-spark-1.3` | `MODEL_API_KEY` is set |
 | 2 | Workers AI — `@cf/meta/llama-3.1-8b-instruct` | an `AI` binding exists |
 | 3 | Offline mock | neither — the site still runs |
 
@@ -42,7 +42,7 @@ To switch to Workers AI after deploying, add this to `wrangler.jsonc` and redepl
 "ai": { "binding": "AI" }
 ```
 
-Leave `GROQ_API_KEY` unset (or delete the secret) if you want the AI binding to take over.
+Leave `MODEL_API_KEY` unset (or delete the secret) if you want the AI binding to take over.
 
 ## What is where
 
@@ -79,7 +79,7 @@ node scripts/check.mjs ide    # every IDE example really runs, in Pyodide
 | `/guides/<slug>` | One book's guide |
 | `/guides/<slug>-cheatsheet` | The printable cheat sheet (`.md` alongside for the raw file) |
 | `/ide` | Python in the browser, via Pyodide |
-| `/tutor` | Groq / Workers AI / offline mock |
+| `/tutor` | Meta Model API / Workers AI / offline mock |
 | `/agent-walkthrough` | Four recorded agent runs, replayed step by step |
 | `/api/tutor`, `/api/tutor/health` | The tutor endpoint and which engine is live |
 
