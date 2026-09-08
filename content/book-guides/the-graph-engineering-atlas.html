@@ -9,18 +9,17 @@
 </head>
 <body>
 <title>The Graph Engineering Atlas</title>
-<style>
-:root{color-scheme:light;
- --surface:#faf9f5;--surface-2:#f2f0e9;--surface-3:#e8e6dc;--surface-ink:#141413;--line:#d9d7cc;--line-soft:#e8e6dc;
+<style>:root{color-scheme:light;
+ --surface:#faf9f5;--surface-2:#f2f0e9;--surface-3:#e8e6dc;--line:#d9d7cc;--line-soft:#e8e6dc;
  --ink:#141413;--ink-2:#5c5b57;--ink-3:#6b6a65;--on-ink:#faf9f5;
  --accent:#d97757;--accent-2:#6a9bcc;--accent-3:#788c5d;
  --font-head:"Poppins",Arial,sans-serif;--font-body:"Lora",Georgia,serif;--font-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--surface);color:var(--ink-2);font-family:var(--font-body);font-size:17px;line-height:1.7}
-main{max-width:980px;margin:0 auto;padding:36px 22px 90px}
+main{max-width:1080px;margin:0 auto;padding:30px 22px 90px}
 h1,h2,h3,h4{font-family:var(--font-head);color:var(--ink);line-height:1.2;margin:0 0 10px;text-wrap:balance}
 h1{font-size:38px;letter-spacing:-.02em;font-weight:600}
-h2{font-size:25px;font-weight:600;margin-top:44px;border-top:1px solid var(--line);padding-top:24px}
+h2{font-size:24px;font-weight:600}
 h3{font-size:18px;font-weight:600}
 p{margin:0 0 12px;max-width:70ch}
 strong{color:var(--ink)}
@@ -29,22 +28,66 @@ code,.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
 code{font-size:.86em;background:var(--surface-3);padding:1px 5px;border-radius:5px;color:var(--ink)}
 .small{font-size:14px;color:var(--ink-3)}
 .eyebrow{font-family:var(--font-mono);color:var(--ink-3);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase}
-.who{font-family:var(--font-mono);font-size:13.5px;color:var(--ink-3);margin-bottom:18px}
-.toc{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:16px 20px;margin:24px 0 8px}
-.toc strong{font-family:var(--font-head);display:block;margin-bottom:6px}
-.toc ol{margin:0;padding-left:20px;columns:2;column-gap:28px}
-.toc li{margin:3px 0;break-inside:avoid}
+.who{font-family:var(--font-mono);font-size:13.5px;color:var(--ink-3);margin-bottom:16px}
+.btn{font-family:var(--font-head);font-weight:600;font-size:13.5px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:10px;padding:8px 14px;cursor:pointer;text-decoration:none;display:inline-block}
+.btn:hover{border-color:var(--accent)}
+button:focus-visible,a:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+
+/* ── tabs ── */
+.tabbar{position:sticky;top:44px;z-index:30;display:flex;gap:4px;overflow-x:auto;padding:10px 0 0;margin:22px 0 0;
+  background:linear-gradient(180deg,var(--surface) 70%,transparent);scrollbar-width:thin}
+.tabbar button{flex:0 0 auto;font-family:var(--font-head);font-size:13.5px;font-weight:600;color:var(--ink-3);
+  background:transparent;border:0;border-bottom:2px solid transparent;padding:9px 13px;cursor:pointer;white-space:nowrap}
+.tabbar button:hover{color:var(--ink)}
+.tabbar button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tabbar .num{font-family:var(--font-mono);font-size:11px;color:var(--ink-3);margin-left:5px;font-weight:400}
+.panel{padding-top:26px;border-top:1px solid var(--line);animation:fade .25s ease;scroll-margin-top:120px}
+figure{scroll-margin-top:120px}
+.panel[hidden]{display:none!important}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ── figures: white plates, pinned ink, both themes ── */
+figure{margin:0 0 20px;background:#FFFFFF;color:#1A1A18;border:1px solid rgba(25,25,23,.15);border-radius:14px;overflow:hidden}
+figure svg{display:block;width:100%;height:auto;background:#FFFFFF}
+.fig-cap{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:start;padding:14px 18px;
+  border-top:1px solid rgba(25,25,23,.15);background:#FFFFFF}
+@media(max-width:720px){.fig-cap{grid-template-columns:1fr}}
+.fig-nav{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-bottom:2px}
+.dot{width:26px;height:26px;border-radius:999px;border:1px solid rgba(25,25,23,.22);background:transparent;
+  font-family:var(--font-mono);font-size:11px;cursor:pointer;color:#686256;padding:0}
+.dot:hover{border-color:#C4633C;color:#A34A28}
+.dot[aria-current="true"]{background:#1A1A18;border-color:#1A1A18;color:#fff}
+.dot.seen{border-color:#C4633C}
+.langtoggle{margin-left:auto;display:flex;border:1px solid rgba(25,25,23,.22);border-radius:999px;overflow:hidden}
+.langtoggle button{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+  padding:6px 12px;border:0;background:transparent;cursor:pointer;color:#686256;white-space:nowrap}
+.langtoggle button+button{border-left:1px solid rgba(25,25,23,.22)}
+.langtoggle button[aria-pressed="true"]{background:#1A1A18;color:#fff}
+.fig-kick{font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#8C857A;display:block}
+.fig-text h4{font-family:var(--font-head);font-size:18px;margin:3px 0 5px;color:#1A1A18}
+.fig-text p{font-size:15.5px;color:#3B3833;max-width:72ch;margin:0}
+.fig-text p em{color:#A34A28;font-style:normal;font-weight:600}
+.fig-text .tj{display:block;margin-top:9px;padding-top:8px;border-top:1px dashed rgba(25,25,23,.18);font-size:14.5px;color:#686256}
+.fig-text .tj::before{content:"In code: ";font-family:var(--font-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#8C857A}
+.fig-ctrl{display:flex;gap:6px;align-items:flex-start}
+.fig-ctrl button{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  padding:7px 12px;border:1px solid rgba(25,25,23,.22);background:transparent;border-radius:8px;cursor:pointer;color:#3B3833;white-space:nowrap}
+.fig-ctrl button:hover{border-color:#C4633C;color:#A34A28}
+.fig-ctrl button.go{background:#1A1A18;border-color:#1A1A18;color:#fff}
+.fig-ctrl button.go:hover{background:#A34A28;border-color:#A34A28}
+.fig-ctrl button:disabled{opacity:.35;cursor:default}
+.fig-note{padding:12px 18px;border-top:1px solid rgba(25,25,23,.09);background:#FBFAF8;font-size:13.5px;color:#686256}
+.fig-note a{color:#A34A28}
+.sc{transition:opacity .45s ease}
+
+/* ── content ── */
 .callout{background:var(--surface-2);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:12px;padding:14px 18px;margin:16px 0}
 .callout.green{border-left-color:var(--accent-3)}
 .callout.blue{border-left-color:var(--accent-2)}
 .note{background:var(--surface-3);border-radius:12px;padding:13px 18px;margin:16px 0;font-size:15.5px}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-@media(max-width:760px){.two{grid-template-columns:1fr}.toc ol{columns:1}}
+@media(max-width:760px){.two{grid-template-columns:1fr}}
 .two .callout{margin:0}
-ol.story{padding-left:22px;max-width:74ch}
-ol.story li{margin:0 0 16px}
-.incode{display:block;margin-top:7px;padding-top:6px;border-top:1px dashed var(--line);font-size:14.5px;color:var(--ink-3)}
-.tierhead{margin-top:32px;font-size:17px;color:var(--ink)}
 .concept{border:1px solid var(--line);border-radius:14px;margin:12px 0;overflow:hidden;background:var(--surface-2)}
 .chead{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;padding:12px 18px;border-bottom:1px solid var(--line)}
 .chead .idx{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-3)}
@@ -54,8 +97,7 @@ ol.story li{margin:0 0 16px}
 .chip.intermediate{background:#e2eaf3;color:#3f5f80}
 .chip.advanced{background:#f5e3da;color:#9a4d2c}
 .cbody{padding:14px 18px;background:var(--surface)}
-.cbody p{margin:0 0 10px}
-.cbody p:last-child{margin:0}
+.cbody p{margin:0 0 10px}.cbody p:last-child{margin:0}
 .got{font-size:15.5px}
 .kv{display:grid;grid-template-columns:150px 1fr;gap:6px 14px;margin:0;font-size:15.5px}
 .kv dt{font-family:var(--font-mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);padding-top:3px}
@@ -66,35 +108,57 @@ table{width:100%;border-collapse:collapse;font-size:15px}
 th{font-family:var(--font-head);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);text-align:left;padding:7px 9px;border-bottom:1px solid var(--line)}
 td{padding:9px 9px;border-bottom:1px solid var(--line-soft);vertical-align:top}
 .plainline{display:block;margin-top:6px;padding-left:10px;border-left:2px solid var(--line);font-size:14px;color:var(--ink-3)}
-ol.anti{padding-left:22px;max-width:74ch}
+ol.anti,ol.story{padding-left:22px;max-width:74ch}
 ol.anti li{margin:6px 0}
-ul{padding-left:22px;max-width:74ch}
-ul li{margin:5px 0}
+ol.story li{margin:0 0 16px}
+.incode{display:block;margin-top:7px;padding-top:6px;border-top:1px dashed var(--line);font-size:14.5px;color:var(--ink-3)}
+ul{padding-left:22px;max-width:74ch}ul li{margin:5px 0}
+.tierhead{margin-top:26px;font-size:17px;color:var(--ink)}
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 14px}
+.filters button{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;padding:6px 11px;
+  border:1px solid var(--line);background:transparent;border-radius:999px;cursor:pointer;color:var(--ink-3)}
+.filters button:hover{border-color:var(--accent);color:var(--ink)}
+.filters button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--on-ink)}
+.concept.hide{display:none}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 <main>
 <span class="eyebrow">Guide 15 · research synthesis</span>
 <h1>The Graph Engineering Atlas</h1>
 <p class="who">22 YouTube transcripts, April–August 2026 · 33 weighted practices · 6 tools · 12 anti-patterns</p>
-<p><strong>Core idea:</strong> a coding agent with no index answers architecture questions by opening files until it guesses. A code knowledge graph records what calls what, once, so the same question becomes a path lookup. The reproducible saving is <em>tool calls</em>, not tokens — and almost every headline ratio in this field is measured against a baseline nobody actually uses.</p>
-
-<div class="callout blue"><strong>How this guide is weighted.</strong> Every practice carries the number of <em>distinct</em> sources that argue for it — not how loudly any one of them says it. Weight 17 means seventeen creators, mostly reviewing different tools, landed on the same instruction. Weight 1 means one person said it once; several of those are the sharpest items here.</div>
-
-<nav class="toc"><strong>On this page</strong><ol><li><a href="#plain">Start here, in plain English</a></li><li><a href="#two-senses">The two things “graph engineering” means</a></li><li><a href="#gate">Should this repo have a graph at all?</a></li><li><a href="#anatomy">Anatomy of a build, and the eight words</a></li><li><a href="#practices">The 33 weighted practices</a></li><li><a href="#tools">The tool landscape</a></li><li><a href="#reality">Which headline numbers survive</a></li><li><a href="#anti">Twelve anti-patterns</a></li><li><a href="#turn">The agent-turn card</a></li><li><a href="#sources">All 23 sources</a></li></ol></nav>
-
-<h2 id="plain">Start here, in plain English</h2>
-<p>No jargon in this section. It is a house with pipes in it, and it explains the whole idea before any technical term appears.</p>
-<ol class="story"><li><strong>One question about a house you have never seen</strong><br>Turn on the bathroom tap — which boiler is heating that water? It is a question about <strong>what is joined to what</strong>, not about what anything is called. Everything below turns on that distinction.</li><li><strong>Way one — reading every label in the house</strong><br>You walk round reading every label and sticker. Five things say HOT WATER on them. The boiler's own label just says BOILER, so it never comes up — even though it is the answer. Labels tell you what things are <em>called</em>, not what they are <em>joined to</em>. <span class="incode">In code this is <code>grep</code>: search every file for a word.</span></li><li><strong>Way two — reading only the signs on the doors</strong><br>So you ignore labels and read door signs instead. One door says <em>bathroom</em>. But the pipe junction that actually joins that tap to the boiler is in the cupboard under the stairs — a door nobody would ever label bathroom. Signs tell you where things <em>live</em>, not what they are <em>joined to</em>. <span class="incode">In code this is <code>glob</code>: pick files by name, like <code>**/*auth*</code>.</span></li><li><strong>So you start opening cupboards</strong><br>Labels failed and signs failed, so there is nothing left but opening cupboards one at a time and hoping. Forty goes, seventeen cupboards actually opened, and the junction was still missed. <span class="incode">This is what a coding agent does to your repo with no index — and it cost $1.41 for that single question on a real codebase.</span></li><li><strong>A plumber draws the house — once</strong><br>Someone walks the house properly and writes down two things: a <strong>dot</strong> for every fitting, and a <strong>line</strong> for every pipe joining two of them. Careful looking rather than guessing, and it only happens once. <span class="incode">The dots are functions and files; the lines are one function calling another. The thing that does the walking is a parser, and it runs offline and free.</span></li><li><strong>The line is the bit labels could never show</strong><br>Bathroom tap → mixer valve → riser pipe → the boiler. Nobody wrote the word <em>bathroom</em> on the boiler and no door sign gave it away. The drawing knows anyway, because it recorded what is joined to what instead of what everything is called.</li><li><strong>Now you just follow the line</strong><br>Put a finger on the tap and follow the pipe. Two moves, no cupboards opened, and you are standing at the boiler. <span class="incode">On the real codebase: 2 tool calls instead of 40, zero files opened, 36 cents instead of $1.41.</span></li><li><strong>Why it is cheaper — and what did not change</strong><br>Nothing magic happened. The looking was done once and written down, so it never has to be repeated. Notice which number collapsed: <strong>how many times it had to go and look</strong>. Money saved is argued over across all 22 sources; the collapse in rummaging is the one finding that holds everywhere.</li></ol>
-
-<h2 id="two-senses">The two things “graph engineering” means</h2>
+<p>An agent with no index answers architecture questions by opening files until it guesses. A code knowledge graph records what calls what, once, so the same question becomes a path lookup. <strong>Start on the Walkthrough tab</strong> — it explains the whole idea in plain English before a single technical term appears.</p>
+<div class="tabbar" role="tablist" aria-label="Guide sections"><button role="tab" id="tab-walkthrough" aria-controls="panel-walkthrough" aria-selected="true" data-tab="walkthrough">Walkthrough</button><button role="tab" id="tab-decide" aria-controls="panel-decide" aria-selected="false" data-tab="decide">Decide</button><button role="tab" id="tab-anatomy" aria-controls="panel-anatomy" aria-selected="false" data-tab="anatomy">Anatomy</button><button role="tab" id="tab-practices" aria-controls="panel-practices" aria-selected="false" data-tab="practices">Practices<span class="num">33</span></button><button role="tab" id="tab-tools" aria-controls="panel-tools" aria-selected="false" data-tab="tools">Tools<span class="num">6</span></button><button role="tab" id="tab-numbers" aria-controls="panel-numbers" aria-selected="false" data-tab="numbers">Numbers</button><button role="tab" id="tab-dags" aria-controls="panel-dags" aria-selected="false" data-tab="dags">Workflow DAGs</button><button role="tab" id="tab-pitfalls" aria-controls="panel-pitfalls" aria-selected="false" data-tab="pitfalls">Pitfalls<span class="num">12</span></button><button role="tab" id="tab-sources" aria-controls="panel-sources" aria-selected="false" data-tab="sources">Sources<span class="num">23</span></button></div>
+<section class="panel" id="panel-walkthrough" role="tabpanel" aria-labelledby="tab-walkthrough">
+<h2>What grep sees, what glob sees, and what a graph records instead</h2>
+<p>Step through it. Eight frames, each one written out. It runs in <strong>plain English</strong> by default — the whole thing told as a house with pipes in it — and the toggle switches to the technical version whenever you want the real names.</p>
+<figure>
+<svg id="heroSvg" viewBox="0 0 1000 420" role="img" aria-label="An eight-step story: what grep sees, what glob sees, why both miss the connection, and what a code graph records instead.">
+  <defs>
+    <marker id="arh" viewBox="0 0 8 8" refX="6.4" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0.6 0.9 L7 4 L0.6 7.1 z" fill="#9C3B2E"/></marker>
+    <marker id="arm" viewBox="0 0 8 8" refX="6.4" refY="4" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0.6 0.9 L7 4 L0.6 7.1 z" fill="#3F7050"/></marker>
+  </defs>
+  <rect x="0" y="0" width="1000" height="420" fill="#FFFFFF"/>
+  <g id="lyQuestion" class="sc"></g><g id="lyFiles"></g><g id="lyGrep" class="sc"></g><g id="lyGlob" class="sc"></g>
+  <g id="lyGraph" class="sc"></g><g id="lyPath" class="sc"></g><g id="lyAnt" class="sc"></g><g id="lyAtlas" class="sc"></g>
+  <g id="lyPanel"></g><g id="lyMode"></g>
+</svg>
+<div class="fig-cap">
+  <div class="fig-nav" id="storyNav" role="tablist" aria-label="Walkthrough steps"></div>
+  <div class="fig-text"><span class="fig-kick" id="stKick">Step 1 of 8</span><h4 id="stTitle">Loading…</h4><p id="stBody"></p></div>
+  <div class="fig-ctrl"><button id="stPrev" type="button">Back</button><button id="stPlay" class="go" type="button">Play</button><button id="stNext" type="button">Next</button></div>
+</div>
+<div class="fig-note">The twelve items on screen are an illustration; the numbers in the panel are measured — median of 4 runs on the VS&nbsp;Code repo, CodeGraph vs. an unaided agent, revalidated 21 July 2026 (<a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a>). Across seven repos the same harness averaged 89% fewer tool calls, 69% fewer tokens, 60% cheaper — and on small repos plain grep still won on wall clock.</div>
+</figure>
+<h3 style="margin-top:26px">The same story in one line</h3>
+<p>An agent with no index answers architecture questions by opening files until it guesses. A graph records what calls what, once, so the same question becomes a path lookup. The reproducible saving is <em>tool calls</em>, not tokens — and almost every headline ratio in this field is measured against a baseline nobody uses.</p></section><section class="panel" id="panel-decide" role="tabpanel" aria-labelledby="tab-decide" hidden>
+<h2>Two different jobs share one name</h2>
 <p>The most-watched sources and the most useful ones are not discussing the same thing. Mixing them up is the commonest confusion in the material.</p>
 <div class="two">
   <div class="callout"><strong>A code / knowledge graph</strong> — 19 of 22 sources. A persistent index of the repo: functions, files, imports, call edges, optionally docs and PDFs. Answers <em>what connects to what</em>. Pay once at index, cheap per query. Blind to runtime, reflection and <code>eval</code>.</div>
-  <div class="callout green"><strong>An agent workflow DAG</strong> — 3 of 22, and they are the viral ones. A shape for the work: planner → parallel workers → skeptic → merge → human gate. Answers <em>what can run at the same time, and who checks it</em>. More tokens, less wall clock. It will not index your repo.</div>
+  <div class="callout green"><strong>An agent workflow DAG</strong> — 3 of 22, and they are the viral ones. A shape for the work: planner → parallel workers → skeptic → merge → human gate. Answers <em>what can run at the same time, and who checks it</em>. More tokens, less wall clock.</div>
 </div>
-<div class="note">A viral title promising to 10× your agent is usually the second sense — a way of writing prompts. It will not stop your agent grepping through forty files. Each practice below is tagged with which sense it belongs to.</div>
-
-<h2 id="gate">Should this repo have a graph at all?</h2>
+<div class="note">A viral title promising to 10× your agent is usually the second sense — a way of writing prompts. It will not stop your agent grepping through forty files.</div>
+<h2 style="margin-top:30px">Should this repo have a graph at all?</h2>
 <p>Three sources say independently: under roughly 20 files, indexing is pure overhead — just read the files. Build one when several of these hold.</p>
 <ul>
 <li>The repo is too big to hold reliably in one context window.</li>
@@ -104,444 +168,843 @@ ul li{margin:5px 0}
 <li>Non-code artefacts — design docs, PDFs, recordings — need to link to code symbols.</li>
 <li>A risky refactor is coming and you want blast radius first.</li>
 </ul>
-<div class="callout"><strong>Do not</strong> build one for a repo under about 20 files, for a single-file keyword lookup, for runtime, race-condition or performance debugging where the graph is structurally blind, or when the agent already has the exact files open.</div>
-
-<h2 id="anatomy">Anatomy of a build, and the eight words</h2>
-<p>Every tool here shares one skeleton: <strong>source files → parse → nodes → edges → communities and hubs</strong>. Real figures from one build: 357 code files, 53 docs and 7 images became 4,041 nodes, 20,900 edges and 185 communities in about twelve minutes.</p>
+<div class="callout"><strong>Do not</strong> build one for a repo under about 20 files, for a single-file keyword lookup, for runtime, race-condition or performance debugging where the graph is structurally blind, or when the agent already has the exact files open.</div></section><section class="panel" id="panel-anatomy" role="tabpanel" aria-labelledby="tab-anatomy" hidden>
+<h2>How a graph gets built, in five stages</h2>
+<p>Every tool here shares one skeleton. Knowing the five stages tells you which knob to turn when a build is slow, expensive, or wrong.</p>
+<figure>
+<svg id="pipeSvg" viewBox="0 0 1000 330" role="img" aria-label="Five-stage indexing pipeline: source files, parse, nodes, edges, communities and hubs.">
+  <rect x="0" y="0" width="1000" height="330" fill="#FFFFFF"/>
+  <g id="pipeStages"></g><g id="pipeEdges"></g><g id="pipeNodes"></g><g id="pipeFiles"></g>
+</svg>
+<div class="fig-cap">
+  <div class="fig-nav" id="pipeNav" role="tablist" aria-label="Pipeline stages"></div>
+  <div class="fig-text"><span class="fig-kick" id="pipeKick">Stage 1 of 5</span><h4 id="pipeTitle">Loading…</h4><p id="pipeBody"></p></div>
+  <div class="fig-ctrl"><button id="pipePrev" type="button">Back</button><button id="pipePlay" class="go" type="button">Play</button><button id="pipeNext" type="button">Next</button></div>
+</div>
+<div class="fig-note">Real figures from one build on the <code>browser-use</code> repo: 357 code files, 53 docs, 7 images → 4,041 nodes, 20,900 edges, 185 communities, about 12 minutes (<a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a>). Hub sizing from a god node with 47 connections (<a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a>).</div>
+</figure>
+<h3 style="margin-top:26px">The eight words you need</h3>
+<p>Each one gets the technical definition, then the same idea in the language of the house from the walkthrough.</p>
 <div class="tablewrap"><table>
-<thead><tr><th>Term</th><th>What it means, and the same idea in plain English</th><th>Concrete anchor</th></tr></thead>
-<tbody><tr><td><strong>tree-sitter</strong></td><td>An incremental parser that builds a syntax tree per file. Local, deterministic, offline, no API key — this is why the code pass of a graph build is free.<span class="plainline">The surveyor who walks the house and writes down exactly what is there. No opinions, no guessing, and free.</span></td><td class="mono small">36 grammars / 79 extensions (Graphify); 158 languages (codebase-memory-mcp); 20 of 34 languages moved to compiled Rust parsers in CodeGraph v1.5</td></tr><tr><td><strong>Leiden / Louvain</strong></td><td>Community-detection algorithms. They cluster the graph by connection density, so you get the modules your code actually has, not the ones your folder names claim.<span class="plainline">Grouping rooms by which ones are actually plumbed together — not by which floor the estate agent put them on.</span></td><td class="mono small">185 communities from 4,041 nodes; 67 communities from 591 doc concepts</td></tr><tr><td><strong>god node / hub</strong></td><td>The highest-degree entities. Read these first — they are the architectural spine, and they are where a refactor hurts.<span class="plainline">The main junction in the airing cupboard. Everything runs through it, so it is the first thing to look at and the worst thing to move.</span></td><td class="mono small"><code>extract</code> with 47 connections; <code>build_graph</code> with 32</td></tr><tr><td><strong>confidence tag</strong></td><td>Per-edge provenance: extracted (the parser saw it), inferred (probably), ambiguous (a model guessed). Treat anything below extracted as a lead, not a fact.<span class="plainline">The difference between “I traced this pipe with my hand” and “I think it probably goes that way”. Worth knowing which is which before you cut anything.</span></td><td class="mono small">extracted = 1.0; inferred = 0.55–0.95; GitNexus lets Cypher filter on &gt; 0.8</td></tr><tr><td><strong>content-addressed cache</strong></td><td>Files are hashed; only changed hashes get re-parsed. This is the mechanism behind incremental update in every tool here.<span class="plainline">You only re-survey the rooms that got redecorated.</span></td><td class="mono small">SHA-256 (Graphify / GitNexus / CodeGraph); XXH3 (codebase-memory-mcp)</td></tr><tr><td><strong>dynamic-dispatch synthesis</strong></td><td>Resolving edges a parser cannot see statically: callbacks, event-emitter string keys, React state updates driving a child re-render, C function pointers. Only synthesises an edge when the whole flow closes end to end.<span class="plainline">Some pipes only carry water when a valve opens. A good surveyor notes those too — but only when they can follow the whole run.</span></td><td class="mono small">CodeGraph only, of the tools compared head to head</td></tr><tr><td><strong>blast radius</strong></td><td>The transitive set of things reachable from a change. The query you run before a refactor, not after the tests go red.<span class="plainline">Before you cut a pipe: what stops working upstairs?</span></td><td class="mono small">A 5-layer dependency chain resolved in sub-milliseconds (codebase-memory-mcp)</td></tr><tr><td><strong>MCP</strong></td><td>The protocol that lets the agent call the index as a tool. Without it the graph is a file the agent has to be told to read — which it will forget to do.<span class="plainline">The doorbell. Without it the assistant has the drawing in a drawer and never thinks to open it.</span></td><td class="mono small">1 tool (CodeGraph explorer) vs 17 tools (GitNexus) — fewer is easier for an agent to actually pick</td></tr></tbody>
-</table></div>
-
-<h2 id="practices">The 33 weighted practices</h2>
-
-<h3 class="tierhead">Tier S — eight or more sources agree</h3>
-<p class="small">Do these first. Nothing else on this page is worth doing until these are in place.</p>
-
-<div class="concept">
+<thead><tr><th style="width:150px">Term</th><th>What it means here</th><th style="width:230px">Concrete anchor</th></tr></thead>
+<tbody><tr><td><strong>tree-sitter</strong></td><td>An incremental parser that builds a syntax tree per file. Local, deterministic, offline, no API key — this is why the code pass of a graph build is free.<span class="plainline">The surveyor who walks the house and writes down exactly what is there. No opinions, no guessing, and free.</span></td><td class="mono small">36 grammars / 79 extensions (Graphify); 158 languages (codebase-memory-mcp); 20 of 34 languages moved to compiled Rust parsers in CodeGraph v1.5</td></tr><tr><td><strong>Leiden / Louvain</strong></td><td>Community-detection algorithms. They cluster the graph by connection density, so you get the modules your code actually has, not the ones your folder names claim.<span class="plainline">Grouping rooms by which ones are actually plumbed together — not by which floor the estate agent put them on.</span></td><td class="mono small">185 communities from 4,041 nodes; 67 communities from 591 doc concepts</td></tr><tr><td><strong>god node / hub</strong></td><td>The highest-degree entities. Read these first — they are the architectural spine, and they are where a refactor hurts.<span class="plainline">The main junction in the airing cupboard. Everything runs through it, so it is the first thing to look at and the worst thing to move.</span></td><td class="mono small"><code>extract</code> with 47 connections; <code>build_graph</code> with 32</td></tr><tr><td><strong>confidence tag</strong></td><td>Per-edge provenance: extracted (the parser saw it), inferred (probably), ambiguous (a model guessed). Treat anything below extracted as a lead, not a fact.<span class="plainline">The difference between “I traced this pipe with my hand” and “I think it probably goes that way”. Worth knowing before you cut anything.</span></td><td class="mono small">extracted = 1.0; inferred = 0.55–0.95; GitNexus lets Cypher filter on &gt; 0.8</td></tr><tr><td><strong>content-addressed cache</strong></td><td>Files are hashed; only changed hashes get re-parsed. This is the mechanism behind incremental update in every tool here.<span class="plainline">You only re-survey the rooms that got redecorated.</span></td><td class="mono small">SHA-256 (Graphify / GitNexus / CodeGraph); XXH3 (codebase-memory-mcp)</td></tr><tr><td><strong>dynamic-dispatch synthesis</strong></td><td>Resolving edges a parser cannot see statically: callbacks, event-emitter string keys, React state updates driving a child re-render, C function pointers. Only synthesises an edge when the whole flow closes end to end.<span class="plainline">Some pipes only carry water when a valve opens. A good surveyor notes those too — but only when they can follow the whole run.</span></td><td class="mono small">CodeGraph only, of the tools compared head to head</td></tr><tr><td><strong>blast radius</strong></td><td>The transitive set of things reachable from a change. The query you run before a refactor, not after the tests go red.<span class="plainline">Before you cut a pipe: what stops working upstairs?</span></td><td class="mono small">A 5-layer dependency chain resolved in sub-milliseconds (codebase-memory-mcp)</td></tr><tr><td><strong>MCP</strong></td><td>The protocol that lets the agent call the index as a tool. Without it the graph is a file the agent has to be told to read — which it will forget to do.<span class="plainline">The doorbell. Without it the assistant has the drawing in a drawer and never thinks to open it.</span></td><td class="mono small">1 tool (CodeGraph explorer) vs 17 tools (GitNexus) — fewer is easier for an agent to actually pick</td></tr></tbody>
+</table></div></section><section class="panel" id="panel-practices" role="tabpanel" aria-labelledby="tab-practices" hidden>
+<h2>33 practices, weighted by independent agreement</h2>
+<p>Weight = how many <em>distinct</em> sources argue for the practice, not how loudly any one says it. Weight 17 means seventeen creators, mostly reviewing different tools, landed on the same instruction. Weight 1 means one person said it once — sometimes the sharpest items in the list.</p>
+<div class="filters" id="tierFilter" role="group" aria-label="Filter by tier">
+  <button data-tier="all" aria-pressed="true">All 33</button>
+  <button data-tier="S" aria-pressed="false">Tier S · ≥8</button>
+  <button data-tier="A" aria-pressed="false">Tier A · 5–7</button>
+  <button data-tier="B" aria-pressed="false">Tier B · 3–4</button>
+  <button data-tier="C" aria-pressed="false">Tier C · 1–2</button>
+</div>
+<div class="tierblock" data-tier="S"><h3 class="tierhead">Tier S — eight or more sources agree</h3><p class="small">Do these first. Nothing else here is worth doing until these are in place.</p><div class="concept" data-tier="S">
   <div class="chead"><span class="idx">01</span><span class="t">Build the graph once; query it across sessions instead of re-learning the repo.</span>
     <span class="chip foundation">weight 17</span>
-    <span class="chip ch">code graph</span>
-  </div>
-  <div class="cbody">
-    <p>Left alone, an agent rediscovers your architecture from scratch every single session — the equivalent of rehiring a junior every morning. A persistent index turns that recurring cost into a one-off.</p>
-    <p class="got"><strong>In practice:</strong> Build from the project root, then load the graph summary at session start rather than the file tree. Seventeen of twenty-two transcripts open with this argument; it is the closest thing to consensus in the whole corpus.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=Owv503rTqYY">Owv503rTqYY</a> · <a href="https://www.youtube.com/watch?v=WNru_PFycT8">WNru_PFycT8</a> · <a href="https://www.youtube.com/watch?v=EKbQ5sajVxA">EKbQ5sajVxA</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a> · <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=dNLM94o-HTw">dNLM94o-HTw</a> · <a href="https://www.youtube.com/watch?v=rgYnZqi2GmA">rgYnZqi2GmA</a> · <a href="https://www.youtube.com/watch?v=mWLDn49_8HA">mWLDn49_8HA</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=LVnKcfHHaFM">LVnKcfHHaFM</a> · <a href="https://www.youtube.com/watch?v=wBAlh70Quk8">wBAlh70Quk8</a> · <a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a> · <a href="https://www.youtube.com/watch?v=Ynv_WYO_slw">Ynv_WYO_slw</a> · <a href="https://www.youtube.com/watch?v=nvJ1M_GRj8Q">nvJ1M_GRj8Q</a></p>
-  </div>
-</div>
-<div class="concept">
+    <span class="chip">code graph</span></div>
+  <div class="cbody"><p>Left alone, an agent rediscovers your architecture from scratch every single session — the equivalent of rehiring a junior every morning. A persistent index turns that recurring cost into a one-off.</p><p class="got"><strong>In practice:</strong> Build from the project root, then load the graph summary at session start rather than the file tree. Seventeen of twenty-two transcripts open with this argument; it is the closest thing to consensus in the whole corpus.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=Owv503rTqYY">Owv503rTqYY</a> · <a href="https://www.youtube.com/watch?v=WNru_PFycT8">WNru_PFycT8</a> · <a href="https://www.youtube.com/watch?v=EKbQ5sajVxA">EKbQ5sajVxA</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a> · <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=dNLM94o-HTw">dNLM94o-HTw</a> · <a href="https://www.youtube.com/watch?v=rgYnZqi2GmA">rgYnZqi2GmA</a> · <a href="https://www.youtube.com/watch?v=mWLDn49_8HA">mWLDn49_8HA</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=LVnKcfHHaFM">LVnKcfHHaFM</a> · <a href="https://www.youtube.com/watch?v=wBAlh70Quk8">wBAlh70Quk8</a> · <a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a> · <a href="https://www.youtube.com/watch?v=Ynv_WYO_slw">Ynv_WYO_slw</a> · <a href="https://www.youtube.com/watch?v=nvJ1M_GRj8Q">nvJ1M_GRj8Q</a></p></div>
+</div><div class="concept" data-tier="S">
   <div class="chead"><span class="idx">02</span><span class="t">Treat token and tool-call cost as a first-class reason to reach for a map.</span>
     <span class="chip foundation">weight 16</span>
-    <span class="chip ch">code graph</span>
-  </div>
-  <div class="cbody">
-    <p>The graph is not an intelligence upgrade. It is a cost structure — it replaces stuffing raw files into context with a targeted lookup.</p>
-    <p class="got"><strong>In practice:</strong> The reproducible win is tool calls, not tokens: 40 → 2, 52 file reads → 3, zero file reads across seven repos. Token deltas are contested and occasionally negative. Treat the one-off build (200k–400k tokens with full image and document extraction) as capital expenditure, not running cost.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=mBePcvqLX88">mBePcvqLX88</a> · <a href="https://www.youtube.com/watch?v=rgYnZqi2GmA">rgYnZqi2GmA</a> · <a href="https://www.youtube.com/watch?v=Ynv_WYO_slw">Ynv_WYO_slw</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=EKbQ5sajVxA">EKbQ5sajVxA</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=mWLDn49_8HA">mWLDn49_8HA</a> · <a href="https://www.youtube.com/watch?v=dNLM94o-HTw">dNLM94o-HTw</a> · <a href="https://www.youtube.com/watch?v=LVnKcfHHaFM">LVnKcfHHaFM</a> · <a href="https://www.youtube.com/watch?v=Owv503rTqYY">Owv503rTqYY</a> · <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a> · <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a> · <a href="https://www.youtube.com/watch?v=WNru_PFycT8">WNru_PFycT8</a></p>
-  </div>
-</div>
-<div class="concept">
+    <span class="chip">code graph</span></div>
+  <div class="cbody"><p>The graph is not an intelligence upgrade. It is a cost structure — it replaces stuffing raw files into context with a targeted lookup.</p><p class="got"><strong>In practice:</strong> The reproducible win is tool calls, not tokens: 40 → 2, 52 file reads → 3, zero file reads across seven repos. Token deltas are contested and occasionally negative. Treat the one-off build (200k–400k tokens with full image and document extraction) as capital expenditure, not running cost.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=mBePcvqLX88">mBePcvqLX88</a> · <a href="https://www.youtube.com/watch?v=rgYnZqi2GmA">rgYnZqi2GmA</a> · <a href="https://www.youtube.com/watch?v=Ynv_WYO_slw">Ynv_WYO_slw</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=EKbQ5sajVxA">EKbQ5sajVxA</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=mWLDn49_8HA">mWLDn49_8HA</a> · <a href="https://www.youtube.com/watch?v=dNLM94o-HTw">dNLM94o-HTw</a> · <a href="https://www.youtube.com/watch?v=LVnKcfHHaFM">LVnKcfHHaFM</a> · <a href="https://www.youtube.com/watch?v=Owv503rTqYY">Owv503rTqYY</a> · <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a> · <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a> · <a href="https://www.youtube.com/watch?v=WNru_PFycT8">WNru_PFycT8</a></p></div>
+</div><div class="concept" data-tier="S">
   <div class="chead"><span class="idx">03</span><span class="t">Wire the graph into the agent — skill, MCP or hook — so structural lookup happens by default.</span>
     <span class="chip foundation">weight 14</span>
-    <span class="chip ch">code graph</span>
-  </div>
-  <div class="cbody">
-    <p>A graph the agent has to be reminded about is a graph the agent will not use. Every transcript that reports a disappointing result has this failure somewhere in it.</p>
-    <p class="got"><strong>In practice:</strong> <code>graphify claude install</code> adds an always-on session hook that reads the report before touching files. CodeGraph's installer writes your MCP config directly. codebase-memory-mcp goes furthest: it auto-patches Claude Code, Zed and Cursor with a pre-tool-use hook that intercepts raw grep and injects graph structure into the result.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=Ynv_WYO_slw">Ynv_WYO_slw</a> · <a href="https://www.youtube.com/watch?v=dNLM94o-HTw">dNLM94o-HTw</a> · <a href="https://www.youtube.com/watch?v=mWLDn49_8HA">mWLDn49_8HA</a> · <a href="https://www.youtube.com/watch?v=Owv503rTqYY">Owv503rTqYY</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a> · <a href="https://www.youtube.com/watch?v=rgYnZqi2GmA">rgYnZqi2GmA</a> · <a href="https://www.youtube.com/watch?v=EKbQ5sajVxA">EKbQ5sajVxA</a> · <a href="https://www.youtube.com/watch?v=wBAlh70Quk8">wBAlh70Quk8</a> · <a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a> · <a href="https://www.youtube.com/watch?v=LVnKcfHHaFM">LVnKcfHHaFM</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a></p>
-  </div>
-</div>
-<div class="concept">
+    <span class="chip">code graph</span></div>
+  <div class="cbody"><p>A graph the agent has to be reminded about is a graph the agent will not use. Every transcript that reports a disappointing result has this failure somewhere in it.</p><p class="got"><strong>In practice:</strong> <code>graphify claude install</code> adds an always-on session hook that reads the report before touching files. CodeGraph's installer writes your MCP config directly. codebase-memory-mcp goes furthest: it auto-patches Claude Code, Zed and Cursor with a pre-tool-use hook that intercepts raw grep and injects graph structure into the result.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=Ynv_WYO_slw">Ynv_WYO_slw</a> · <a href="https://www.youtube.com/watch?v=dNLM94o-HTw">dNLM94o-HTw</a> · <a href="https://www.youtube.com/watch?v=mWLDn49_8HA">mWLDn49_8HA</a> · <a href="https://www.youtube.com/watch?v=Owv503rTqYY">Owv503rTqYY</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a> · <a href="https://www.youtube.com/watch?v=rgYnZqi2GmA">rgYnZqi2GmA</a> · <a href="https://www.youtube.com/watch?v=EKbQ5sajVxA">EKbQ5sajVxA</a> · <a href="https://www.youtube.com/watch?v=wBAlh70Quk8">wBAlh70Quk8</a> · <a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a> · <a href="https://www.youtube.com/watch?v=LVnKcfHHaFM">LVnKcfHHaFM</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a></p></div>
+</div><div class="concept" data-tier="S">
   <div class="chead"><span class="idx">04</span><span class="t">Query relationships — calls, imports, paths — instead of grepping for architecture.</span>
     <span class="chip foundation">weight 10</span>
-    <span class="chip ch">code graph</span>
-  </div>
-  <div class="cbody">
-    <p>Grep answers “where does this string appear”. Architecture questions are “what reaches what”, and no amount of string matching composes into that answer.</p>
-    <p class="got"><strong>In practice:</strong> The corpus's standing example: “how does the auth middleware connect to the DB pool” in a 200-file project costs an unaided agent 15+ tool calls and ~4,000 tokens across 40 matches and 15 files — and it still misses the wiring callback. Reserve grep for a known string in a known file.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=LVnKcfHHaFM">LVnKcfHHaFM</a> · <a href="https://www.youtube.com/watch?v=Owv503rTqYY">Owv503rTqYY</a> · <a href="https://www.youtube.com/watch?v=EKbQ5sajVxA">EKbQ5sajVxA</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a> · <a href="https://www.youtube.com/watch?v=rgYnZqi2GmA">rgYnZqi2GmA</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a></p>
-  </div>
-</div>
-<div class="concept">
+    <span class="chip">code graph</span></div>
+  <div class="cbody"><p>Grep answers “where does this string appear”. Architecture questions are “what reaches what”, and no amount of string matching composes into that answer.</p><p class="got"><strong>In practice:</strong> The corpus's standing example: “how does the auth middleware connect to the DB pool” in a 200-file project costs an unaided agent 15+ tool calls and ~4,000 tokens across 40 matches and 15 files — and it still misses the wiring callback. Reserve grep for a known string in a known file.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=LVnKcfHHaFM">LVnKcfHHaFM</a> · <a href="https://www.youtube.com/watch?v=Owv503rTqYY">Owv503rTqYY</a> · <a href="https://www.youtube.com/watch?v=EKbQ5sajVxA">EKbQ5sajVxA</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a> · <a href="https://www.youtube.com/watch?v=rgYnZqi2GmA">rgYnZqi2GmA</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a></p></div>
+</div><div class="concept" data-tier="S">
   <div class="chead"><span class="idx">05</span><span class="t">Keep it fresh — manual update, git hooks, or an OS file watcher.</span>
     <span class="chip foundation">weight 10</span>
-    <span class="chip ch">code graph</span>
-  </div>
-  <div class="cbody">
-    <p>A stale graph is worse than no graph: it answers confidently about code that no longer exists.</p>
-    <p class="got"><strong>In practice:</strong> Three models, in ascending order of how little you have to think about it. <b>Manual</b>: <code>graphify update</code>, <code>npx gitnexus analyze</code> — put the command in CLAUDE.md so the agent runs it. <b>Git hook</b>: <code>graphify hook install</code> rebuilds on commit and branch switch. <b>Watcher</b>: CodeGraph's native FSEvents / inotify / ReadDirectoryChangesW with a 2s debounce — ~0.3s to resync 4,000 files, ~0.4s on 27,000. When a tool names a stale file, read that file raw and trust the rest of the graph.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=LVnKcfHHaFM">LVnKcfHHaFM</a> · <a href="https://www.youtube.com/watch?v=rgYnZqi2GmA">rgYnZqi2GmA</a> · <a href="https://www.youtube.com/watch?v=WNru_PFycT8">WNru_PFycT8</a> · <a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a> · <a href="https://www.youtube.com/watch?v=wBAlh70Quk8">wBAlh70Quk8</a> · <a href="https://www.youtube.com/watch?v=Owv503rTqYY">Owv503rTqYY</a> · <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a></p>
-  </div>
-</div>
-<div class="concept">
+    <span class="chip">code graph</span></div>
+  <div class="cbody"><p>A stale graph is worse than no graph: it answers confidently about code that no longer exists.</p><p class="got"><strong>In practice:</strong> Three models, in ascending order of how little you have to think about it. <b>Manual</b>: <code>graphify update</code>, <code>npx gitnexus analyze</code> — put the command in CLAUDE.md so the agent runs it. <b>Git hook</b>: <code>graphify hook install</code> rebuilds on commit and branch switch. <b>Watcher</b>: CodeGraph's native FSEvents / inotify / ReadDirectoryChangesW with a 2s debounce — ~0.3s to resync 4,000 files, ~0.4s on 27,000. When a tool names a stale file, read that file raw and trust the rest of the graph.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=LVnKcfHHaFM">LVnKcfHHaFM</a> · <a href="https://www.youtube.com/watch?v=rgYnZqi2GmA">rgYnZqi2GmA</a> · <a href="https://www.youtube.com/watch?v=WNru_PFycT8">WNru_PFycT8</a> · <a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a> · <a href="https://www.youtube.com/watch?v=wBAlh70Quk8">wBAlh70Quk8</a> · <a href="https://www.youtube.com/watch?v=Owv503rTqYY">Owv503rTqYY</a> · <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a></p></div>
+</div><div class="concept" data-tier="S">
   <div class="chead"><span class="idx">06</span><span class="t">Index docs, PDFs, images and video into the same graph when non-code context matters.</span>
     <span class="chip foundation">weight 10</span>
-    <span class="chip ch">code graph</span>
-  </div>
-  <div class="cbody">
-    <p>Design intent usually lives outside the code. If the spec and the implementation are in different systems, no graph over the code alone can connect them.</p>
-    <p class="got"><strong>In practice:</strong> Optional install extras cover PDF, office formats, video transcription and local inference. This is also where the token cost lives — the code pass is free via tree-sitter, the non-code pass is an LLM pass. Scale reference: 171 documentation pages became 591 concept nodes across 67 communities.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=WNru_PFycT8">WNru_PFycT8</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=dNLM94o-HTw">dNLM94o-HTw</a> · <a href="https://www.youtube.com/watch?v=mWLDn49_8HA">mWLDn49_8HA</a> · <a href="https://www.youtube.com/watch?v=EKbQ5sajVxA">EKbQ5sajVxA</a> · <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a></p>
-  </div>
-</div>
-<div class="concept">
+    <span class="chip">code graph</span></div>
+  <div class="cbody"><p>Design intent usually lives outside the code. If the spec and the implementation are in different systems, no graph over the code alone can connect them.</p><p class="got"><strong>In practice:</strong> Optional install extras cover PDF, office formats, video transcription and local inference. This is also where the token cost lives — the code pass is free via tree-sitter, the non-code pass is an LLM pass. Scale reference: 171 documentation pages became 591 concept nodes across 67 communities.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=WNru_PFycT8">WNru_PFycT8</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=dNLM94o-HTw">dNLM94o-HTw</a> · <a href="https://www.youtube.com/watch?v=mWLDn49_8HA">mWLDn49_8HA</a> · <a href="https://www.youtube.com/watch?v=EKbQ5sajVxA">EKbQ5sajVxA</a> · <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a></p></div>
+</div><div class="concept" data-tier="S">
   <div class="chead"><span class="idx">07</span><span class="t">Index once, query many — amortise the extraction.</span>
     <span class="chip foundation">weight 9</span>
-    <span class="chip ch">code graph</span>
-  </div>
-  <div class="cbody">
-    <p>The economics only work if you ask more than a handful of questions against the same index. One-off questions never reach break-even.</p>
-    <p class="got"><strong>In practice:</strong> First build: 1–3 minutes on 150 files; ~12 minutes on 357 code files plus docs and images; under 12 minutes for the Linux kernel's 70k files and 6.4M relationships on 2 cores and 6GB. Everything after that should be a cheap lookup against cached JSON or SQLite.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=WNru_PFycT8">WNru_PFycT8</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a> · <a href="https://www.youtube.com/watch?v=EKbQ5sajVxA">EKbQ5sajVxA</a> · <a href="https://www.youtube.com/watch?v=rgYnZqi2GmA">rgYnZqi2GmA</a></p>
-  </div>
-</div>
-<div class="concept">
+    <span class="chip">code graph</span></div>
+  <div class="cbody"><p>The economics only work if you ask more than a handful of questions against the same index. One-off questions never reach break-even.</p><p class="got"><strong>In practice:</strong> First build: 1–3 minutes on 150 files; ~12 minutes on 357 code files plus docs and images; under 12 minutes for the Linux kernel's 70k files and 6.4M relationships on 2 cores and 6GB. Everything after that should be a cheap lookup against cached JSON or SQLite.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=WNru_PFycT8">WNru_PFycT8</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a> · <a href="https://www.youtube.com/watch?v=EKbQ5sajVxA">EKbQ5sajVxA</a> · <a href="https://www.youtube.com/watch?v=rgYnZqi2GmA">rgYnZqi2GmA</a></p></div>
+</div><div class="concept" data-tier="S">
   <div class="chead"><span class="idx">08</span><span class="t">Parse code with local tree-sitter / AST before spending anything on an LLM pass.</span>
     <span class="chip foundation">weight 8</span>
-    <span class="chip ch">code graph</span>
-  </div>
-  <div class="cbody">
-    <p>Structure is a parsing problem, not a language-model problem. Anything you can get deterministically, you should get deterministically.</p>
-    <p class="got"><strong>In practice:</strong> Offline, free, no API key, same answer every run. 36 grammars and 79 extensions in one tool; 158 languages in another; 20 of 34 languages moved to compiled Rust parsers with claimed byte-identical output in CodeGraph v1.5. Reserve LLM tokens for docs, media and semantic enrichment. Unsupported across every tool here: Haskell, OCaml, F#, Clojure.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a> · <a href="https://www.youtube.com/watch?v=WNru_PFycT8">WNru_PFycT8</a> · <a href="https://www.youtube.com/watch?v=LVnKcfHHaFM">LVnKcfHHaFM</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a></p>
-  </div>
-</div>
-<h3 class="tierhead">Tier A — five to seven sources</h3>
-<p class="small">Real consensus, narrower application. Adopt these once the Tier S habits hold.</p>
-
-<div class="concept">
+    <span class="chip">code graph</span></div>
+  <div class="cbody"><p>Structure is a parsing problem, not a language-model problem. Anything you can get deterministically, you should get deterministically.</p><p class="got"><strong>In practice:</strong> Offline, free, no API key, same answer every run. 36 grammars and 79 extensions in one tool; 158 languages in another; 20 of 34 languages moved to compiled Rust parsers with claimed byte-identical output in CodeGraph v1.5. Reserve LLM tokens for docs, media and semantic enrichment. Unsupported across every tool here: Haskell, OCaml, F#, Clojure.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a> · <a href="https://www.youtube.com/watch?v=WNru_PFycT8">WNru_PFycT8</a> · <a href="https://www.youtube.com/watch?v=LVnKcfHHaFM">LVnKcfHHaFM</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a></p></div>
+</div></div><div class="tierblock" data-tier="A"><h3 class="tierhead">Tier A — five to seven sources</h3><p class="small">Real consensus, narrower application. Adopt once the Tier S habits hold.</p><div class="concept" data-tier="A">
   <div class="chead"><span class="idx">09</span><span class="t">Cluster the graph to find the modules your folder names hide.</span>
     <span class="chip intermediate">weight 7</span>
-    <span class="chip ch">code graph</span>
-  </div>
-  <div class="cbody">
-    <p>Directory structure records what someone intended two years ago. Connection density records what the code actually does now.</p>
-    <p class="got"><strong>In practice:</strong> Leiden or Louvain community detection over the node graph. 4,041 nodes collapsed to 185 communities in one build; 664 nodes to 55 in another; 591 doc concepts to 67. Use <code>--cluster-only</code> to redraw boundaries without re-running extraction.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a> · <a href="https://www.youtube.com/watch?v=Owv503rTqYY">Owv503rTqYY</a> · <a href="https://www.youtube.com/watch?v=WNru_PFycT8">WNru_PFycT8</a> · <a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a> · <a href="https://www.youtube.com/watch?v=rgYnZqi2GmA">rgYnZqi2GmA</a></p>
-  </div>
-</div>
-<div class="concept">
+    <span class="chip">code graph</span></div>
+  <div class="cbody"><p>Directory structure records what someone intended two years ago. Connection density records what the code actually does now.</p><p class="got"><strong>In practice:</strong> Leiden or Louvain community detection over the node graph. 4,041 nodes collapsed to 185 communities in one build; 664 nodes to 55 in another; 591 doc concepts to 67. Use <code>--cluster-only</code> to redraw boundaries without re-running extraction.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a> · <a href="https://www.youtube.com/watch?v=Owv503rTqYY">Owv503rTqYY</a> · <a href="https://www.youtube.com/watch?v=WNru_PFycT8">WNru_PFycT8</a> · <a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a> · <a href="https://www.youtube.com/watch?v=rgYnZqi2GmA">rgYnZqi2GmA</a></p></div>
+</div><div class="concept" data-tier="A">
   <div class="chead"><span class="idx">10</span><span class="t">Export for humans, not only for agents.</span>
     <span class="chip intermediate">weight 7</span>
-    <span class="chip ch">code graph</span>
-  </div>
-  <div class="cbody">
-    <p>You will make better calls about a codebase you can see. And a graph you can show a colleague is worth more than one only an agent reads.</p>
-    <p class="got"><strong>In practice:</strong> HTML graph coloured by community (clickable, filterable, searchable), Obsidian vault with wiki-links, SVG for GitHub or Notion, GraphML for Gephi, direct Neo4j push. Read <code>GRAPH_REPORT.md</code> yourself before asking the agent anything — it lists god nodes, insights and suggested queries.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=mWLDn49_8HA">mWLDn49_8HA</a> · <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a> · <a href="https://www.youtube.com/watch?v=yYSTsKo8moU">yYSTsKo8moU</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a></p>
-  </div>
-</div>
-<div class="concept">
+    <span class="chip">code graph</span></div>
+  <div class="cbody"><p>You will make better calls about a codebase you can see. And a graph you can show a colleague is worth more than one only an agent reads.</p><p class="got"><strong>In practice:</strong> HTML graph coloured by community (clickable, filterable, searchable), Obsidian vault with wiki-links, SVG for GitHub or Notion, GraphML for Gephi, direct Neo4j push. Read <code>GRAPH_REPORT.md</code> yourself before asking the agent anything — it lists god nodes, insights and suggested queries.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=mWLDn49_8HA">mWLDn49_8HA</a> · <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a> · <a href="https://www.youtube.com/watch?v=yYSTsKo8moU">yYSTsKo8moU</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a></p></div>
+</div><div class="concept" data-tier="A">
   <div class="chead"><span class="idx">11</span><span class="t">Install on the platform you actually use — the paths genuinely differ.</span>
     <span class="chip intermediate">weight 7</span>
-    <span class="chip ch">code graph</span>
-  </div>
-  <div class="cbody">
-    <p>“It supports Claude Code” and “it registered itself correctly in your Claude Code” are different statements. The install variant is what determines whether the tool is ever called.</p>
-    <p class="got"><strong>In practice:</strong> Named targets across the corpus: Claude Code, Codex, Cursor, OpenCode, Antigravity, OpenClaw, Hermes, Gemini CLI, GitHub Copilot, Aider, Kilocode, Amp. Choose global vs per-project deliberately — a project-scoped install keeps a client repo's index out of everything else.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a> · <a href="https://www.youtube.com/watch?v=rgYnZqi2GmA">rgYnZqi2GmA</a> · <a href="https://www.youtube.com/watch?v=dNLM94o-HTw">dNLM94o-HTw</a> · <a href="https://www.youtube.com/watch?v=wBAlh70Quk8">wBAlh70Quk8</a> · <a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a></p>
-  </div>
-</div>
-<div class="concept">
+    <span class="chip">code graph</span></div>
+  <div class="cbody"><p>“It supports Claude Code” and “it registered itself correctly in your Claude Code” are different statements. The install variant is what determines whether the tool is ever called.</p><p class="got"><strong>In practice:</strong> Named targets across the corpus: Claude Code, Codex, Cursor, OpenCode, Antigravity, OpenClaw, Hermes, Gemini CLI, GitHub Copilot, Aider, Kilocode, Amp. Choose global vs per-project deliberately — a project-scoped install keeps a client repo's index out of everything else.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a> · <a href="https://www.youtube.com/watch?v=rgYnZqi2GmA">rgYnZqi2GmA</a> · <a href="https://www.youtube.com/watch?v=dNLM94o-HTw">dNLM94o-HTw</a> · <a href="https://www.youtube.com/watch?v=wBAlh70Quk8">wBAlh70Quk8</a> · <a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a></p></div>
+</div><div class="concept" data-tier="A">
   <div class="chead"><span class="idx">12</span><span class="t">Run an impact / blast-radius query before a large refactor.</span>
     <span class="chip intermediate">weight 6</span>
-    <span class="chip ch">code graph</span>
-  </div>
-  <div class="cbody">
-    <p>“What breaks if I change X” is the question a graph exists to answer, and the one you least want to answer by watching CI go red.</p>
-    <p class="got"><strong>In practice:</strong> GitNexus adds cross-repo blast radius for microservices and a contract registry. CodeGraph pipes a diff into <code>codegraph affected</code> so CI runs only reachable tests. codebase-memory-mcp resolves a 5-layer dependency chain in sub-milliseconds. Always pair the query with the tests — the graph cannot see runtime.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a> · <a href="https://www.youtube.com/watch?v=LVnKcfHHaFM">LVnKcfHHaFM</a> · <a href="https://www.youtube.com/watch?v=Owv503rTqYY">Owv503rTqYY</a> · <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a></p>
-  </div>
-</div>
-<div class="concept">
+    <span class="chip">code graph</span></div>
+  <div class="cbody"><p>“What breaks if I change X” is the question a graph exists to answer, and the one you least want to answer by watching CI go red.</p><p class="got"><strong>In practice:</strong> GitNexus adds cross-repo blast radius for microservices and a contract registry. CodeGraph pipes a diff into <code>codegraph affected</code> so CI runs only reachable tests. codebase-memory-mcp resolves a 5-layer dependency chain in sub-milliseconds. Always pair the query with the tests — the graph cannot see runtime.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a> · <a href="https://www.youtube.com/watch?v=LVnKcfHHaFM">LVnKcfHHaFM</a> · <a href="https://www.youtube.com/watch?v=Owv503rTqYY">Owv503rTqYY</a> · <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a></p></div>
+</div><div class="concept" data-tier="A">
   <div class="chead"><span class="idx">13</span><span class="t">Prefer relationship structure to vector similarity for architectural questions.</span>
     <span class="chip intermediate">weight 6</span>
-    <span class="chip ch">code graph</span>
-  </div>
-  <div class="cbody">
-    <p>Embeddings answer “what reads like this”. A graph answers “what reaches this”. For architecture, only the second one is the question.</p>
-    <p class="got"><strong>In practice:</strong> A React component and a database schema rarely embed near each other yet may be critically linked. Worth noting that CodeGraph ships no vector store, no embeddings and requires no API key — deliberately. Keep vector RAG for prose and semantics, where it is genuinely better.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a> · <a href="https://www.youtube.com/watch?v=WNru_PFycT8">WNru_PFycT8</a> · <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a> · <a href="https://www.youtube.com/watch?v=EKbQ5sajVxA">EKbQ5sajVxA</a> · <a href="https://www.youtube.com/watch?v=JWhICz1QR8M">JWhICz1QR8M</a> · <a href="https://www.youtube.com/watch?v=yYSTsKo8moU">yYSTsKo8moU</a></p>
-  </div>
-</div>
-<div class="concept">
+    <span class="chip">code graph</span></div>
+  <div class="cbody"><p>Embeddings answer “what reads like this”. A graph answers “what reaches this”. For architecture, only the second one is the question.</p><p class="got"><strong>In practice:</strong> A React component and a database schema rarely embed near each other yet may be critically linked. Worth noting that CodeGraph ships no vector store, no embeddings and requires no API key — deliberately. Keep vector RAG for prose and semantics, where it is genuinely better.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a> · <a href="https://www.youtube.com/watch?v=WNru_PFycT8">WNru_PFycT8</a> · <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a> · <a href="https://www.youtube.com/watch?v=EKbQ5sajVxA">EKbQ5sajVxA</a> · <a href="https://www.youtube.com/watch?v=JWhICz1QR8M">JWhICz1QR8M</a> · <a href="https://www.youtube.com/watch?v=yYSTsKo8moU">yYSTsKo8moU</a></p></div>
+</div><div class="concept" data-tier="A">
   <div class="chead"><span class="idx">14</span><span class="t">Compile a durable knowledge artefact instead of re-reading raw folders.</span>
     <span class="chip intermediate">weight 5</span>
-    <span class="chip ch">code graph</span>
-  </div>
-  <div class="cbody">
-    <p>A model reading raw notes produces the most probable answer, which is another way of saying the generic one. A compiled artefact is what makes a later session specific.</p>
-    <p class="got"><strong>In practice:</strong> A Karpathy-style LLM wiki, a <code>GRAPH_REPORT.md</code>, an ontology graph folder that persists between sessions. The compiled thing — not the raw corpus — is what future sessions should read first.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=EKbQ5sajVxA">EKbQ5sajVxA</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a> · <a href="https://www.youtube.com/watch?v=yYSTsKo8moU">yYSTsKo8moU</a></p>
-  </div>
-</div>
-<div class="concept">
+    <span class="chip">code graph</span></div>
+  <div class="cbody"><p>A model reading raw notes produces the most probable answer, which is another way of saying the generic one. A compiled artefact is what makes a later session specific.</p><p class="got"><strong>In practice:</strong> A Karpathy-style LLM wiki, a <code>GRAPH_REPORT.md</code>, an ontology graph folder that persists between sessions. The compiled thing — not the raw corpus — is what future sessions should read first.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=EKbQ5sajVxA">EKbQ5sajVxA</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a> · <a href="https://www.youtube.com/watch?v=yYSTsKo8moU">yYSTsKo8moU</a></p></div>
+</div><div class="concept" data-tier="A">
   <div class="chead"><span class="idx">15</span><span class="t">Tag edges by confidence and treat guessed links as provisional.</span>
     <span class="chip intermediate">weight 5</span>
-    <span class="chip ch">code graph</span>
-  </div>
-  <div class="cbody">
-    <p>A graph mixes facts the parser saw with links a model inferred. Editing production code as if those are the same thing is how a clean refactor breaks something invisible.</p>
-    <p class="got"><strong>In practice:</strong> <b>extracted</b> = 1.0 (the parser saw it) · <b>inferred</b> = 0.55–0.95 · <b>ambiguous</b> = an LLM's guess. Filter where the tool allows — GitNexus lets Cypher queries require confidence &gt; 0.8. Verify anything below <em>extracted</em> before you act on it.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=WNru_PFycT8">WNru_PFycT8</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a></p>
-  </div>
-</div>
-<div class="concept">
+    <span class="chip">code graph</span></div>
+  <div class="cbody"><p>A graph mixes facts the parser saw with links a model inferred. Editing production code as if those are the same thing is how a clean refactor breaks something invisible.</p><p class="got"><strong>In practice:</strong> <b>extracted</b> = 1.0 (the parser saw it) · <b>inferred</b> = 0.55–0.95 · <b>ambiguous</b> = an LLM's guess. Filter where the tool allows — GitNexus lets Cypher queries require confidence &gt; 0.8. Verify anything below <em>extracted</em> before you act on it.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=WNru_PFycT8">WNru_PFycT8</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a></p></div>
+</div><div class="concept" data-tier="A">
   <div class="chead"><span class="idx">16</span><span class="t">Design multi-step agent work as a graph: parallelise the independent, gate the irreversible.</span>
     <span class="chip intermediate">weight 5</span>
-    <span class="chip ch">workflow DAG</span>
-  </div>
-  <div class="cbody">
-    <p>Most agent workflows are written as a chain because that is how you type them, not because the work depends that way.</p>
-    <p class="got"><strong>In practice:</strong> Planner → parallel workers → skeptic → merge → human approval. Put the gate before the expensive or irreversible decision: customer emails, public posts, code deploys, refunds, production data. Keep it light for a private memo. Anthropic's named patterns map onto this directly — prompt chaining, routing, parallelisation, orchestrator, evaluator-optimizer.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=JWhICz1QR8M">JWhICz1QR8M</a> · <a href="https://www.youtube.com/watch?v=5nB8Rs4l0_M">5nB8Rs4l0_M</a> · <a href="https://www.youtube.com/watch?v=mBePcvqLX88">mBePcvqLX88</a> · <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a></p>
-  </div>
-</div>
-<h3 class="tierhead">Tier B — three or four sources</h3>
-<p class="small">Judgement calls the corpus mostly agrees on. Worth knowing; not worth arguing about.</p>
-
-<div class="concept">
+    <span class="chip">workflow DAG</span></div>
+  <div class="cbody"><p>Most agent workflows are written as a chain because that is how you type them, not because the work depends that way.</p><p class="got"><strong>In practice:</strong> Planner → parallel workers → skeptic → merge → human approval. Put the gate before the expensive or irreversible decision: customer emails, public posts, code deploys, refunds, production data. Keep it light for a private memo. Anthropic's named patterns map onto this directly — prompt chaining, routing, parallelisation, orchestrator, evaluator-optimizer.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=JWhICz1QR8M">JWhICz1QR8M</a> · <a href="https://www.youtube.com/watch?v=5nB8Rs4l0_M">5nB8Rs4l0_M</a> · <a href="https://www.youtube.com/watch?v=mBePcvqLX88">mBePcvqLX88</a> · <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a></p></div>
+</div></div><div class="tierblock" data-tier="B"><h3 class="tierhead">Tier B — three or four sources</h3><p class="small">Judgement calls the corpus mostly agrees on. Worth knowing; not worth arguing about.</p><div class="concept" data-tier="B">
   <div class="chead"><span class="idx">17</span><span class="t">Scope the index on big repos.</span>
     <span class="chip advanced">weight 4</span>
-    <span class="chip ch">code graph</span>
-  </div>
-  <div class="cbody">
-    <p>Indexing everything is rarely what you want, and it is always the slowest and most expensive option.</p>
-    <p class="got"><strong>In practice:</strong> Above ~200 files one tool stops and asks you to pick subfolders; above ~500, scope by hand regardless. Not a hard ceiling — the Linux kernel indexes fine — but a prompt to decide what you actually want mapped.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=Ynv_WYO_slw">Ynv_WYO_slw</a> · <a href="https://www.youtube.com/watch?v=rgYnZqi2GmA">rgYnZqi2GmA</a></p>
-  </div>
-</div>
-<div class="concept">
+    <span class="chip">code graph</span></div>
+  <div class="cbody"><p>Indexing everything is rarely what you want, and it is always the slowest and most expensive option.</p><p class="got"><strong>In practice:</strong> Above ~200 files one tool stops and asks you to pick subfolders; above ~500, scope by hand regardless. Not a hard ceiling — the Linux kernel indexes fine — but a prompt to decide what you actually want mapped.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=Ynv_WYO_slw">Ynv_WYO_slw</a> · <a href="https://www.youtube.com/watch?v=rgYnZqi2GmA">rgYnZqi2GmA</a></p></div>
+</div><div class="concept" data-tier="B">
   <div class="chead"><span class="idx">18</span><span class="t">Read the god nodes first.</span>
     <span class="chip advanced">weight 4</span>
-    <span class="chip ch">code graph</span>
-  </div>
-  <div class="cbody">
-    <p>The highest-degree entities are the architectural spine. They are the fastest route into an unfamiliar codebase and the place a refactor does the most damage.</p>
-    <p class="got"><strong>In practice:</strong> One build's top node, <code>extract</code>, had 47 connections; <code>build_graph</code> had 32. They sit at the top of <code>GRAPH_REPORT.md</code>. A useful follow-up query: why this node bridges multiple subsystems.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=Owv503rTqYY">Owv503rTqYY</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a></p>
-  </div>
-</div>
-<div class="concept">
+    <span class="chip">code graph</span></div>
+  <div class="cbody"><p>The highest-degree entities are the architectural spine. They are the fastest route into an unfamiliar codebase and the place a refactor does the most damage.</p><p class="got"><strong>In practice:</strong> One build's top node, <code>extract</code>, had 47 connections; <code>build_graph</code> had 32. They sit at the top of <code>GRAPH_REPORT.md</code>. A useful follow-up query: why this node bridges multiple subsystems.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=Owv503rTqYY">Owv503rTqYY</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a></p></div>
+</div><div class="concept" data-tier="B">
   <div class="chead"><span class="idx">19</span><span class="t">Transcribe local audio and video with Faster-Whisper before linking media into the graph.</span>
     <span class="chip advanced">weight 4</span>
-    <span class="chip ch">code graph</span>
-  </div>
-  <div class="cbody">
-    <p>Recordings carry decisions that never made it into a doc. Transcription is the cheap step that makes them linkable to code symbols.</p>
-    <p class="got"><strong>In practice:</strong> A free local pass, run before the LLM extraction pass rather than instead of it. Install the video extra; point it at the folder of recordings; let the graph link the resulting text to the symbols it names.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a></p>
-  </div>
-</div>
-<div class="concept">
+    <span class="chip">code graph</span></div>
+  <div class="cbody"><p>Recordings carry decisions that never made it into a doc. Transcription is the cheap step that makes them linkable to code symbols.</p><p class="got"><strong>In practice:</strong> A free local pass, run before the LLM extraction pass rather than instead of it. Install the video extra; point it at the folder of recordings; let the graph link the resulting text to the symbols it names.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a></p></div>
+</div><div class="concept" data-tier="B">
   <div class="chead"><span class="idx">20</span><span class="t">Run the weight test on every edge of a workflow graph.</span>
     <span class="chip advanced">weight 3</span>
-    <span class="chip ch">workflow DAG</span>
-  </div>
-  <div class="cbody">
-    <p>Sequential steps that do not depend on each other are pure waiting. You are paying wall-clock for an ordering nothing required.</p>
-    <p class="got"><strong>In practice:</strong> At every edge ask: <em>“does this actually need the result of the one before it?”</em> If no, the connection is useless — run them simultaneously. Roughly 2× faster on the two-research-step example. Start every workflow as a chain, because it is easiest to test, then re-engineer.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=5nB8Rs4l0_M">5nB8Rs4l0_M</a> · <a href="https://www.youtube.com/watch?v=JWhICz1QR8M">JWhICz1QR8M</a> · <a href="https://www.youtube.com/watch?v=mBePcvqLX88">mBePcvqLX88</a></p>
-  </div>
-</div>
-<div class="concept">
+    <span class="chip">workflow DAG</span></div>
+  <div class="cbody"><p>Sequential steps that do not depend on each other are pure waiting. You are paying wall-clock for an ordering nothing required.</p><p class="got"><strong>In practice:</strong> At every edge ask: <em>“does this actually need the result of the one before it?”</em> If no, the connection is useless — run them simultaneously. Roughly 2× faster on the two-research-step example. Start every workflow as a chain, because it is easiest to test, then re-engineer.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=5nB8Rs4l0_M">5nB8Rs4l0_M</a> · <a href="https://www.youtube.com/watch?v=JWhICz1QR8M">JWhICz1QR8M</a> · <a href="https://www.youtube.com/watch?v=mBePcvqLX88">mBePcvqLX88</a></p></div>
+</div><div class="concept" data-tier="B">
   <div class="chead"><span class="idx">21</span><span class="t">Measure the token claims against your own agent loop.</span>
     <span class="chip advanced">weight 3</span>
-    <span class="chip ch">code graph</span>
-  </div>
-  <div class="cbody">
-    <p>Every headline ratio in this space depends on a baseline chosen by the vendor. Yours is different.</p>
-    <p class="got"><strong>In practice:</strong> One tester's controlled rerun of ten identical questions in two sessions: 120,000 tokens without the graph vs 113,000 with — about 8%, against a marketed 71.5×. The honest win was answer quality. Log your own runs before you standardise on anything.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=Ynv_WYO_slw">Ynv_WYO_slw</a></p>
-  </div>
-</div>
-<div class="concept">
+    <span class="chip">code graph</span></div>
+  <div class="cbody"><p>Every headline ratio in this space depends on a baseline chosen by the vendor. Yours is different.</p><p class="got"><strong>In practice:</strong> One tester's controlled rerun of ten identical questions in two sessions: 120,000 tokens without the graph vs 113,000 with — about 8%, against a marketed 71.5×. The honest win was answer quality. Log your own runs before you standardise on anything.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=Ynv_WYO_slw">Ynv_WYO_slw</a></p></div>
+</div><div class="concept" data-tier="B">
   <div class="chead"><span class="idx">22</span><span class="t">Choose between tools by job: multimodal vs auto-sync depth vs multi-repo power.</span>
     <span class="chip advanced">weight 3</span>
-    <span class="chip ch">code graph</span>
-  </div>
-  <div class="cbody">
-    <p>These are not competitors so much as different shapes. Picking by popularity gets you the wrong shape confidently.</p>
-    <p class="got"><strong>In practice:</strong> Mixed content plus human visualisation → Graphify-class. Pure code with zero-maintenance freshness → CodeGraph-class. Cross-service impact and Cypher → GitNexus-class, licence permitting. Wiki UX over graph maths → Understand-Anything-class. You can run more than one.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=Ynv_WYO_slw">Ynv_WYO_slw</a></p>
-  </div>
-</div>
-<div class="concept">
+    <span class="chip">code graph</span></div>
+  <div class="cbody"><p>These are not competitors so much as different shapes. Picking by popularity gets you the wrong shape confidently.</p><p class="got"><strong>In practice:</strong> Mixed content plus human visualisation → Graphify-class. Pure code with zero-maintenance freshness → CodeGraph-class. Cross-service impact and Cypher → GitNexus-class, licence permitting. Wiki UX over graph maths → Understand-Anything-class. You can run more than one.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=Ynv_WYO_slw">Ynv_WYO_slw</a></p></div>
+</div><div class="concept" data-tier="B">
   <div class="chead"><span class="idx">23</span><span class="t">Skip the graph entirely on tiny projects.</span>
     <span class="chip advanced">weight 3</span>
-    <span class="chip ch">code graph</span>
-  </div>
-  <div class="cbody">
-    <p>Below a certain size the index is maintenance you pay for and never recover. Three transcripts say this independently, and the tools' own authors agree.</p>
-    <p class="got"><strong>In practice:</strong> Under roughly 20 files, just read them. Also skip for single-file keyword lookup, and for runtime, race-condition or performance debugging, where the graph is structurally blind.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a></p>
-  </div>
-</div>
-<h3 class="tierhead">Tier C — one or two sources</h3>
-<p class="small">Thin evidence, often the sharpest advice on the page. Treat each as a lead to test, not a rule.</p>
-
-<div class="concept">
+    <span class="chip">code graph</span></div>
+  <div class="cbody"><p>Below a certain size the index is maintenance you pay for and never recover. Three transcripts say this independently, and the tools' own authors agree.</p><p class="got"><strong>In practice:</strong> Under roughly 20 files, just read them. Also skip for single-file keyword lookup, and for runtime, race-condition or performance debugging, where the graph is structurally blind.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a></p></div>
+</div></div><div class="tierblock" data-tier="C"><h3 class="tierhead">Tier C — one or two sources</h3><p class="small">Thin evidence, often the sharpest advice here. A lead to test, not a rule.</p><div class="concept" data-tier="C">
   <div class="chead"><span class="idx">24</span><span class="t">Respect .gitignore — keep node_modules, dist and build artefacts out of the index.</span>
     <span class="chip advanced">weight 1</span>
-    <span class="chip ch">code graph</span>
-  </div>
-  <div class="cbody">
-    <p>Indexing dependencies inflates build time, blows out the node count, and buries your own code in noise you will then pay to query around.</p>
-    <p class="got"><strong>In practice:</strong> All three head-to-head tools honour ignore files by default. Check what was actually indexed after your first build: if the node count looks implausible for the repo, this is why.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a></p>
-  </div>
-</div>
-<div class="concept">
+    <span class="chip">code graph</span></div>
+  <div class="cbody"><p>Indexing dependencies inflates build time, blows out the node count, and buries your own code in noise you will then pay to query around.</p><p class="got"><strong>In practice:</strong> All three head-to-head tools honour ignore files by default. Check what was actually indexed after your first build: if the node count looks implausible for the repo, this is why.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a></p></div>
+</div><div class="concept" data-tier="C">
   <div class="chead"><span class="idx">25</span><span class="t">Handle staleness explicitly: read the dirty file, trust the rest.</span>
     <span class="chip advanced">weight 1</span>
-    <span class="chip ch">code graph</span>
-  </div>
-  <div class="cbody">
-    <p>Partial staleness is the normal state of a watched index. The right response is surgical, not a full rebuild.</p>
-    <p class="got"><strong>In practice:</strong> CodeGraph surfaces an explicit warning naming the stale file. Read that file raw, keep using the graph for everything else, and let the watcher catch up rather than blocking on a re-index.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a></p>
-  </div>
-</div>
-<div class="concept">
+    <span class="chip">code graph</span></div>
+  <div class="cbody"><p>Partial staleness is the normal state of a watched index. The right response is surgical, not a full rebuild.</p><p class="got"><strong>In practice:</strong> CodeGraph surfaces an explicit warning naming the stale file. Read that file raw, keep using the graph for everything else, and let the watcher catch up rather than blocking on a re-index.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a></p></div>
+</div><div class="concept" data-tier="C">
   <div class="chead"><span class="idx">26</span><span class="t">Pipe a git diff into codegraph affected to run only impacted tests.</span>
     <span class="chip advanced">weight 2</span>
-    <span class="chip ch">code graph</span>
-  </div>
-  <div class="cbody">
-    <p>The graph already knows what your change can reach. Running the whole suite is throwing that away.</p>
-    <p class="got"><strong>In practice:</strong> <code>git diff | codegraph affected</code> returns the reachable test files. This is the highest-leverage CI use of a code graph in the corpus and the one with the clearest payback.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=LVnKcfHHaFM">LVnKcfHHaFM</a></p>
-  </div>
-</div>
-<div class="concept">
+    <span class="chip">code graph</span></div>
+  <div class="cbody"><p>The graph already knows what your change can reach. Running the whole suite is throwing that away.</p><p class="got"><strong>In practice:</strong> <code>git diff | codegraph affected</code> returns the reachable test files. This is the highest-leverage CI use of a code graph in the corpus and the one with the clearest payback.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=LVnKcfHHaFM">LVnKcfHHaFM</a></p></div>
+</div><div class="concept" data-tier="C">
   <div class="chead"><span class="idx">27</span><span class="t">Do not delegate exploration to a sub-agent that cannot see the graph.</span>
     <span class="chip advanced">weight 1</span>
-    <span class="chip ch">code graph</span>
-  </div>
-  <div class="cbody">
-    <p>The sub-agent will grep. You then pay for the index and the grepping, and the index provides nothing.</p>
-    <p class="got"><strong>In practice:</strong> Named plainly in the corpus: if the parent delegates and the sub-agent reads files directly, the graph becomes pure overhead — it only helps on direct queries. Keep exploration in the agent that holds the MCP tool.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a></p>
-  </div>
-</div>
-<div class="concept">
+    <span class="chip">code graph</span></div>
+  <div class="cbody"><p>The sub-agent will grep. You then pay for the index and the grepping, and the index provides nothing.</p><p class="got"><strong>In practice:</strong> Named plainly in the corpus: if the parent delegates and the sub-agent reads files directly, the graph becomes pure overhead — it only helps on direct queries. Keep exploration in the agent that holds the MCP tool.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a></p></div>
+</div><div class="concept" data-tier="C">
   <div class="chead"><span class="idx">28</span><span class="t">Remember static analysis cannot see runtime, reflection or eval.</span>
     <span class="chip advanced">weight 2</span>
-    <span class="chip ch">code graph</span>
-  </div>
-  <div class="cbody">
-    <p>The graph describes what the code says, not what it does. Dynamic imports, reflection and eval are invisible to every tool here.</p>
-    <p class="got"><strong>In practice:</strong> CodeGraph's dynamic-dispatch synthesis narrows the gap — callbacks, <code>.on</code>/<code>.emit</code> string keys, React <code>setState</code> → child re-render, C function pointers — and only synthesises an edge when the flow closes end to end. It does not close the gap. Keep the debugger and the test suite.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a></p>
-  </div>
-</div>
-<div class="concept">
+    <span class="chip">code graph</span></div>
+  <div class="cbody"><p>The graph describes what the code says, not what it does. Dynamic imports, reflection and eval are invisible to every tool here.</p><p class="got"><strong>In practice:</strong> CodeGraph's dynamic-dispatch synthesis narrows the gap — callbacks, <code>.on</code>/<code>.emit</code> string keys, React <code>setState</code> → child re-render, C function pointers — and only synthesises an edge when the flow closes end to end. It does not close the gap. Keep the debugger and the test suite.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a></p></div>
+</div><div class="concept" data-tier="C">
   <div class="chead"><span class="idx">29</span><span class="t">Intercept raw grep with a pre-tool hook and augment it with graph structure.</span>
     <span class="chip advanced">weight 1</span>
-    <span class="chip ch">code graph</span>
-  </div>
-  <div class="cbody">
-    <p>The most reliable way to make an agent use the graph is to make grep itself return graph-aware results.</p>
-    <p class="got"><strong>In practice:</strong> The codebase-memory-mcp pattern: the MCP interface auto-patches Claude Code, Zed and Cursor configs with a pre-tool-use hook that catches raw grep calls and injects graph data into the result. Reported effect: 80,000 → 500 tokens on a structural query.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a></p>
-  </div>
-</div>
-<div class="concept">
+    <span class="chip">code graph</span></div>
+  <div class="cbody"><p>The most reliable way to make an agent use the graph is to make grep itself return graph-aware results.</p><p class="got"><strong>In practice:</strong> The codebase-memory-mcp pattern: the MCP interface auto-patches Claude Code, Zed and Cursor configs with a pre-tool-use hook that catches raw grep calls and injects graph data into the result. Reported effect: 80,000 → 500 tokens on a structural query.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a></p></div>
+</div><div class="concept" data-tier="C">
   <div class="chead"><span class="idx">30</span><span class="t">Keep chat and entity memory in a separate local Memory MCP from your code graph.</span>
     <span class="chip advanced">weight 1</span>
-    <span class="chip ch">code graph</span>
-  </div>
-  <div class="cbody">
-    <p>They answer different questions and go stale on different clocks. Merging them makes both harder to reason about.</p>
-    <p class="got"><strong>In practice:</strong> The reference Memory MCP stores entities, relations and observations as local JSON. Note the gap: the official snippet does not document how to enable persistence or where the store lives — you add those lines. In the corpus it is Claude Desktop only.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=qeru0ZdudD4">qeru0ZdudD4</a></p>
-  </div>
-</div>
-<div class="concept">
+    <span class="chip">code graph</span></div>
+  <div class="cbody"><p>They answer different questions and go stale on different clocks. Merging them makes both harder to reason about.</p><p class="got"><strong>In practice:</strong> The reference Memory MCP stores entities, relations and observations as local JSON. Note the gap: the official snippet does not document how to enable persistence or where the store lives — you add those lines. In the corpus it is Claude Desktop only.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=qeru0ZdudD4">qeru0ZdudD4</a></p></div>
+</div><div class="concept" data-tier="C">
   <div class="chead"><span class="idx">31</span><span class="t">Trial a wiki-style tool against a graph-style tool on your own repo before standardising.</span>
     <span class="chip advanced">weight 2</span>
-    <span class="chip ch">code graph</span>
-  </div>
-  <div class="cbody">
-    <p>The head-to-head that exists was run on someone else's SaaS. Which UX suits you is not a fact you can inherit.</p>
-    <p class="got"><strong>In practice:</strong> On the same question, the wiki-style tool traced file provenance and drew a step-by-step flowchart; the graph-style tool returned a table plus file and rule text. Build cost differed (~200k tokens vs roughly half); per-query cost and time were about the same. The tester preferred the flowchart.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=Ynv_WYO_slw">Ynv_WYO_slw</a> · <a href="https://www.youtube.com/watch?v=Owv503rTqYY">Owv503rTqYY</a></p>
-  </div>
-</div>
-<div class="concept">
+    <span class="chip">code graph</span></div>
+  <div class="cbody"><p>The head-to-head that exists was run on someone else's SaaS. Which UX suits you is not a fact you can inherit.</p><p class="got"><strong>In practice:</strong> On the same question, the wiki-style tool traced file provenance and drew a step-by-step flowchart; the graph-style tool returned a table plus file and rule text. Build cost differed (~200k tokens vs roughly half); per-query cost and time were about the same. The tester preferred the flowchart.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=Ynv_WYO_slw">Ynv_WYO_slw</a> · <a href="https://www.youtube.com/watch?v=Owv503rTqYY">Owv503rTqYY</a></p></div>
+</div><div class="concept" data-tier="C">
   <div class="chead"><span class="idx">32</span><span class="t">Check the licence before work use.</span>
     <span class="chip advanced">weight 2</span>
-    <span class="chip ch">code graph</span>
-  </div>
-  <div class="cbody">
-    <p>The most feature-rich tool in the comparison is the one you cannot ship commercially. Finding that out after standardising is expensive.</p>
-    <p class="got"><strong>In practice:</strong> GitNexus is PolyForm Noncommercial 1.0 — “44,000 stars you can't ship at work.” CodeGraph is MIT. Graphify is called MIT in one comparison and Apache 2.0 in another; the two videos disagree, so check the repo yourself rather than either transcript.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a></p>
-  </div>
-</div>
-<div class="concept">
+    <span class="chip">code graph</span></div>
+  <div class="cbody"><p>The most feature-rich tool in the comparison is the one you cannot ship commercially. Finding that out after standardising is expensive.</p><p class="got"><strong>In practice:</strong> GitNexus is PolyForm Noncommercial 1.0 — “44,000 stars you can't ship at work.” CodeGraph is MIT. Graphify is called MIT in one comparison and Apache 2.0 in another; the two videos disagree, so check the repo yourself rather than either transcript.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a></p></div>
+</div><div class="concept" data-tier="C">
   <div class="chead"><span class="idx">33</span><span class="t">Budget for multi-agent DAGs costing far more tokens, even when they are faster.</span>
     <span class="chip advanced">weight 1</span>
-    <span class="chip ch">workflow DAG</span>
-  </div>
-  <div class="cbody">
-    <p>Parallelism buys wall clock with tokens. That is a good trade sometimes and a terrible one often, and the difference is whether you noticed you were making it.</p>
-    <p class="got"><strong>In practice:</strong> Citing Anthropic's multi-agent research: a single agent uses ~4× the tokens of a regular chat; a multi-agent system ~15×. In the 108-agent deep-research example, ~20k tokens per agent put input cost near $10 at Opus 5 pricing — closer to $1 with prompt caching.</p>
-    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=mBePcvqLX88">mBePcvqLX88</a></p>
-  </div>
-</div>
-
-<h2 id="tools">The tool landscape</h2>
+    <span class="chip">workflow DAG</span></div>
+  <div class="cbody"><p>Parallelism buys wall clock with tokens. That is a good trade sometimes and a terrible one often, and the difference is whether you noticed you were making it.</p><p class="got"><strong>In practice:</strong> Citing Anthropic's multi-agent research: a single agent uses ~4× the tokens of a regular chat; a multi-agent system ~15×. In the 108-agent deep-research example, ~20k tokens per agent put input cost near $10 at Opus 5 pricing — closer to $1 with prompt caching.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=mBePcvqLX88">mBePcvqLX88</a></p></div>
+</div></div></section><section class="panel" id="panel-tools" role="tabpanel" aria-labelledby="tab-tools" hidden>
+<h2>The tool landscape</h2>
 <p>Six products appear across the corpus. They are less competitors than different shapes of one idea — and the comparison sources are blunt that stars, batches and README claims are not selection criteria.</p>
-
-<div class="concept">
-  <div class="chead"><span class="t">Graphify</span><span class="chip ch">MIT / Apache 2.0 — disputed</span></div>
-  <div class="cbody"><dl class="kv"><dt>Shape</dt><dd>Python; tree-sitter for code (36 grammars) plus an LLM pass for everything else; 7-stage pipeline into a networkx graph with Leiden clustering</dd><dt>Outputs</dt><dd><code>graph.html</code>, <code>GRAPH_REPORT.md</code>, <code>graph.json</code> in <code>graphify_out/</code>; optional Obsidian, SVG, GraphML, Neo4j</dd><dt>Freshness</dt><dd><code>graphify update</code> (changed files only) or <code>graphify hook install</code> for commit / branch switch</dd><dt>Standout</dt><dd>The only one here that maps code, docs, PDFs and media into a single graph a human can look at</dd><dt>Watch out</dt><dd>The non-code pass costs real tokens; the 71.5× claim has been quietly dropped from the README; ASR mangles the package name constantly</dd></dl></div>
-</div>
-<div class="concept">
-  <div class="chead"><span class="t">CodeGraph</span><span class="chip ch">MIT</span></div>
-  <div class="cbody"><dl class="kv"><dt>Shape</dt><dd>Standalone binary; 5 layers — native file watcher → tree-sitter → dynamic-dispatch synthesis → SQLite with WAL and FTS5 → one daemon. No embeddings, no API key</dd><dt>Outputs</dt><dd><code>.codegraph/</code> with a SQLite DB (nodes, edges, files); a single <code>codegraph explorer</code> MCP tool</dd><dt>Freshness</dt><dd>OS watchers with 2s debounce; ~0.3s per 4,000 files. Names the stale file when it is behind</dd><dt>Standout</dt><dd>The most credible benchmark set in the corpus, and the only tool that synthesises callback and event-emitter edges</dd><dt>Watch out</dt><dd>Code only — no PDFs, docs or notes. Useless the moment a sub-agent explores without the MCP</dd></dl></div>
-</div>
-<div class="concept">
-  <div class="chead"><span class="t">GitNexus</span><span class="chip ch">PolyForm Noncommercial</span></div>
-  <div class="cbody"><dl class="kv"><dt>Shape</dt><dd>Node.js; a 15+ phase DAG pipeline, 44 node types, 21 relationship types, embedded graph DB with vector support, Leiden communities, execution flows as queryable process nodes</dd><dt>Outputs</dt><dd><code>.gitnexus/</code> per repo; 17 specialised MCP tools; Cypher with confidence filters</dd><dt>Freshness</dt><dd>Manual <code>npx gitnexus analyze</code>; post-tool hooks detect staleness and prompt a re-index</dd><dt>Standout</dt><dd>Multi-repo and cross-service blast radius, with a contract registry — nothing else here does this</dd><dt>Watch out</dt><dd>Licence blocks commercial use. README describes in-browser WASM; the shipped package is an HTTP client against a local Node server on port 4747. Publishes no benchmarks</dd></dl></div>
-</div>
-<div class="concept">
-  <div class="chead"><span class="t">Understand-Anything</span><span class="chip ch">Not stated in corpus</span></div>
-  <div class="cbody"><dl class="kv"><dt>Shape</dt><dd>A Claude Code marketplace plugin, project-scoped; wiki / knowledge-base UX rather than graph maths</dd><dt>Outputs</dt><dd><code>/understand</code>, <code>/understand dashboard</code>, <code>/understand explain</code>, <code>/understand ignore</code></dd><dt>Freshness</dt><dd><code>/understand auto updates</code> on commit</dd><dt>Standout</dt><dd>Its explanations traced file provenance and produced a step-by-step flowchart — the tester preferred them</dd><dt>Watch out</dt><dd>~200k tokens for a full dashboard, roughly double the Graphify build. No documented local-model option, so code goes to whatever provider your IDE uses</dd></dl></div>
-</div>
-<div class="concept">
-  <div class="chead"><span class="t">codebase-memory-mcp</span><span class="chip ch">Not stated in corpus</span></div>
-  <div class="cbody"><dl class="kv"><dt>Shape</dt><dd>158 languages; tree-sitter phase then a custom LSP-hybrid resolution engine (parameter binding, generics, JSDoc inference); gRPC / tRPC / HTTP route detection; Louvain communities</dd><dt>Outputs</dt><dd>SQLite with WAL; MCP interface that auto-patches Claude Code, Zed and Cursor configs</dd><dt>Freshness</dt><dd>Background watcher keyed on XXH3 content hashes; only changed files re-index</dd><dt>Standout</dt><dd>The pre-tool-use hook that intercepts raw grep — the most reliable way to make an agent actually use the index</dd><dt>Watch out</dt><dd>One transcript covers it in depth. The evidence base is thinner than everything above, however good the numbers look</dd></dl></div>
-</div>
-<div class="concept">
-  <div class="chead"><span class="t">Neo4j / Cypher</span><span class="chip ch">—</span></div>
-  <div class="cbody"><dl class="kv"><dt>Shape</dt><dd>A graph database you push into, rather than a code-indexing tool. Graphify exports to it; GitNexus speaks Cypher natively</dd><dt>Outputs</dt><dd>Whatever you query — this is the power-user escape hatch</dd><dt>Freshness</dt><dd>Whatever feeds it</dd><dt>Standout</dt><dd>Expressive queries, and a shared graph a team can point at</dd><dt>Watch out</dt><dd>Setup cost buys nothing an export cannot, unless you genuinely need shared or expressive querying</dd></dl></div>
-</div>
-<div class="note"><strong>Shared design patterns across all three head-to-head tools:</strong> tree-sitter parsing · content-addressed caching · a tool protocol as the agent interface · confidence tags on edges · index-once/query-many · ignore-file hygiene. If you ever build your own, that is the skeleton the field converged on.</div>
-
-<h2 id="reality">Which headline numbers survive</h2>
+<div class="concept"><div class="chead"><span class="t">Graphify</span><span class="chip">MIT / Apache 2.0 — disputed</span></div>
+<div class="cbody"><dl class="kv"><dt>Shape</dt><dd>Python; tree-sitter for code (36 grammars) plus an LLM pass for everything else; 7-stage pipeline into a networkx graph with Leiden clustering</dd><dt>Outputs</dt><dd><code>graph.html</code>, <code>GRAPH_REPORT.md</code>, <code>graph.json</code> in <code>graphify_out/</code>; optional Obsidian, SVG, GraphML, Neo4j</dd><dt>Freshness</dt><dd><code>graphify update</code> (changed files only) or <code>graphify hook install</code> for commit / branch switch</dd><dt>Standout</dt><dd>The only one here that maps code, docs, PDFs and media into a single graph a human can look at</dd><dt>Watch out</dt><dd>The non-code pass costs real tokens; the 71.5× claim has been quietly dropped from the README; ASR mangles the package name constantly</dd></dl></div></div><div class="concept"><div class="chead"><span class="t">CodeGraph</span><span class="chip">MIT</span></div>
+<div class="cbody"><dl class="kv"><dt>Shape</dt><dd>Standalone binary; 5 layers — native file watcher → tree-sitter → dynamic-dispatch synthesis → SQLite with WAL and FTS5 → one daemon. No embeddings, no API key</dd><dt>Outputs</dt><dd><code>.codegraph/</code> with a SQLite DB (nodes, edges, files); a single <code>codegraph explorer</code> MCP tool</dd><dt>Freshness</dt><dd>OS watchers with 2s debounce; ~0.3s per 4,000 files. Names the stale file when it is behind</dd><dt>Standout</dt><dd>The most credible benchmark set in the corpus, and the only tool that synthesises callback and event-emitter edges</dd><dt>Watch out</dt><dd>Code only — no PDFs, docs or notes. Useless the moment a sub-agent explores without the MCP</dd></dl></div></div><div class="concept"><div class="chead"><span class="t">GitNexus</span><span class="chip">PolyForm Noncommercial</span></div>
+<div class="cbody"><dl class="kv"><dt>Shape</dt><dd>Node.js; a 15+ phase DAG pipeline, 44 node types, 21 relationship types, embedded graph DB with vector support, Leiden communities, execution flows as queryable process nodes</dd><dt>Outputs</dt><dd><code>.gitnexus/</code> per repo; 17 specialised MCP tools; Cypher with confidence filters</dd><dt>Freshness</dt><dd>Manual <code>npx gitnexus analyze</code>; post-tool hooks detect staleness and prompt a re-index</dd><dt>Standout</dt><dd>Multi-repo and cross-service blast radius, with a contract registry — nothing else here does this</dd><dt>Watch out</dt><dd>Licence blocks commercial use. README describes in-browser WASM; the shipped package is an HTTP client against a local Node server on port 4747. Publishes no benchmarks</dd></dl></div></div><div class="concept"><div class="chead"><span class="t">Understand-Anything</span><span class="chip">Not stated in corpus</span></div>
+<div class="cbody"><dl class="kv"><dt>Shape</dt><dd>A Claude Code marketplace plugin, project-scoped; wiki / knowledge-base UX rather than graph maths</dd><dt>Outputs</dt><dd><code>/understand</code>, <code>/understand dashboard</code>, <code>/understand explain</code>, <code>/understand ignore</code></dd><dt>Freshness</dt><dd><code>/understand auto updates</code> on commit</dd><dt>Standout</dt><dd>Its explanations traced file provenance and produced a step-by-step flowchart — the tester preferred them</dd><dt>Watch out</dt><dd>~200k tokens for a full dashboard, roughly double the Graphify build. No documented local-model option, so code goes to whatever provider your IDE uses</dd></dl></div></div><div class="concept"><div class="chead"><span class="t">codebase-memory-mcp</span><span class="chip">Not stated in corpus</span></div>
+<div class="cbody"><dl class="kv"><dt>Shape</dt><dd>158 languages; tree-sitter phase then a custom LSP-hybrid resolution engine (parameter binding, generics, JSDoc inference); gRPC / tRPC / HTTP route detection; Louvain communities</dd><dt>Outputs</dt><dd>SQLite with WAL; MCP interface that auto-patches Claude Code, Zed and Cursor configs</dd><dt>Freshness</dt><dd>Background watcher keyed on XXH3 content hashes; only changed files re-index</dd><dt>Standout</dt><dd>The pre-tool-use hook that intercepts raw grep — the most reliable way to make an agent actually use the index</dd><dt>Watch out</dt><dd>One transcript covers it in depth. The evidence base is thinner than everything above, however good the numbers look</dd></dl></div></div><div class="concept"><div class="chead"><span class="t">Neo4j / Cypher</span><span class="chip">—</span></div>
+<div class="cbody"><dl class="kv"><dt>Shape</dt><dd>A graph database you push into, rather than a code-indexing tool. Graphify exports to it; GitNexus speaks Cypher natively</dd><dt>Outputs</dt><dd>Whatever you query — this is the power-user escape hatch</dd><dt>Freshness</dt><dd>Whatever feeds it</dd><dt>Standout</dt><dd>Expressive queries, and a shared graph a team can point at</dd><dt>Watch out</dt><dd>Setup cost buys nothing an export cannot, unless you genuinely need shared or expressive querying</dd></dl></div></div>
+<div class="note"><strong>Shared design patterns across all three head-to-head tools:</strong> tree-sitter parsing · content-addressed caching · a tool protocol as the agent interface · confidence tags on edges · index-once/query-many · ignore-file hygiene.</div></section><section class="panel" id="panel-numbers" role="tabpanel" aria-labelledby="tab-numbers" hidden>
+<h2>Which headline numbers survive</h2>
 <p>Almost every number in this space is real <em>and</em> misleading, because the baseline does the work.</p>
 <div class="tablewrap"><table>
-<thead><tr><th>The claim</th><th>What was actually measured</th><th>What survives</th></tr></thead>
-<tbody><tr><td><strong>71.5× fewer tokens</strong><span class="plainline">Graphify, repeated as 70× / 71×</span></td><td>A 52-file corpus. Naive load ≈ 123,000 tokens; a graph-neighbourhood read ≈ 1,700 tokens per query. The denominator is pasting fifty-two raw files into context — a workflow almost nobody uses.</td><td>Very little as a token claim. One tester re-ran ten identical questions in two sessions: <strong>120k without vs 113k with — about 8%</strong>. The honest win was answer quality. The claim has since been dropped from the README.</td></tr><tr><td><strong>94% fewer tool calls, 77% faster</strong><span class="plainline">CodeGraph, vendor benchmark</span></td><td>VS Code repo: 52 file reads down to 3; 6 tool calls and 0 file reads on the Swift compiler, 25,000+ files indexed in minutes.</td><td>Directionally confirmed by an independent harness — but see the row below for the footnotes the promotion omits.</td></tr><tr><td><strong>89% fewer calls, 69% fewer tokens, 60% cheaper</strong><span class="plainline">independent, 7 repos, median of 4 runs</span></td><td>Revalidated 21 July 2026. VS Code 2 vs 40 calls; Django 2 vs 29; a third repo 3 vs 57. Zero file reads on all seven. Cost per question $3.04→$0.40 and $1.81→$0.40 on two repos.</td><td>The most credible set in the corpus — with its own footnotes: Excalidraw took <strong>36s with the graph vs 23s with grep</strong>; one repo cost <strong>3¢ more</strong>; on small repos grep wins on wall clock while still burning 5–10× the tokens.</td></tr><tr><td><strong>99% token reduction</strong><span class="plainline">codebase-memory-mcp</span></td><td>80,000 → 500 tokens per structural query; the Linux kernel's 28M lines indexed in 3 minutes; 83% semantic answer quality at half the tool calls.</td><td>Single-source. Promising, but thinner evidence than the rest of this table.</td></tr><tr><td><strong>58% fewer tool calls</strong><span class="plainline">comparison video, 7 codebases</span></td><td>Source of the figure not stated. The illustrative example: “how does the auth middleware connect to the DB pool” in a 200-file project costs an unaided agent 15+ calls and ~4,000 tokens — and it still misses the wiring callback.</td><td>Take the example, not the percentage. The missed callback is the real argument.</td></tr><tr><td><strong>“Unlimited memory” / “local RAG”</strong><span class="plainline">video titles</span></td><td>What they describe is a persistent graph or report on disk.</td><td>Nothing about context length changes. Rename it “a map that survives the session” and the claim becomes true.</td></tr><tr><td><strong>Retrieval benchmarks</strong><span class="plainline">Graphify's current numbers</span></td><td>LoCoMo, 300 questions: recall@10 of 0.497 vs Mem0 at 0.048 and SuperMemory at 0.149, with 90.6% judge agreement.</td><td>Recall is genuinely strong. But it <strong>loses on QA accuracy — 45.3% vs SuperMemory's 49.7%</strong> — and ties plain dense retrieval on LongMemEval. Finding the right neighbourhood is not the same as answering better.</td></tr><tr><td><strong>Stars, downloads, YC batch</strong><span class="plainline">across the corpus</span></td><td>100,000 GitHub stars, 5M downloads, 5,000 signups in 10 days. Star counts quoted for the same tool range from 16k to 37k, weeks apart.</td><td>Not a selection criterion, and two sources say so directly. One tool with 44,000 stars carries a licence you cannot ship at work.</td></tr></tbody>
+<thead><tr><th style="width:150px">The claim</th><th>What was actually measured</th><th>What survives</th></tr></thead>
+<tbody><tr><td><strong>71.5× fewer tokens</strong><span class="plainline">Graphify, repeated as 70× / 71×</span></td><td>A 52-file corpus. Naive load ≈ 123,000 tokens; a graph-neighbourhood read ≈ 1,700 tokens per query. The denominator is pasting fifty-two raw files into context — a workflow almost nobody uses.</td><td>Very little as a token claim. One tester re-ran ten identical questions in two sessions: <strong>120k without vs 113k with — about 8%</strong>. The honest win was answer quality. The claim has since been dropped from the README.</td></tr><tr><td><strong>94% fewer tool calls, 77% faster</strong><span class="plainline">CodeGraph, vendor benchmark</span></td><td>VS Code repo: 52 file reads down to 3; 6 tool calls and 0 file reads on the Swift compiler, 25,000+ files indexed in minutes.</td><td>Directionally confirmed by an independent harness — but see the row below for the footnotes the promotion omits.</td></tr><tr><td><strong>89% fewer calls, 69% fewer tokens, 60% cheaper</strong><span class="plainline">independent, 7 repos, median of 4 runs</span></td><td>Revalidated 21 July 2026. VS Code 2 vs 40 calls; Django 2 vs 29; a third repo 3 vs 57. Zero file reads on all seven. Cost per question $3.04→$0.40 and $1.81→$0.40 on two repos.</td><td>The most credible set in the corpus — with its own footnotes: Excalidraw took <strong>36s with the graph vs 23s with grep</strong>; one repo cost <strong>3¢ more</strong>; on small repos grep wins on wall clock while still burning 5–10× the tokens.</td></tr><tr><td><strong>99% token reduction</strong><span class="plainline">codebase-memory-mcp</span></td><td>80,000 → 500 tokens per structural query; the Linux kernel's 28M lines indexed in 3 minutes; 83% semantic answer quality at half the tool calls.</td><td>Single-source. Promising, but thinner evidence than the rest of this table.</td></tr><tr><td><strong>58% fewer tool calls</strong><span class="plainline">comparison video, 7 codebases</span></td><td>Source of the figure not stated. The illustrative example: “how does the auth middleware connect to the DB pool” in a 200-file project costs an unaided agent 15+ calls and ~4,000 tokens — and it still misses the wiring callback.</td><td>Take the example, not the percentage. The missed callback is the real argument.</td></tr><tr><td><strong>“Unlimited memory” / “local RAG”</strong><span class="plainline">video titles</span></td><td>What they describe is a persistent graph or report on disk.</td><td>Nothing about context length changes. Rename it “a map that survives the session” and the claim becomes true.</td></tr><tr><td><strong>Retrieval benchmarks</strong><span class="plainline">Graphify's current numbers</span></td><td>LoCoMo, 300 questions: recall@10 of 0.497 vs Mem0 at 0.048 and SuperMemory at 0.149, with 90.6% judge agreement.</td><td>Recall is genuinely strong. But it <strong>loses on QA accuracy — 45.3% vs SuperMemory's 49.7%</strong> — and ties plain dense retrieval on LongMemEval.</td></tr><tr><td><strong>Stars, downloads, YC batch</strong><span class="plainline">across the corpus</span></td><td>100,000 GitHub stars, 5M downloads, 5,000 signups in 10 days. Star counts quoted for the same tool range from 16k to 37k, weeks apart.</td><td>Not a selection criterion, and two sources say so directly. One tool with 44,000 stars carries a licence you cannot ship at work.</td></tr></tbody>
 </table></div>
-<div class="callout green"><strong>The number worth chasing.</strong> Across the corpus the token deltas are contested and the tool-call deltas are not. Zero file reads on seven of seven repos, 40 calls down to 2, 52 file reads down to 3. Fewer tool calls means less agent thrash and fewer chances to wander off — which is also the mechanism behind every “better answer quality” remark. Benchmark that, on your own repo, before you standardise on anything.</div>
-
-<h2 id="anti">Twelve anti-patterns</h2>
+<div class="callout green"><strong>The number worth chasing.</strong> Across the corpus the token deltas are contested and the tool-call deltas are not. Zero file reads on seven of seven repos, 40 calls down to 2, 52 file reads down to 3. Fewer tool calls means less agent thrash and fewer chances to wander off — which is also the mechanism behind every “better answer quality” remark.</div></section><section class="panel" id="panel-dags" role="tabpanel" aria-labelledby="tab-dags" hidden>
+<h2>Four shapes and one test</h2>
+<p>Nodes are jobs, edges are what genuinely depends on what. Execution only flows forward — no node goes backwards, which would form a loop — hence <em>directed acyclic graph</em>.</p>
+<figure>
+<svg id="dagSvg" viewBox="0 0 1000 260" role="img" aria-label="Four workflow graph shapes: chain, diamond, branch and loop, with work flowing through each.">
+  <rect x="0" y="0" width="1000" height="260" fill="#FFFFFF"/>
+  <defs><marker id="ard" viewBox="0 0 8 8" refX="6.4" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0.6 0.9 L7 4 L0.6 7.1 z" fill="#8C857A"/></marker></defs>
+  <g id="dagLayer"></g>
+</svg>
+<div class="fig-cap">
+  <div class="fig-nav" id="dagNav" role="tablist" aria-label="Workflow shapes"></div>
+  <div class="fig-text"><span class="fig-kick" id="dagKick">Shape 1 of 4</span><h4 id="dagTitle">Loading…</h4><p id="dagBody"></p></div>
+  <div class="fig-ctrl"><button id="dagPrev" type="button">Back</button><button id="dagPlay" class="go" type="button">Play</button><button id="dagNext" type="button">Next</button></div>
+</div>
+<div class="fig-note">Chain is where every workflow should start — easiest to test. Then re-engineer with the weight test (<a href="https://www.youtube.com/watch?v=5nB8Rs4l0_M">5nB8Rs4l0_M</a>).</div>
+</figure>
+<div class="two" style="margin-top:22px">
+  <div class="callout"><strong>The weight test, verbatim:</strong> “does this actually need the result of the one before it?” If no — <em>“that connection is useless and you're waiting for something that you don't need to wait for, and you can run it simultaneously.”</em> Worked: <em>research YouTube</em> → <em>research Google</em> fails the test; roughly 2× quicker in parallel.</div>
+  <div class="callout green"><strong>The six-step conversion:</strong> pick one workflow you run weekly · write the final output in one sentence · list the jobs a great human would do · draw arrows only where work truly depends on another step · add one human gate before the expensive decision · run it manually once before automating anything.</div>
+</div>
+<div class="tablewrap"><table>
+<thead><tr><th style="width:110px">Shape</th><th>Use for</th><th>Failure mode named in the corpus</th><th style="width:190px">Guardrail</th></tr></thead>
+<tbody><tr><td><strong>Chain</strong></td><td>Everything, to begin with — easiest to test</td><td>Slow and brittle: if one step breaks, the entire process breaks</td><td>Ship it, then run the weight test on every edge</td></tr><tr><td><strong>Diamond</strong></td><td>Fan out independent work, fan back in to merge</td><td>False independence and silent failures — two agents do the same task twice and burn tokens; it will not break loudly</td><td>Only fan out where the cost of an error is low</td></tr><tr><td><strong>Branch</strong></td><td>Routing — funnel the request down one path</td><td>Overengineering into a decision tree nobody can reason about</td><td>No more than five branches; past that, split the skill</td></tr><tr><td><strong>Loop</strong></td><td>Do → evaluate → approve or feed back</td><td>Infinite loops. One client's loop spent thousands of dollars on tokens overnight</td><td>A hard maximum iteration count that fails the run</td></tr></tbody>
+</table></div>
+<div class="callout"><strong>The cost of a bigger graph.</strong> Citing Anthropic's multi-agent research: a single agent uses roughly 4× more tokens than a regular chat, and a multi-agent system roughly 15×. <em>“The goal is not to make the biggest graph possible, the goal is to make the smallest graph that improves the quality of work.”</em> (<a href="https://www.youtube.com/watch?v=mBePcvqLX88">mBePcvqLX88</a>)</div></section><section class="panel" id="panel-pitfalls" role="tabpanel" aria-labelledby="tab-pitfalls" hidden>
+<h2>Twelve anti-patterns</h2>
 <ol class="anti"><li>Blind grep/glob loops as the default architecture strategy.</li><li>Trusting an inflated <em>N</em>× token claim without measuring your own sessions.</li><li>Skipping the rebuild after a big refactor, a branch switch, or a mass rename.</li><li>Indexing a tiny repo where reading the files is cheaper than maintaining a graph.</li><li>Assuming the graph sees runtime behaviour — dynamic imports, reflection, <code>eval</code>. It does not. Still test and debug.</li><li>Letting sub-agents explore without the index while the parent holds it.</li><li>Pasting an entire corpus into context and calling that your “without graph” baseline.</li><li>Choosing by stars or a viral title instead of multimodal vs auto-sync vs multi-repo fit.</li><li>Ignoring licence constraints on commercial use.</li><li>Confusing a workflow DAG with a code knowledge graph — you often need both, for different problems.</li><li>Indexing <code>node_modules</code>, <code>dist</code> and build artefacts. Respect the ignore rules.</li><li>Treating inferred or ambiguous edges as compile-time truth when editing production code.</li></ol>
-
-<h2 id="turn">The agent-turn card</h2>
+<h2 style="margin-top:34px">The agent-turn card</h2>
 <p>If you take one thing from this guide into a project instructions file, take this.</p>
-<ol class="anti"><li>Is this a structural, multi-file, or repeated question? If not, skip the graph entirely.</li><li>Is an index present and fresh for <em>this branch</em>? If not, build or update it — scoped.</li><li>Consult the graph report or the index before any mass file read.</li><li>Answer from relationships; open only the files the graph names.</li><li>Changing architecture? Run an impact / blast-radius query, then the tests.</li><li>Multi-step work? Use a DAG: parallel where the weight test allows, plus a check node and a human gate where it matters.</li></ol>
-
-<h2 id="sources">All 23 sources</h2>
+<ol class="anti"><li>Is this a structural, multi-file, or repeated question? If not, skip the graph entirely.</li><li>Is an index present and fresh for <em>this branch</em>? If not, build or update it — scoped.</li><li>Consult the graph report or the index before any mass file read.</li><li>Answer from relationships; open only the files the graph names.</li><li>Changing architecture? Run an impact / blast-radius query, then the tests.</li><li>Multi-step work? Use a DAG: parallel where the weight test allows, plus a check node and a human gate where it matters.</li></ol></section><section class="panel" id="panel-sources" role="tabpanel" aria-labelledby="tab-sources" hidden>
+<h2>All 23 sources</h2>
 <p>Transcripts were fetched via English captions with a fallback; one failed outright and is marked. Dates cluster April–August 2026, with a single 2025 outlier about chat memory rather than code indexing.</p>
 <div class="tablewrap"><table>
-<thead><tr><th>ID</th><th>Title</th><th>Views</th><th>Uploaded</th><th>Transcript</th></tr></thead>
+<thead><tr><th style="width:88px">ID</th><th>Title</th><th style="width:80px">Views</th><th style="width:96px">Uploaded</th><th style="width:110px">Transcript</th></tr></thead>
 <tbody><tr><td class="mono"><a href="https://www.youtube.com/watch?v=JWhICz1QR8M">JWhICz1QR8M</a></td><td>Why Graph Engineering will 10x your Claude/Codex</td><td class="mono small">193,271</td><td class="mono small">3 Aug 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a></td><td>Graphify Solves Claude's Biggest Limitation (Finally)</td><td class="mono small">172,403</td><td class="mono small">18 May 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=mWLDn49_8HA">mWLDn49_8HA</a></td><td>Graphify + Obsidian + Claude Code = CHEAT CODE</td><td class="mono small">121,087</td><td class="mono small">8 Jun 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a></td><td>Graphify: Instant Knowledge Graph for Claude Code / Antigravity (FREE)</td><td class="mono small">100,492</td><td class="mono small">15 Apr 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=Owv503rTqYY">Owv503rTqYY</a></td><td>Claude Code + Graphify = Insane Agentic OS</td><td class="mono small">88,677</td><td class="mono small">8 Jun 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=mBePcvqLX88">mBePcvqLX88</a></td><td>Graph Engineering explained in 8min..</td><td class="mono small">79,739</td><td class="mono small">30 Jul 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=Ynv_WYO_slw">Ynv_WYO_slw</a></td><td>Understand-Anything vs Graphify: I Tested Both on My SaaS</td><td class="mono small">70,032</td><td class="mono small">27 May 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=rgYnZqi2GmA">rgYnZqi2GmA</a></td><td>Graphify + Claude Code: The Solution For Big Repos</td><td class="mono small">61,309</td><td class="mono small">28 Apr 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=WNru_PFycT8">WNru_PFycT8</a></td><td>This Tool Fixes AI Coding at Scale with 70x Fewer Tokens (Graphify)</td><td class="mono small">59,384</td><td class="mono small">29 Apr 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=EKbQ5sajVxA">EKbQ5sajVxA</a></td><td>Claude Code + Graphify = Local Rag (Unlimited Memory)</td><td class="mono small">57,809</td><td class="mono small">9 Apr 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=5nB8Rs4l0_M">5nB8Rs4l0_M</a></td><td>Stanford's Graph Method Explained: How to 10x Your Claude Productivity</td><td class="mono small">51,658</td><td class="mono small">20 Aug 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=yYSTsKo8moU">yYSTsKo8moU</a></td><td>Fix Karpathy's LLM Wiki with a Knowledge Graph | Claude Code + Obsidian + InfraNodus</td><td class="mono small">39,587</td><td class="mono small">11 Apr 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a></td><td>Graphify vs GitNexus vs CodeGraph — Which Code Knowledge Graph Should You Use?</td><td class="mono small">34,580</td><td class="mono small">6 Jul 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=qeru0ZdudD4">qeru0ZdudD4</a></td><td>Unlock Claude's Memory: Knowledge Graph MCP Server Tutorial</td><td class="mono small">20,792</td><td class="mono small">1 Jan 2025</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a></td><td>Stop Wasting Money On AI Coding Agent Use Graphify (71x Cheap And 10x Smarter)</td><td class="mono small">17,407</td><td class="mono small">8 May 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a></td><td>Graphify vs GitNexus vs CodeGraph: Stop Wasting API Tokens</td><td class="mono small">12,383</td><td class="mono small">26 Jul 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=dNLM94o-HTw">dNLM94o-HTw</a></td><td>Graphify Knowledge Graph Tutorial | Ultimate Step-by-Step Guide</td><td class="mono small">11,963</td><td class="mono small">5 Jun 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a></td><td>Graphify: Turn Your Codebase into a Queryable Knowledge Graph for Claude Code</td><td class="mono small">11,749</td><td class="mono small">8 Jun 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a></td><td>codebase-memory-mcp Tutorial: Codebase Memory MCP for Claude Code, Cursor &amp; Codex</td><td class="mono small">9,064</td><td class="mono small">27 Jun 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=nvJ1M_GRj8Q">nvJ1M_GRj8Q</a></td><td>Graphify: The Knowledge Graph Layer for Claude Code &amp; AI Coding Agents | YC S26</td><td class="mono small">5,839</td><td class="mono small">15 Aug 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=wBAlh70Quk8">wBAlh70Quk8</a></td><td>CodeGraph: SuperCharge Claude Code with Pre-indexed Semantic Code Intelligence</td><td class="mono small">5,546</td><td class="mono small">21 May 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=BpEtWpQw0yw">BpEtWpQw0yw</a></td><td>Graphify Tested: A Knowledge Graph Index for Claude Code</td><td class="mono small">395</td><td class="mono small">19 May 2026</td><td class="small">captions disabled</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=LVnKcfHHaFM">LVnKcfHHaFM</a></td><td>94% Faster Claude Code: Semantic Graphs! [2026]</td><td class="mono small">90</td><td class="mono small">17 May 2026</td><td class="small">fetched</td></tr></tbody>
 </table></div>
-<p class="small">Weighting rule, so any claim here can be audited: each practice is one atomic imperative, and its weight is the number of distinct transcripts that discuss it — never how often a single source repeats itself. Where automatic transcription mangled a tool name, that is flagged rather than guessed at.</p>
+<p class="small">Weighting rule, so any claim here can be audited: each practice is one atomic imperative, and its weight is the number of distinct transcripts that discuss it — never how often a single source repeats itself.</p></section>
 </main>
+<script>
+(function(){
+
+const NS = "http://www.w3.org/2000/svg";
+const mk = (n, a) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); return e; };
+const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+
+function stepper(opts){
+  const { navId, kickId, titleId, bodyId, prevId, playId, nextId, steps, apply, dwell } = opts;
+  const nav = document.getElementById(navId);
+  let cur = -1, playing = false, timer = null, tmo = [];
+  const clear = () => { while (tmo.length) clearTimeout(tmo.pop()); };
+  steps.forEach((_, i) => {
+    const b = document.createElement("button");
+    b.className = "dot"; b.type = "button"; b.textContent = i + 1;
+    b.setAttribute("role", "tab"); b.setAttribute("aria-label", "Step " + (i + 1));
+    b.addEventListener("click", () => { stop(); go(i); });
+    nav.appendChild(b);
+  });
+  function go(i){
+    clear(); cur = (i + steps.length) % steps.length;
+    const s = steps[cur];
+    document.getElementById(kickId).textContent = s.k + " · " + (cur + 1) + " of " + steps.length;
+    document.getElementById(titleId).textContent = s.t;
+    document.getElementById(bodyId).innerHTML = s.b;
+    [...nav.querySelectorAll(".dot")].forEach((d, n) => { d.setAttribute("aria-current", n === cur); d.classList.toggle("seen", n <= cur); });
+    document.getElementById(prevId).disabled = cur === 0;
+    apply(cur, (fn, ms) => tmo.push(setTimeout(fn, ms)));
+  }
+  function stop(){ playing = false; clearTimeout(timer); document.getElementById(playId).textContent = "Play"; }
+  function play(){
+    playing = true; document.getElementById(playId).textContent = "Pause";
+    const tick = () => { if (!playing) return; if (cur >= steps.length - 1) { stop(); return; } go(cur + 1); timer = setTimeout(tick, dwell); };
+    timer = setTimeout(tick, dwell);
+  }
+  document.getElementById(nextId).addEventListener("click", () => { stop(); go(cur + 1); });
+  document.getElementById(prevId).addEventListener("click", () => { stop(); go(cur - 1); });
+  document.getElementById(playId).addEventListener("click", () => { if (playing) stop(); else { if (cur >= steps.length - 1) go(0); play(); } });
+  go(0);
+  return { go: (i) => { stop(); go(i); }, restart: () => { stop(); go(0); if (!reduce) play(); } };
+}
+
+/* ── HERO: an eight-step story, in two registers ───── */
+let LANG = (() => { try { return localStorage.getItem("atlas.lang") === "tech" ? "tech" : "plain"; } catch (e) { return "plain"; } })();
+const isP = () => LANG === "plain";
+
+const FILES = [
+  { n:"routes.ts",         p:"hallway",          t:1 },
+  { n:"authMiddleware.ts", p:"bathroom tap",     t:1, g:1 },
+  { n:"session.ts",        p:"shower",           t:1 },
+  { n:"index.ts",          p:"front door" },
+  { n:"db.ts",             p:"water meter" },
+  { n:"pool.ts",           p:"the boiler",       tgt:1 },
+  { n:"logger.ts",         p:"airing cupboard" },
+  { n:"config.ts",         p:"thermostat",       t:1 },
+  { n:"userService.ts",    p:"radiator",         t:1 },
+  { n:"cache.ts",          p:"loft" },
+  { n:"mailer.ts",         p:"garden tap" },
+  { n:"bootstrap.ts",      p:"under the stairs", key:1 }
+];
+const FW = 104, FH = 56;
+const fx = i => 56 + (i % 4) * 118, fy = i => 104 + Math.floor(i / 4) * 76;
+
+const L = id => document.getElementById(id);
+const lyQ = L("lyQuestion"), lyF = L("lyFiles"), lyGrep = L("lyGrep"), lyGlob = L("lyGlob"),
+      lyGraph = L("lyGraph"), lyPath = L("lyPath"), lyAnt = L("lyAnt"), lyAtlas = L("lyAtlas"),
+      lyPanel = L("lyPanel"), lyMode = L("lyMode");
+
+/* every swappable bit of canvas text registers itself here */
+const SWAP = [];
+function label(layer, x, y, tech, plain, fill, size, weight){
+  const t = mk("text", { x, y, "font-family":"var(--font-mono)", "font-size":size || "10.5", fill,
+                         "letter-spacing":"1.4", "font-weight":weight || "400" });
+  t.textContent = isP() ? plain : tech;
+  SWAP.push({ el:t, tech, plain });
+  layer.appendChild(t); return t;
+}
+function applyLang(){ SWAP.forEach(o => o.el.textContent = isP() ? o.plain : o.tech); }
+
+/* — question banner — */
+lyQ.appendChild(mk("rect", { x:40, y:26, width:522, height:46, rx:3, fill:"#FAF9F6", stroke:"#D6CBB8" }));
+label(lyQ, 58, 47, "THE QUESTION", "THE QUESTION", "#8C857A", "9.5");
+const qMain = mk("text", { x:58, y:63, "font-family":"var(--font-body)", "font-size":"14.5", "font-weight":"600", fill:"#1A1A18" });
+const Q_TECH = "How does the auth middleware reach the database pool?",
+      Q_PLAIN = "Turn on the bathroom tap — which boiler is heating that water?";
+qMain.textContent = isP() ? Q_PLAIN : Q_TECH;
+SWAP.push({ el:qMain, tech:Q_TECH, plain:Q_PLAIN });
+lyQ.appendChild(qMain);
+
+/* — the twelve things — */
+const fileEls = FILES.map((f, i) => {
+  const g = mk("g", { transform:`translate(${fx(i)},${fy(i)})` });
+  const r = mk("rect", { width:FW, height:FH, rx:2.5, fill:"#FFFFFF", stroke:"#C9C2B4", "stroke-width":1.2,
+                         style:"transition:fill .4s ease,stroke .4s ease,stroke-width .4s ease" });
+  g.appendChild(r);
+  const t = mk("text", { x:9, y:19, "font-family":"var(--font-mono)", "font-size":"9", fill:"#3B3833" });
+  t.textContent = isP() ? f.p : f.n; SWAP.push({ el:t, tech:f.n, plain:f.p });
+  g.appendChild(t);
+  g.appendChild(mk("path", { d:"M9 31 H72 M9 40 H56", stroke:"#D2CBBD", "stroke-width":1.4, "stroke-linecap":"round" }));
+  const tag = mk("text", { x:9, y:50, "font-family":"var(--font-mono)", "font-size":"8.5", fill:"#9A6F20",
+                           opacity:"0", style:"transition:opacity .4s ease" });
+  tag.textContent = isP() ? '“HOT WATER”' : '…"auth"…';
+  SWAP.push({ el:tag, tech:'…"auth"…', plain:'“HOT WATER”' });
+  g.appendChild(tag);
+  lyF.appendChild(g);
+  return { g, r, tag };
+});
+function resetFiles(){
+  fileEls.forEach(({ r, tag }) => {
+    r.setAttribute("fill", "#FFFFFF"); r.setAttribute("stroke", "#C9C2B4");
+    r.setAttribute("stroke-width", 1.2); r.setAttribute("stroke-dasharray", "");
+    tag.setAttribute("opacity", "0");
+  });
+}
+
+/* — the two searches, annotated in the right column — */
+label(lyGrep, 586, 348, 'grep  "auth"', "READING EVERY LABEL", "#9A6F20", "13", "700");
+label(lyGrep, 586, 368, "→ matches the WORD in 5 files here.",   "→ five things say HOT WATER on them.", "#3B3833");
+label(lyGrep, 586, 384, "→ 40 matches / 15 files in the real repo.", "→ forty such labels in a whole house.", "#3B3833");
+label(lyGrep, 586, 404, '→ pool.ts never says "auth". Not found.', "→ the boiler's label just says BOILER.", "#9C3B2E");
+
+label(lyGlob, 586, 348, "glob  **/*auth*", "READING ONLY THE DOOR SIGNS", "#46606F", "13", "700");
+label(lyGlob, 586, 368, "→ matches the FILE NAME. One hit.", "→ one door says bathroom. That's it.", "#3B3833");
+label(lyGlob, 586, 384, "→ the file that actually wires them",  "→ but the join is under the stairs —", "#3B3833");
+label(lyGlob, 586, 400, "   is called bootstrap.ts. Missed.",       "   a door nobody labelled bathroom.", "#9C3B2E");
+const KEY = FILES.findIndex(f => f.key);
+lyGlob.appendChild(mk("path", { d:`M${fx(KEY) + FW / 2} ${fy(KEY) + FH + 28} L${fx(KEY) + FW / 2} ${fy(KEY) + FH + 5}`,
+  stroke:"#9C3B2E", "stroke-width":1.6, "marker-end":"url(#arh)" }));
+const gmiss = mk("text", { x:fx(KEY) + FW / 2, y:fy(KEY) + FH + 44, "text-anchor":"middle",
+  "font-family":"var(--font-mono)", "font-size":"9.5", fill:"#9C3B2E" });
+gmiss.textContent = isP() ? "the join is in here" : "the wiring lives here";
+SWAP.push({ el:gmiss, tech:"the wiring lives here", plain:"the join is in here" });
+lyGlob.appendChild(gmiss);
+
+/* — the map — */
+const GN = [
+  { x:120, y:142, l:"authMiddleware", p:"bathroom tap", k:1 },
+  { x:252, y:112, l:"getSession",     p:"mixer valve",  k:1 },
+  { x:380, y:160, l:"db.query",       p:"riser pipe",   k:1 },
+  { x:500, y:128, l:"pool",           p:"the boiler",   k:1 },
+  { x:152, y:236 }, { x:240, y:274 }, { x:332, y:240 }, { x:432, y:266 },
+  { x:196, y:186 }, { x:320, y:104 }, { x:466, y:216 }, { x:98,  y:288 },
+  { x:276, y:198 }, { x:404, y:300 }
+];
+const GE = [[0,1],[1,2],[2,3],[4,5],[5,6],[6,7],[8,4],[8,0],[9,1],[10,3],[11,4],[12,2],[12,8],[13,7],[6,12],[10,7],[9,12]];
+const gEdgeEls = GE.map(([a2, b2]) => {
+  const e = mk("line", { x1:GN[a2].x, y1:GN[a2].y, x2:GN[b2].x, y2:GN[b2].y,
+    stroke:"#B9B2A4", "stroke-width":1.3, style:"transition:opacity .5s ease" });
+  lyGraph.appendChild(e); return e;
+});
+GN.forEach(n => {
+  lyGraph.appendChild(mk("circle", { cx:n.x, cy:n.y, r:n.k ? 9 : 5.5, fill:n.k ? "#46606F" : "#C9C2B4",
+    stroke:"#FFFFFF", "stroke-width":2 }));
+  if(n.k){
+    const t = mk("text", { x:n.x, y:n.y - 16, "text-anchor":"middle", "font-family":"var(--font-mono)",
+      "font-size":"10", fill:"#1A1A18" });
+    t.textContent = isP() ? n.p : n.l; SWAP.push({ el:t, tech:n.l, plain:n.p });
+    lyGraph.appendChild(t);
+  }
+});
+label(lyGraph, 586, 354, "EVERY FUNCTION IS A NODE.", "EVERY FITTING GETS A DOT.",  "#8C857A");
+label(lyGraph, 586, 372, "EVERY CALL IS AN EDGE.",    "EVERY PIPE GETS A LINE.",    "#8C857A");
+label(lyGraph, 586, 396, "That is the whole trick.",  "That is the whole trick.",   "#3B3833");
+
+/* — the answer, traced — */
+[[0,1],[1,2],[2,3]].forEach(([a2, b2]) =>
+  lyPath.appendChild(mk("line", { x1:GN[a2].x, y1:GN[a2].y, x2:GN[b2].x, y2:GN[b2].y,
+    stroke:"#3F7050", "stroke-width":3.2, "marker-end":"url(#arm)" })));
+[[0,1,"calls","draws from"],[1,2,"calls","draws from"],[2,3,"uses","heated by"]].forEach(([a2, b2, w, wp]) => {
+  const t = mk("text", { x:(GN[a2].x + GN[b2].x) / 2, y:(GN[a2].y + GN[b2].y) / 2 - 8, "text-anchor":"middle",
+    "font-family":"var(--font-mono)", "font-size":"9", fill:"#3F7050" });
+  t.textContent = isP() ? wp : w; SWAP.push({ el:t, tech:w, plain:wp });
+  lyPath.appendChild(t);
+});
+const pathDot = mk("circle", { cx:GN[0].x, cy:GN[0].y, r:5, fill:"#3F7050",
+  style:"transition:cx .55s ease-in-out,cy .55s ease-in-out" });
+lyPath.appendChild(pathDot);
+
+/* — the two searchers — */
+function scruff(layer, fill, calm){
+  const g = mk("g", { transform:"translate(110,366)", style:"transition:transform .38s ease-in-out" });
+  g.appendChild(mk("ellipse", { cx:0, cy:17, rx:18, ry:4, fill:"#1A1A18", opacity:".10" }));
+  g.appendChild(mk("path", { d:"M-15 8 C-20 -2 -13 -12 -1 -12 C11 -12 18 -3 15 8 C13 14 5 16 -1 16 C-8 16 -13 14 -15 8 Z",
+    fill, stroke:"#1A1A18", "stroke-width":1.7, "stroke-linejoin":"round" }));
+  g.appendChild(mk("path", { d: calm ? "M-6 -11 L-7 -18 M3 -12 L4 -19" : "M-10 -9 L-14 -17 M-4 -12 L-5 -21 M3 -12 L4 -20 M10 -9 L15 -17",
+    stroke:"#1A1A18", "stroke-width":1.5, "stroke-linecap":"round" }));
+  g.appendChild(mk("path", { d:"M-9 15 L-11 23 M-2 16 L-2 24 M6 15 L8 23", stroke:"#1A1A18", "stroke-width":1.6, "stroke-linecap":"round" }));
+  g.appendChild(mk("circle", { cx:-4.5, cy:-1, r:3.4, fill:"#fff", stroke:"#1A1A18", "stroke-width":1.3 }));
+  g.appendChild(mk("circle", { cx:6.5,  cy:-1, r:3.4, fill:"#fff", stroke:"#1A1A18", "stroke-width":1.3 }));
+  g.appendChild(mk("circle", { cx:-4.5, cy:-1, r:1.4, fill:"#1A1A18" }));
+  g.appendChild(mk("circle", { cx:6.5,  cy:-1, r:1.4, fill:"#1A1A18" }));
+  if(calm){
+    g.appendChild(mk("path", { d:"M-1.1 -1 L3.1 -1 M-7.9 -1 L-12 -3 M9.9 -1 L14 -3", stroke:"#1A1A18", "stroke-width":1.1 }));
+    g.appendChild(mk("path", { d:"M-2 7 q3 2 6 -1", stroke:"#1A1A18", "stroke-width":1.3, fill:"none", "stroke-linecap":"round" }));
+    const ch = mk("g", { transform:"translate(17,6) rotate(-12)" });
+    ch.appendChild(mk("path", { d:"M0 -9 L16 -9 L16 7 L0 7 Z", fill:"#FFFFFF", stroke:"#1A1A18", "stroke-width":1.5 }));
+    ch.appendChild(mk("path", { d:"M3 -5 L13 -5 M3 -1 L11 -1 M3 3 L13 3", stroke:"#46606F", "stroke-width":1.2, "stroke-linecap":"round" }));
+    g.appendChild(ch);
+  } else {
+    g.appendChild(mk("path", { d:"M-1 6 q2 3 4 0", stroke:"#1A1A18", "stroke-width":1.3, fill:"none", "stroke-linecap":"round" }));
+    const mag = mk("g", { transform:"translate(18,4) rotate(24)" });
+    mag.appendChild(mk("circle", { cx:0, cy:0, r:8, fill:"#46606F", opacity:".13" }));
+    mag.appendChild(mk("circle", { cx:0, cy:0, r:8, fill:"none", stroke:"#1A1A18", "stroke-width":1.9 }));
+    mag.appendChild(mk("path", { d:"M5.5 6.5 L12 13", stroke:"#1A1A18", "stroke-width":2.5, "stroke-linecap":"round" }));
+    g.appendChild(mag);
+  }
+  layer.appendChild(g); return g;
+}
+const ant = scruff(lyAnt, "#C4633C", false);
+const atlas = scruff(lyAtlas, "#3F7050", true);
+
+/* — the tally — */
+lyPanel.appendChild(mk("rect", { x:586, y:100, width:376, height:214, rx:3, fill:"#FAF9F6", stroke:"#D6CBB8" }));
+label(lyPanel, 604, 124, "MEASURED · VS CODE REPO", "MEASURED ON A REAL CODEBASE", "#8C857A", "9.5");
+const rowP = mk("g", { opacity:"0", style:"transition:opacity .5s ease" });
+label(rowP, 604, 176, "Nothing counted yet.", "Nothing counted yet.", "#8C857A", "11");
+label(rowP, 604, 198, "The tally starts at step 4, when the",   "The tally starts at step 4, when it", "#8C857A", "11");
+label(rowP, 604, 216, "agent gives up and starts opening files.", "gives up and starts opening cupboards.", "#8C857A", "11");
+lyPanel.appendChild(rowP);
+const rowA = mk("g", { opacity:"0", style:"transition:opacity .5s ease" });
+label(rowA, 604, 154, "WITHOUT A MAP", "WITHOUT A MAP", "#9C3B2E", "10", "700");
+const aC = label(rowA, 604, 184, "0", "0", "#9C3B2E", "26");
+label(rowA, 660, 184, "TOOL CALLS", "TIMES IT LOOKED", "#8C857A", "9.5");
+const aF = label(rowA, 790, 184, "0", "0", "#9C3B2E", "26");
+label(rowA, 830, 184, "FILES · $1.41", "OPENED · $1.41", "#8C857A", "9.5");
+lyPanel.appendChild(rowA);
+const rowB = mk("g", { opacity:"0", style:"transition:opacity .5s ease" });
+label(rowB, 604, 232, "WITH A GRAPH", "WITH A MAP", "#3F7050", "10", "700");
+const bC = label(rowB, 604, 262, "0", "0", "#3F7050", "26");
+label(rowB, 640, 262, "TOOL CALLS", "TIMES IT LOOKED", "#8C857A", "9.5");
+const bF = label(rowB, 790, 262, "0", "0", "#3F7050", "26");
+label(rowB, 815, 262, "FILES · $0.36", "OPENED · $0.36", "#8C857A", "9.5");
+lyPanel.appendChild(rowB);
+const rowD = mk("g", { opacity:"0", style:"transition:opacity .5s ease" });
+label(rowD, 604, 296, "20× fewer tool calls · same answer · found the callback",
+                      "20× less rummaging · same answer · found the hidden bit", "#1A1A18", "11", "600");
+lyPanel.appendChild(rowD);
+const modeTxt = label(lyMode, 586, 330, "", "", "#8C857A", "9.5");
+
+/* — small helpers — */
+const timers = [];
+function later(fn, ms){ timers.push(setTimeout(fn, ms)); }
+function clearAll(){ while(timers.length) clearTimeout(timers.pop()); }
+function countTo(el, to, ms){
+  const t0 = performance.now();
+  (function step(now){
+    const k = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - k, 3);
+    el.textContent = Math.round(to * e);
+    if(k < 1) requestAnimationFrame(step);
+  })(t0);
+}
+const setOp = (el, v) => el.style.opacity = v;
+const at = (el, x, y) => el.setAttribute("transform", `translate(${x},${y})`);
+
+/* — the eight steps, told twice — */
+const STEPS = [
+{ m:"12 FILES SHOWN · THE REAL REPO HAS 200", mp:"12 THINGS SHOWN · A REAL HOUSE HAS HUNDREDS",
+  k:"The question", t:"One question, asked of a 200-file repo",
+  b:"“How does the auth middleware reach the database pool?” It is a question about a <em>connection</em> — which piece of code eventually leads to which other piece. Hold on to that word; everything below turns on it.",
+  ek:"The question", et:"One question about a house you've never seen",
+  eb:"Turn on the bathroom tap — which boiler is heating that water? It is a question about <em>what is joined to what</em>, not about what anything is called. Hold on to that, because everything below turns on it.",
+  run(){ resetFiles(); setOp(lyQ,1); setOp(lyF,1); setOp(lyGrep,0); setOp(lyGlob,0); setOp(lyGraph,0); setOp(lyPath,0);
+         setOp(lyAnt,1); setOp(lyAtlas,0); at(ant,110,366); setOp(rowA,0); setOp(rowB,0); setOp(rowD,0); setOp(rowP,1); } },
+
+{ m:"LENS: TEXT SEARCH", mp:"HOW YOU'RE LOOKING: READING LABELS",
+  k:"Tool one", t:"grep searches the text inside files",
+  b:"<em>grep</em> reads every file and reports every line containing a string. Ask it for “auth” and it lights up five files here — forty matches across fifteen files in the real repo. But <code>pool.ts</code> never contains the word “auth”, so grep cannot return it. grep finds <em>the word</em>, never the connection.",
+  ek:"Way one", et:"Reading every label in the house",
+  eb:"You walk round reading every label and sticker. Five things say HOT WATER on them. The boiler's own label just says BOILER — so it never comes up, even though it is the answer. <em>Labels tell you what things are called, not what they are joined to.</em><span class='tj'>this is <code>grep</code> — search every file for a word. Same trick, same blind spot.</span>",
+  run(){ resetFiles(); setOp(lyQ,1); setOp(lyF,1); setOp(lyGrep,1); setOp(lyGlob,0); setOp(lyGraph,0); setOp(lyPath,0);
+         setOp(lyAnt,1); setOp(lyAtlas,0); at(ant,110,366); setOp(rowA,0); setOp(rowB,0); setOp(rowD,0); setOp(rowP,1);
+         FILES.forEach((f,i) => { if(f.t){ fileEls[i].r.setAttribute("fill","#FBF2DE"); fileEls[i].r.setAttribute("stroke","#9A6F20"); fileEls[i].tag.setAttribute("opacity","1"); }
+           if(f.tgt){ fileEls[i].r.setAttribute("stroke","#9C3B2E"); fileEls[i].r.setAttribute("stroke-width",2); } }); } },
+
+{ m:"LENS: FILENAME PATTERN", mp:"HOW YOU'RE LOOKING: READING DOOR SIGNS",
+  k:"Tool two", t:"glob searches the names of files",
+  b:"<em>glob</em> ignores content entirely and matches file <em>paths</em> against a pattern — <code>**/*auth*</code> returns exactly one file. The code that actually hands the middleware to the pool sits in <code>bootstrap.ts</code>: a name with no “auth” in it. glob finds <em>the file</em>, never the connection.",
+  ek:"Way two", et:"Reading only the signs on the doors",
+  eb:"So you ignore labels and read door signs instead. One door says <em>bathroom</em>. But the pipe junction that actually joins that tap to the boiler is in the cupboard under the stairs — a door nobody would ever label bathroom. <em>Signs tell you where things live, not what they are joined to.</em><span class='tj'>this is <code>glob</code> — pick files by their name, like <code>**/*auth*</code>. Same trick, same blind spot.</span>",
+  run(){ resetFiles(); setOp(lyQ,1); setOp(lyF,1); setOp(lyGrep,0); setOp(lyGlob,1); setOp(lyGraph,0); setOp(lyPath,0);
+         setOp(lyAnt,1); setOp(lyAtlas,0); at(ant,110,366); setOp(rowA,0); setOp(rowB,0); setOp(rowD,0); setOp(rowP,1);
+         FILES.forEach((f,i) => { if(f.g){ fileEls[i].r.setAttribute("fill","#EAF0F3"); fileEls[i].r.setAttribute("stroke","#46606F"); fileEls[i].r.setAttribute("stroke-width",2); }
+           if(f.key){ fileEls[i].r.setAttribute("stroke","#9C3B2E"); fileEls[i].r.setAttribute("stroke-width",2); fileEls[i].r.setAttribute("stroke-dasharray","4 3"); } }); } },
+
+{ m:"LENS: OPEN IT AND SEE", mp:"HOW YOU'RE LOOKING: OPENING EVERYTHING",
+  k:"The consequence", t:"So the agent opens doors until it guesses",
+  b:"Given only words and filenames, there is nothing left to do but read files one at a time and hope the link appears. On the VS&nbsp;Code repo that came to <em>40 tool calls, 17 files opened, $1.41</em> — and the callback doing the wiring was still missed. This is the loop the whole category exists to end.",
+  ek:"What happens next", et:"So you start opening cupboards",
+  eb:"Labels failed and signs failed, so there is nothing left but opening cupboards one at a time and hoping. Forty goes, seventeen cupboards actually opened, and the junction under the stairs was <em>still</em> missed.<span class='tj'>this is exactly what an AI assistant does to your codebase with no map — and the bill on a real one was $1.41 for that single question.</span>",
+  run(){ resetFiles(); setOp(lyQ,1); setOp(lyF,1); setOp(lyGrep,0); setOp(lyGlob,0); setOp(lyGraph,0); setOp(lyPath,0);
+         setOp(lyAnt,1); setOp(lyAtlas,0); setOp(rowA,1); setOp(rowB,0); setOp(rowD,0); setOp(rowP,0);
+         aC.textContent = "0"; aF.textContent = "0";
+         if(!reduce){
+           countTo(aC, 40, 3000); countTo(aF, 17, 3000);
+           [0,5,2,8,3,10,1,7,11,4,6,9].forEach((idx,n) => later(() => {
+             at(ant, fx(idx) + FW / 2, fy(idx) + FH + 22);
+             fileEls[idx].r.setAttribute("fill", "#F1EEE6");
+           }, 160 + n * 250));
+         } else { aC.textContent = "40"; aF.textContent = "17"; at(ant, 110, 366); } } },
+
+{ m:"BUILT ONCE · TREE-SITTER · OFFLINE · FREE", mp:"DRAWN ONCE · BY LOOKING, NOT GUESSING",
+  k:"The alternative", t:"A graph writes down what a parser can see",
+  b:"Build it once. A parser walks every file and records two kinds of thing: <em>nodes</em> — each function, class and file — and <em>edges</em> — each call, import and reference. No model, no API key, no guessing. It is bookkeeping, and it is the step grep and glob never do.",
+  ek:"The alternative", et:"A plumber draws the house — once",
+  eb:"Someone walks the house properly and writes down two things: a <em>dot</em> for every fitting, and a <em>line</em> for every pipe joining two of them. It is careful looking rather than guessing, and it only has to happen once.<span class='tj'>the dots are functions and files; the lines are one function calling another. The thing that does the walking is a <em>parser</em>, and it runs offline and free.</span>",
+  run(){ resetFiles(); setOp(lyQ,1); setOp(lyF,0); setOp(lyGrep,0); setOp(lyGlob,0); setOp(lyGraph,1); setOp(lyPath,0);
+         setOp(lyAnt,0); setOp(lyAtlas,0); setOp(rowA,1); setOp(rowB,0); setOp(rowD,0); setOp(rowP,0);
+         aC.textContent = "40"; aF.textContent = "17";
+         gEdgeEls.forEach((e,i) => { e.style.opacity = 0; later(() => e.style.opacity = 1, 60 + i * 45); }); } },
+
+{ m:"LENS: RELATIONSHIPS", mp:"WHAT IS JOINED TO WHAT",
+  k:"Why it works", t:"The edge is the thing neither search could see",
+  b:"<code>authMiddleware</code> calls <code>getSession</code>, which calls <code>db.query</code>, which uses <code>pool</code>. Nobody wrote the word “auth” anywhere in <code>pool.ts</code>, and no filename gave it away. The graph knows regardless, because at build time it recorded <em>who calls whom</em> rather than what anything is called.",
+  ek:"Why it works", et:"The line is the bit labels could never show",
+  eb:"Bathroom tap → mixer valve → riser pipe → the boiler. Nobody wrote the word <em>bathroom</em> on the boiler, and no door sign gave it away. The drawing knows anyway, because when it was made, someone recorded <em>what is joined to what</em> instead of what everything is called.",
+  run(){ resetFiles(); setOp(lyQ,1); setOp(lyF,0); setOp(lyGrep,0); setOp(lyGlob,0); setOp(lyGraph,1); setOp(lyPath,1);
+         setOp(lyAnt,0); setOp(lyAtlas,0); setOp(rowA,1); setOp(rowB,0); setOp(rowD,0); setOp(rowP,0);
+         aC.textContent = "40"; aF.textContent = "17";
+         gEdgeEls.forEach(e => e.style.opacity = .45);
+         pathDot.setAttribute("cx", GN[0].x); pathDot.setAttribute("cy", GN[0].y); } },
+
+{ m:"LENS: RELATIONSHIPS", mp:"WHAT IS JOINED TO WHAT",
+  k:"The payoff", t:"Now the question is a path lookup, not a search",
+  b:"Asking becomes walking: start at one node, follow the edges, arrive at the other. Nothing is scanned and nothing is opened on spec. Same question, same answer — <em>2 tool calls, 0 files opened, $0.36</em>.",
+  ek:"The payoff", et:"Now you just follow the line",
+  eb:"Put a finger on the tap and follow the pipe. Two moves, no cupboards opened, and you are standing at the boiler. Same question, same answer — you simply never had to go rummaging.<span class='tj'>on the real codebase — 2 goes instead of 40, nothing opened, 36 cents instead of $1.41.</span>",
+  run(){ resetFiles(); setOp(lyQ,1); setOp(lyF,0); setOp(lyGrep,0); setOp(lyGlob,0); setOp(lyGraph,1); setOp(lyPath,1);
+         setOp(lyAnt,0); setOp(lyAtlas,1); at(atlas, 96, 366); setOp(rowA,1); setOp(rowB,1); setOp(rowD,0); setOp(rowP,0);
+         aC.textContent = "40"; aF.textContent = "17"; bC.textContent = "2"; bF.textContent = "0";
+         gEdgeEls.forEach(e => e.style.opacity = .35);
+         if(!reduce){ [1,2,3].forEach((ni,n) => later(() => {
+             pathDot.setAttribute("cx", GN[ni].x); pathDot.setAttribute("cy", GN[ni].y);
+           }, 350 + n * 600)); } else { pathDot.setAttribute("cx", GN[3].x); pathDot.setAttribute("cy", GN[3].y); } } },
+
+{ m:"INDEX ONCE · QUERY MANY", mp:"LOOK ONCE · USE IT FOREVER",
+  k:"The honest version", t:"What actually got cheaper, and what did not",
+  b:"The saving is not magic: the work of understanding the structure was done once and stored, so it is not repeated per question. Note which number moved most — <em>tool calls, twentyfold</em>. Token savings are contested across the corpus and occasionally negative; the collapse in tool calls is the finding that holds everywhere.",
+  ek:"The honest version", et:"Why it is cheaper — and what did not change",
+  eb:"Nothing magic happened. The looking was done once and written down, so it never has to be repeated. And notice which number actually collapsed: <em>how many times it had to go and look</em>.<span class='tj'>that distinction matters when you read the marketing. Money saved is argued over across all 22 videos; the collapse in how often the assistant goes rummaging is the one finding that holds everywhere.</span>",
+  run(){ resetFiles(); setOp(lyQ,1); setOp(lyF,0); setOp(lyGrep,0); setOp(lyGlob,0); setOp(lyGraph,1); setOp(lyPath,1);
+         setOp(lyAnt,0); setOp(lyAtlas,1); at(atlas, 96, 366); setOp(rowA,1); setOp(rowB,1); setOp(rowD,1); setOp(rowP,0);
+         aC.textContent = "40"; aF.textContent = "17"; bC.textContent = "2"; bF.textContent = "0";
+         gEdgeEls.forEach(e => e.style.opacity = .35);
+         pathDot.setAttribute("cx", GN[3].x); pathDot.setAttribute("cy", GN[3].y); } }
+];
+
+/* — controller — */
+const nav = L("storyNav");
+STEPS.forEach((_, i) => {
+  const b2 = document.createElement("button");
+  b2.className = "dot"; b2.type = "button"; b2.textContent = i + 1;
+  b2.setAttribute("role", "tab"); b2.setAttribute("aria-label", "Step " + (i + 1));
+  b2.addEventListener("click", () => { stop(); go(i); });
+  nav.appendChild(b2);
+});
+const langBox = document.createElement("div");
+langBox.className = "langtoggle";
+langBox.innerHTML = '<button type="button" data-lang="plain">Plain English</button><button type="button" data-lang="tech">Technical</button>';
+nav.appendChild(langBox);
+langBox.addEventListener("click", e => {
+  const b2 = e.target.closest("[data-lang]"); if(!b2) return;
+  LANG = b2.dataset.lang;
+  try { localStorage.setItem("atlas.lang", LANG); } catch (err) {}
+  applyLang(); markLang(); go(cur);
+});
+function markLang(){
+  langBox.querySelectorAll("[data-lang]").forEach(b2 => b2.setAttribute("aria-pressed", b2.dataset.lang === LANG));
+}
+
+let cur = -1, playing = false, playTimer = null;
+function go(i){
+  clearAll(); cur = (i + STEPS.length) % STEPS.length;
+  const st = STEPS[cur], plain = isP();
+  L("stKick").textContent = (plain ? st.ek : st.k) + " · step " + (cur + 1) + " of " + STEPS.length;
+  L("stTitle").textContent = plain ? st.et : st.t;
+  L("stBody").innerHTML = plain ? st.eb : st.b;
+  modeTxt.textContent = plain ? st.mp : st.m;
+  const sw = SWAP.find(o => o.el === modeTxt); if(sw){ sw.tech = st.m; sw.plain = st.mp; }
+  [...nav.querySelectorAll(".dot")].forEach((d, n) => { d.setAttribute("aria-current", n === cur); d.classList.toggle("seen", n <= cur); });
+  L("stPrev").disabled = cur === 0;
+  st.run();
+}
+function stop(){ playing = false; clearTimeout(playTimer); L("stPlay").textContent = "Play"; }
+function play(){
+  playing = true; L("stPlay").textContent = "Pause";
+  const tick2 = () => {
+    if(!playing) return;
+    if(cur >= STEPS.length - 1){ stop(); return; }
+    go(cur + 1); playTimer = setTimeout(tick2, 7200);
+  };
+  playTimer = setTimeout(tick2, 7200);
+}
+L("stNext").addEventListener("click", () => { stop(); go(cur + 1); });
+L("stPrev").addEventListener("click", () => { stop(); go(cur - 1); });
+L("stPlay").addEventListener("click", () => { if(playing) stop(); else { if(cur >= STEPS.length - 1) go(0); play(); } });
+function playHero(){ stop(); go(0); if(!reduce) play(); }
+markLang(); go(0);
+
+(function(){
+  const files = document.getElementById("pipeFiles"), nodesG = document.getElementById("pipeNodes"),
+        edgesG = document.getElementById("pipeEdges"), stagesG = document.getElementById("pipeStages");
+  let rs = 20260908; const rnd = () => { rs = (rs * 1103515245 + 12345) & 0x7fffffff; return rs / 0x7fffffff; };
+
+  ["01 SOURCE","02 PARSE","03 NODES","04 EDGES","05 COMMUNITIES"].forEach((s, i) => {
+    const t = mk("text", { x: 44 + i * 196, y: 26, "font-family":"var(--font-mono)", "font-size":"10.5",
+      "letter-spacing":"2", fill:"#8C857A", class:"stagelbl", style:"transition:fill .4s ease" });
+    t.textContent = s; stagesG.appendChild(t);
+  });
+  for (let i = 0; i < 20; i++){
+    const g = mk("g", { transform:`translate(${52 + (i % 4) * 30},${58 + Math.floor(i / 4) * 40})`, style:"transition:opacity .5s ease,transform .5s ease" });
+    g.appendChild(mk("rect", { width:21, height:27, rx:2, fill:"#FFFFFF", stroke:"#C9C2B4", "stroke-width":1.1 }));
+    g.appendChild(mk("path", { d:"M4 8 H16 M4 12 H13 M4 16 H16", stroke:"#D2CBBD", "stroke-width":.9 }));
+    files.appendChild(g);
+  }
+  const CENTRES = [[392,112,0],[548,84,1],[628,206,2],[812,120,3],[884,232,4],[452,228,5]];
+  const CCOL = ["#C4633C","#46606F","#3F7050","#6B5480","#9A6F20","#9C3B2E"];
+  const PN = [];
+  CENTRES.forEach(([cx, cy, c]) => { for (let i = 0; i < 7; i++){
+    const a = (i / 7) * Math.PI * 2 + rnd() * .7, r = 26 + rnd() * 34;
+    PN.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r * .82, c]); } });
+  const HUB = 7;
+  const PE = [];
+  CENTRES.forEach((_, ci) => {
+    const idx = PN.map((p, i) => [p, i]).filter(([p]) => p[2] === ci).map(([, i]) => i);
+    idx.forEach((a, k) => { PE.push([a, idx[(k + 1) % idx.length]]); if (k % 2 === 0) PE.push([a, idx[(k + 3) % idx.length]]); });
+  });
+  for (let i = 0; i < 9; i++) PE.push([Math.floor(rnd() * PN.length), Math.floor(rnd() * PN.length)]);
+  const eEls = [];
+  PE.forEach(([a, b]) => { if (a === b) return;
+    const len = Math.hypot(PN[a][0] - PN[b][0], PN[a][1] - PN[b][1]);
+    const l = mk("line", { x1:PN[a][0], y1:PN[a][1], x2:PN[b][0], y2:PN[b][1], stroke:"#B9B2A4", "stroke-width":1.2,
+      "stroke-dasharray":len, "stroke-dashoffset":len, opacity:"0",
+      style:"transition:opacity .4s ease,stroke-dashoffset .8s ease" });
+    edgesG.appendChild(l); eEls.push(l); });
+  const nEls = PN.map(([x, y, c], i) => { const el = mk("circle", { cx:x, cy:y, r: i === HUB ? 6 : 5.2, fill:"#C9C2B4",
+    stroke:"#FFFFFF", "stroke-width":2, opacity:"0", style:"transition:opacity .45s ease,fill .6s ease,r .5s ease" });
+    nodesG.appendChild(el); return el; });
+
+  const stage = (n) => [...stagesG.children].forEach((t, i) => t.setAttribute("fill", i === n ? "#C4633C" : "#8C857A"));
+  const setFiles = (o, s) => [...files.children].forEach(g => { g.style.opacity = o; g.style.transform = g.getAttribute("transform") + ` scale(${s})`; });
+
+  stepper({
+    navId:"pipeNav", kickId:"pipeKick", titleId:"pipeTitle", bodyId:"pipeBody",
+    prevId:"pipePrev", playId:"pipePlay", nextId:"pipeNext", dwell: 5200,
+    steps: [
+      { k:"Source", t:"It starts with the files you already have",
+        b:"The tool walks the project root and picks up what is there — <em>357 code files, 53 documents, 7 images</em> in this build. Ignore rules are respected, so <code>node_modules</code> and build output never enter the count." },
+      { k:"Parse", t:"A parser reads each file — no model involved",
+        b:"tree-sitter builds a syntax tree per file. <em>Local, deterministic, offline, no API key.</em> This is why the code half of a build is free, and why running it twice gives you the same answer twice." },
+      { k:"Nodes", t:"Every function, class and file becomes a dot",
+        b:"<em>4,041 nodes</em> from those files. A node is a thing that can be referred to — not a line of code, and not a file unless the file itself is the unit." },
+      { k:"Edges", t:"Every call, import and reference becomes a line",
+        b:"<em>20,900 edges</em>, each tagged with how it was known: <strong>extracted</strong> when the parser saw it, <strong>inferred</strong> when it was worked out, <strong>ambiguous</strong> when a model guessed. This tagging is the difference between a map and a rumour." },
+      { k:"Communities", t:"Clustering finds the modules your folders hide",
+        b:"Leiden clustering collapses 4,041 nodes into <em>185 communities</em> by connection density — the modules the code actually has. The largest hub here carries <em>47 connections</em>: read it first, and move it last." }
+    ],
+    apply(i, later){
+      stage(i);
+      setFiles(i === 0 ? 1 : .25, i === 0 ? 1 : .9);
+      nEls.forEach((el, n) => { el.style.opacity = i >= 2 ? 1 : 0;
+        el.setAttribute("fill", i >= 4 ? CCOL[PN[n][2]] : "#C9C2B4");
+        el.setAttribute("r", i >= 4 && n === HUB ? 12 : 5.2); });
+      if (i === 1) nEls.forEach((el, n) => { el.style.opacity = 0; later(() => el.style.opacity = .45, 60 + n * 12); });
+      eEls.forEach((l, n) => { const len = l.getAttribute("stroke-dasharray");
+        l.style.opacity = i >= 3 ? .45 : 0; l.setAttribute("stroke-dashoffset", i >= 3 ? 0 : len); });
+    }
+  });
+})();
+
+
+(function(){
+  const layer = document.getElementById("dagLayer");
+  const SHAPES = [
+    { n:[[120,150],[300,150],[480,150],[660,150]], e:[[0,1],[1,2],[2,3]], path:[1,2,3] },
+    { n:[[120,150],[330,88],[330,212],[560,150]], e:[[0,1],[0,2],[1,3],[2,3]], path:[1,3], path2:[2,3] },
+    { n:[[120,150],[380,72],[380,150],[380,228]], e:[[0,1],[0,2],[0,3]], path:[2] },
+    { n:[[220,150],[460,150]], e:[[0,1]], loop:true, path:[1,0,1] }
+  ];
+  let g = null, tok = null, tok2 = null;
+  function draw(s){
+    if (g) g.remove();
+    g = mk("g", {}); layer.appendChild(g);
+    s.e.forEach(([a, b]) => { const [x1,y1] = s.n[a], [x2,y2] = s.n[b];
+      const dx = x2 - x1, dy = y2 - y1, L = Math.hypot(dx, dy), ux = dx / L, uy = dy / L;
+      g.appendChild(mk("line", { x1:x1 + ux * 26, y1:y1 + uy * 26, x2:x2 - ux * 32, y2:y2 - uy * 32,
+        stroke:"#8C857A", "stroke-width":1.6, "marker-end":"url(#ard)" })); });
+    if (s.loop){
+      g.appendChild(mk("path", { d:"M452 178 q-116 78 -224 0", fill:"none", stroke:"#9A6F20", "stroke-width":1.6,
+        "stroke-dasharray":"5 4", "marker-end":"url(#ard)" }));
+      const c = mk("text", { x:340, y:238, "text-anchor":"middle", "font-family":"var(--font-mono)", "font-size":"11", fill:"#9A6F20" });
+      c.textContent = "cap the iterations"; g.appendChild(c);
+    }
+    s.n.forEach(([x, y], i) => g.appendChild(mk("circle", { cx:x, cy:y, r:24,
+      fill: i === 0 ? "#C4633C" : "#F4F2EC", stroke: i === 0 ? "#C4633C" : "#8C857A", "stroke-width":1.6 })));
+    tok = mk("circle", { cx:s.n[0][0], cy:s.n[0][1], r:7, fill:"#3F7050", opacity:"0",
+      style:"transition:cx .6s ease-in-out,cy .6s ease-in-out,opacity .3s ease" });
+    g.appendChild(tok);
+    if (s.path2){ tok2 = mk("circle", { cx:s.n[0][0], cy:s.n[0][1], r:7, fill:"#3F7050", opacity:"0",
+      style:"transition:cx .6s ease-in-out,cy .6s ease-in-out,opacity .3s ease" }); g.appendChild(tok2); } else tok2 = null;
+  }
+  stepper({
+    navId:"dagNav", kickId:"dagKick", titleId:"dagTitle", bodyId:"dagBody",
+    prevId:"dagPrev", playId:"dagPlay", nextId:"dagNext", dwell: 5600,
+    steps: [
+      { k:"Chain", t:"Start here — every step waits for the last",
+        b:"The shape you get by default, because it is the shape you type. Easiest to test and to reason about. <em>Its weakness: if one step breaks, the whole process breaks</em> — and every step waits whether or not it needed to." },
+      { k:"Diamond", t:"Fan out what is independent, then merge",
+        b:"Two jobs that do not need each other's output run at the same time and rejoin. Roughly <em>2× quicker</em> on the worked example. The risk is quiet: sub-agents cannot see each other, so two of them can do the same work twice and you will not get an error — just a bigger bill." },
+      { k:"Branch", t:"Route the request down exactly one path",
+        b:"A decision node picks the path instead of running them all. Useful for skill routing. <em>Keep it under five branches</em> — past that nobody, human or model, can reason about the tree." },
+      { k:"Loop", t:"Do, evaluate, repeat until it passes the bar",
+        b:"A worker produces, a checker judges, and failure feeds back rather than forward. The one shape that can run away with you: an uncapped loop in the corpus <em>spent thousands of dollars on tokens overnight</em>. Always set a hard maximum iteration count that fails the run." }
+    ],
+    apply(i, later){
+      const s = SHAPES[i]; draw(s);
+      if (reduce){ tok.style.opacity = 1; return; }
+      later(() => { tok.style.opacity = 1; if (tok2) tok2.style.opacity = 1; }, 220);
+      s.path.forEach((ni, n) => later(() => { tok.setAttribute("cx", s.n[ni][0]); tok.setAttribute("cy", s.n[ni][1]); }, 500 + n * 650));
+      if (s.path2) s.path2.forEach((ni, n) => later(() => { tok2.setAttribute("cx", s.n[ni][0]); tok2.setAttribute("cy", s.n[ni][1]); }, 500 + n * 650));
+    }
+  });
+})();
+
+
+(function(){
+  const bar = document.querySelector(".tabbar");
+  const select = (id, push) => {
+    bar.querySelectorAll("[data-tab]").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === id));
+    document.querySelectorAll(".panel").forEach(p => { p.hidden = p.id !== "panel-" + id; });
+    if (push) history.replaceState(null, "", "#" + id);
+  };
+  bar.addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if (!b) return; select(b.dataset.tab, true); window.scrollTo({ top: bar.offsetTop - 90, behavior: reduce ? "auto" : "smooth" }); });
+  bar.addEventListener("keydown", e => {
+    const btns = [...bar.querySelectorAll("[data-tab]")];
+    const i = btns.findIndex(b => b.getAttribute("aria-selected") === "true");
+    if (e.key === "ArrowRight" || e.key === "ArrowLeft"){
+      const n = (i + (e.key === "ArrowRight" ? 1 : -1) + btns.length) % btns.length;
+      btns[n].focus(); select(btns[n].dataset.tab, true); e.preventDefault();
+    }
+  });
+  const initial = location.hash.replace("#", "");
+  if (initial && document.getElementById("panel-" + initial)) select(initial, false);
+
+  const filt = document.getElementById("tierFilter");
+  filt.addEventListener("click", e => {
+    const b = e.target.closest("[data-tier]"); if (!b) return;
+    const t = b.dataset.tier;
+    filt.querySelectorAll("[data-tier]").forEach(x => x.setAttribute("aria-pressed", x === b));
+    document.querySelectorAll(".tierblock").forEach(bl => { bl.hidden = !(t === "all" || bl.dataset.tier === t); });
+  });
+})();
+
+})();
+</script>
 </body>
 </html>
