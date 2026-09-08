@@ -148,5 +148,15 @@
     "tags": [
       "scaling"
     ]
+  },
+  {
+    "slug": "skill-induction-trajectory-to-skill",
+    "title": "Skill Induction: Trajectory-to-Skill Learning",
+    "role": "Traces into skills",
+    "source": "DeepLearning.AI × Oracle, Building Adaptive AI Agents L3",
+    "dateAdded": "2026-09-08",
+    "tags": [
+      "building"
+    ]
   }
 ]

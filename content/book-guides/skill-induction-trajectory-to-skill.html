@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+</head>
+<body>
+<title>Skill Induction: Trajectory-to-Skill Learning</title>
+<style>:root{color-scheme:light;
+ --surface:#faf9f5;--surface-2:#f2f0e9;--surface-3:#e8e6dc;--line:#d9d7cc;--line-soft:#e8e6dc;
+ --ink:#141413;--ink-2:#5c5b57;--ink-3:#6b6a65;--on-ink:#faf9f5;
+ --accent:#d97757;--accent-2:#6a9bcc;--accent-3:#788c5d;
+ --font-head:"Poppins",Arial,sans-serif;--font-body:"Lora",Georgia,serif;--font-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--surface);color:var(--ink-2);font-family:var(--font-body);font-size:17px;line-height:1.7}
+main{max-width:1080px;margin:0 auto;padding:30px 22px 90px}
+h1,h2,h3,h4{font-family:var(--font-head);color:var(--ink);line-height:1.2;margin:0 0 10px;text-wrap:balance}
+h1{font-size:38px;letter-spacing:-.02em;font-weight:600}
+h2{font-size:24px;font-weight:600}
+h3{font-size:18px;font-weight:600}
+p{margin:0 0 12px;max-width:70ch}
+strong{color:var(--ink)}
+a{color:var(--ink);text-decoration-color:var(--accent);text-underline-offset:3px}
+code,.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+code{font-size:.86em;background:var(--surface-3);padding:1px 5px;border-radius:5px;color:var(--ink)}
+.small{font-size:14px;color:var(--ink-3)}
+.eyebrow{font-family:var(--font-mono);color:var(--ink-3);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase}
+.who{font-family:var(--font-mono);font-size:13.5px;color:var(--ink-3);margin-bottom:16px}
+.btn{font-family:var(--font-head);font-weight:600;font-size:13.5px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:10px;padding:8px 14px;cursor:pointer;text-decoration:none;display:inline-block}
+.btn:hover{border-color:var(--accent)}
+button:focus-visible,a:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+
+/* ── tabs ── */
+.tabbar{position:sticky;top:44px;z-index:30;display:flex;gap:4px;overflow-x:auto;padding:10px 0 0;margin:22px 0 0;
+  background:linear-gradient(180deg,var(--surface) 70%,transparent);scrollbar-width:thin}
+.tabbar button{flex:0 0 auto;font-family:var(--font-head);font-size:13.5px;font-weight:600;color:var(--ink-3);
+  background:transparent;border:0;border-bottom:2px solid transparent;padding:9px 13px;cursor:pointer;white-space:nowrap}
+.tabbar button:hover{color:var(--ink)}
+.tabbar button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tabbar .num{font-family:var(--font-mono);font-size:11px;color:var(--ink-3);margin-left:5px;font-weight:400}
+.panel{padding-top:26px;border-top:1px solid var(--line);animation:fade .25s ease;scroll-margin-top:120px}
+figure{scroll-margin-top:120px}
+.panel[hidden]{display:none!important}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ── figures: white plates, pinned ink, both themes ── */
+figure{margin:0 0 20px;background:#FFFFFF;color:#1A1A18;border:1px solid rgba(25,25,23,.15);border-radius:14px;overflow:hidden}
+figure svg{display:block;width:100%;height:auto;background:#FFFFFF}
+.fig-cap{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:start;padding:14px 18px;
+  border-top:1px solid rgba(25,25,23,.15);background:#FFFFFF}
+@media(max-width:720px){.fig-cap{grid-template-columns:1fr}}
+.fig-nav{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-bottom:2px}
+.dot{width:26px;height:26px;border-radius:999px;border:1px solid rgba(25,25,23,.22);background:transparent;
+  font-family:var(--font-mono);font-size:11px;cursor:pointer;color:#686256;padding:0}
+.dot:hover{border-color:#C4633C;color:#A34A28}
+.dot[aria-current="true"]{background:#1A1A18;border-color:#1A1A18;color:#fff}
+.dot.seen{border-color:#C4633C}
+.langtoggle{margin-left:auto;display:flex;border:1px solid rgba(25,25,23,.22);border-radius:999px;overflow:hidden}
+.langtoggle button{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+  padding:6px 12px;border:0;background:transparent;cursor:pointer;color:#686256;white-space:nowrap}
+.langtoggle button+button{border-left:1px solid rgba(25,25,23,.22)}
+.langtoggle button[aria-pressed="true"]{background:#1A1A18;color:#fff}
+.fig-kick{font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#8C857A;display:block}
+.fig-text h4{font-family:var(--font-head);font-size:18px;margin:3px 0 5px;color:#1A1A18}
+.fig-text p{font-size:15.5px;color:#3B3833;max-width:72ch;margin:0}
+.fig-text p em{color:#A34A28;font-style:normal;font-weight:600}
+.fig-text .tj{display:block;margin-top:9px;padding-top:8px;border-top:1px dashed rgba(25,25,23,.18);font-size:14.5px;color:#686256}
+.fig-text .tj::before{content:"In code: ";font-family:var(--font-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#8C857A}
+.fig-ctrl{display:flex;gap:6px;align-items:flex-start}
+.fig-ctrl button{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  padding:7px 12px;border:1px solid rgba(25,25,23,.22);background:transparent;border-radius:8px;cursor:pointer;color:#3B3833;white-space:nowrap}
+.fig-ctrl button:hover{border-color:#C4633C;color:#A34A28}
+.fig-ctrl button.go{background:#1A1A18;border-color:#1A1A18;color:#fff}
+.fig-ctrl button.go:hover{background:#A34A28;border-color:#A34A28}
+.fig-ctrl button:disabled{opacity:.35;cursor:default}
+.fig-note{padding:12px 18px;border-top:1px solid rgba(25,25,23,.09);background:#FBFAF8;font-size:13.5px;color:#686256}
+.fig-note a{color:#A34A28}
+.sc{transition:opacity .45s ease}
+
+/* ── content ── */
+.callout{background:var(--surface-2);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:12px;padding:14px 18px;margin:16px 0}
+.callout.green{border-left-color:var(--accent-3)}
+.callout.blue{border-left-color:var(--accent-2)}
+.note{background:var(--surface-3);border-radius:12px;padding:13px 18px;margin:16px 0;font-size:15.5px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:760px){.two{grid-template-columns:1fr}}
+.two .callout{margin:0}
+.concept{border:1px solid var(--line);border-radius:14px;margin:12px 0;overflow:hidden;background:var(--surface-2)}
+.chead{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;padding:12px 18px;border-bottom:1px solid var(--line)}
+.chead .idx{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-3)}
+.chead .t{font-family:var(--font-head);font-weight:600;color:var(--ink);font-size:16.5px;flex:1;min-width:220px}
+.chip{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.04em;padding:2px 8px;border-radius:999px;background:var(--surface-3);color:var(--ink-3);white-space:nowrap}
+.chip.foundation{background:#e6ece0;color:#4c6440}
+.chip.intermediate{background:#e2eaf3;color:#3f5f80}
+.chip.advanced{background:#f5e3da;color:#9a4d2c}
+.cbody{padding:14px 18px;background:var(--surface)}
+.cbody p{margin:0 0 10px}.cbody p:last-child{margin:0}
+.got{font-size:15.5px}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 14px;margin:0;font-size:15.5px}
+.kv dt{font-family:var(--font-mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);padding-top:3px}
+.kv dd{margin:0}
+@media(max-width:640px){.kv{grid-template-columns:1fr}}
+.tablewrap{overflow-x:auto;margin:14px 0}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th{font-family:var(--font-head);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);text-align:left;padding:7px 9px;border-bottom:1px solid var(--line)}
+td{padding:9px 9px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+.plainline{display:block;margin-top:6px;padding-left:10px;border-left:2px solid var(--line);font-size:14px;color:var(--ink-3)}
+ol.anti,ol.story{padding-left:22px;max-width:74ch}
+ol.anti li{margin:6px 0}
+ol.story li{margin:0 0 16px}
+.incode{display:block;margin-top:7px;padding-top:6px;border-top:1px dashed var(--line);font-size:14.5px;color:var(--ink-3)}
+ul{padding-left:22px;max-width:74ch}ul li{margin:5px 0}
+.tierhead{margin-top:26px;font-size:17px;color:var(--ink)}
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 14px}
+.filters button{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;padding:6px 11px;
+  border:1px solid var(--line);background:transparent;border-radius:999px;cursor:pointer;color:var(--ink-3)}
+.filters button:hover{border-color:var(--accent);color:var(--ink)}
+.filters button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--on-ink)}
+.concept.hide{display:none}
+pre{font-family:var(--font-mono);font-size:13.5px;line-height:1.55;background:#1B1F2A;color:#E6E4DC;border-radius:10px;padding:14px 16px;overflow-x:auto;margin:10px 0}
+pre code{background:transparent;padding:0;color:inherit;font-size:inherit}
+.cellhead{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;margin-top:22px}
+.cellhead .cellno{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.pill{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;padding:2px 9px;border-radius:999px;border:1px solid var(--line);color:var(--ink-3);white-space:nowrap}
+.pill.on{border-color:#3FA37A;color:#2E7D6B}
+.pill.off{border-color:#B7412F;color:#B7412F}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+<main>
+<span class="eyebrow">Guide 16 · course lesson</span>
+<h1>Skill Induction: Trajectory-to-Skill Learning</h1>
+<p class="who">DeepLearning.AI × Oracle · Building Adaptive AI Agents, Lesson 3 · 6:07 video + L2.ipynb</p>
+<p>An AI assistant that makes the same mistake every morning is not learning; it is just working. This lesson shows the one mechanism that turns a repeated mistake into a written rule the assistant follows next time — with a person, not the model, deciding whether the rule is allowed in. <strong>Start on the Walkthrough tab</strong> — it tells the whole story in plain English before a single technical term appears.</p>
+<div class="tabbar" role="tablist" aria-label="Guide sections"><button role="tab" id="tab-walkthrough" aria-controls="panel-walkthrough" aria-selected="true" data-tab="walkthrough">Walkthrough</button><button role="tab" id="tab-decide" aria-controls="panel-decide" aria-selected="false" data-tab="decide">Decide</button><button role="tab" id="tab-anatomy" aria-controls="panel-anatomy" aria-selected="false" data-tab="anatomy">Anatomy</button><button role="tab" id="tab-practices" aria-controls="panel-practices" aria-selected="false" data-tab="practices">Practices<span class="num">8</span></button><button role="tab" id="tab-lab" aria-controls="panel-lab" aria-selected="false" data-tab="lab">Lab<span class="num">8</span></button><button role="tab" id="tab-numbers" aria-controls="panel-numbers" aria-selected="false" data-tab="numbers">Numbers</button><button role="tab" id="tab-gate" aria-controls="panel-gate" aria-selected="false" data-tab="gate">Human gate</button><button role="tab" id="tab-pitfalls" aria-controls="panel-pitfalls" aria-selected="false" data-tab="pitfalls">Pitfalls<span class="num">5</span></button><button role="tab" id="tab-sources" aria-controls="panel-sources" aria-selected="false" data-tab="sources">Sources</button></div>
+<section class="panel" id="panel-walkthrough" role="tabpanel" aria-labelledby="tab-walkthrough">
+<h2>From the same wrong turn to a card on the shelf</h2>
+<p>Step through it. Eight frames, each one written out. It runs in <strong>plain English</strong> by default — the whole thing told as an assistant with a diary, a clerk, and a shelf of recipe cards — and the toggle switches to the technical version whenever you want the real names.</p>
+<figure>
+<svg id="heroSvg" viewBox="0 0 1000 480" role="img" aria-label="An eight-step story: an agent repeats the same test-running mistake, its traces are recorded, an induction engine drafts a nine-field skill, a human approves it with a reason, and the same task then passes.">
+  <defs>
+    <marker id="arh" viewBox="0 0 8 8" refX="6.4" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0.6 0.9 L7 4 L0.6 7.1 z" fill="#8C857A"/></marker>
+    <marker id="arg" viewBox="0 0 8 8" refX="6.4" refY="4" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0.6 0.9 L7 4 L0.6 7.1 z" fill="#2E7D6B"/></marker>
+    <marker id="arr" viewBox="0 0 8 8" refX="6.4" refY="4" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0.6 0.9 L7 4 L0.6 7.1 z" fill="#B7412F"/></marker>
+  </defs>
+  <rect x="0" y="0" width="1000" height="480" fill="#FFFFFF"/>
+  <g id="lyTrace"></g><g id="lyStreams" class="sc"></g><g id="lyEngine" class="sc"></g><g id="lyDraft" class="sc"></g>
+  <g id="lyPending" class="sc"></g><g id="lyBox" class="sc"></g><g id="lyGate" class="sc"></g><g id="lyResult" class="sc"></g>
+  <g id="lyAnt" class="sc"></g><g id="lyRev" class="sc"></g><g id="lyPanel"></g><g id="lyMode"></g>
+</svg>
+<div class="fig-cap">
+  <div class="fig-nav" id="storyNav" role="tablist" aria-label="Walkthrough steps"></div>
+  <div class="fig-text"><span class="fig-kick" id="stKick">Step 1 of 8</span><h4 id="stTitle">Loading…</h4><p id="stBody"></p></div>
+  <div class="fig-ctrl"><button id="stPrev" type="button">Back</button><button id="stPlay" class="go" type="button">Play</button><button id="stNext" type="button">Next</button></div>
+</div>
+<div class="fig-note">The cards and characters are an illustration. The numbers in the panel are taken from the lesson's own notebook and fixtures: three repeat episodes, six trace streams, five starter skills, nine schema fields, 212 tests passed after approval (<a href="https://learn.deeplearning.ai/courses/building-adaptive-ai-agents/lesson/9i82mn/behavior-adaptation%3A-trajectory-to-skill-learning">lesson</a>, <code>L2.ipynb</code>). Slide labels — <code>RAW TRACE</code>, <code>INDUCTION ENGINE</code>, <code>SKILL BOX</code>, <code>PENDING HUMAN REVIEW</code> — are quoted verbatim in the Technical register.</div>
+</figure>
+<h3 style="margin-top:26px">The same story in one line</h3>
+<p>Traces in, one reviewed skill out. The engine drafts, a human approves, and only then does the agent's behaviour change. <span class="incode">In code: <code>run_dream</code> proposes a <code>pending</code> v2 from one topic's episodes; <code>approve_skills</code> flips it <code>active</code> and the old version <code>superseded</code>; <code>search_skill_box</code> on the same task now returns v2.</span></p></section><section class="panel" id="panel-decide" role="tabpanel" aria-labelledby="tab-decide" hidden>
+<h2>When a repeated mistake is worth a written rule</h2>
+<p>Skill induction is a heavy tool with a human in the middle. It pays for itself only when the shape of the problem matches. The lesson is explicit about the shape.</p>
+<div class="two">
+  <div class="callout green"><strong>It applies when</strong> the same failure shows up in more than one past run on the same kind of job — in the lesson, three separate episodes on the topic <code>run_test_suite</code> all ran bare <code>pytest</code> and all hit <code>ModuleNotFoundError</code>. The fix is <em>procedural</em>: a sequence of steps a person could write down (“read the Makefile, use <code>make test</code>, never bare <code>pytest</code>”). And you have the raw material: recorded traces, not a memory of what went wrong.<span class="incode">In code: a failure becomes a skill only when it repeats across episodes on one topic; <code>induce_skill</code> refuses mixed topics with <code>ValueError</code>.</span></div>
+  <div class="callout"><strong>It does not apply when</strong> the error happened once — nothing repeated, nothing to generalise. Or when the fix is not a procedure at all: a bug in the code itself, a timing problem, something slow. Writing “do X then Y” does not repair those. And it does not apply anywhere you would not be prepared to read the model's draft line by line before approving it — because in this design approval <em>is</em> the moment behaviour changes.<span class="incode">In code: the lesson's payoff is a retrieval change on a fixed task (<code>before_hit</code> → <code>after_hit</code>). If you cannot state such a task, you cannot tell whether induction worked.</span></div>
+</div>
+<div class="note">A useful test before you start: could you write the improved skill by hand from the traces? If yes, the engine is a time-saver and the human gate is a safety check. If no — if you would be trusting the model to tell you what happened — you are not ready to approve anything it proposes.</div>
+<h2 style="margin-top:30px">Three questions, in order</h2>
+<ul>
+<li><strong>Does it repeat?</strong> Same topic, more than one episode, same error string. The lesson counts three.</li>
+<li><strong>Is the fix a procedure?</strong> In the lesson it is four imperative steps and one prohibition.</li>
+<li><strong>Who will read the draft?</strong> Name the reviewer before running the engine. The slide's third risk is <code>ACCOUNTABILITY</code>: every active skill has an owner, a reason, and a date.</li>
+</ul></section><section class="panel" id="panel-anatomy" role="tabpanel" aria-labelledby="tab-anatomy" hidden>
+<h2>How a trace becomes an active skill, in five stages</h2>
+<p>Every piece of the lesson's code sits in one of these five stages. Knowing them tells you where to look when a proposal is wrong, missing, or invisible.</p>
+<figure>
+<svg id="pipeSvg" viewBox="0 0 1000 330" role="img" aria-label="Five-stage mechanism: traces stored, induce_skill builds the prompt, the reply is validated against EnhancedSkillProposal, run_dream checkpoints v2 pending, approve_skills flips statuses.">
+  <rect x="0" y="0" width="1000" height="330" fill="#FFFFFF"/>
+  <defs><marker id="arp" viewBox="0 0 8 8" refX="6.4" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0.6 0.9 L7 4 L0.6 7.1 z" fill="#8C857A"/></marker></defs>
+  <g id="pipeStages"></g><g id="pipeDetail"></g>
+</svg>
+<div class="fig-cap">
+  <div class="fig-nav" id="pipeNav" role="tablist" aria-label="Mechanism stages"></div>
+  <div class="fig-text"><span class="fig-kick" id="pipeKick">Stage 1 of 5</span><h4 id="pipeTitle">Loading…</h4><p id="pipeBody"></p></div>
+  <div class="fig-ctrl"><button id="pipePrev" type="button">Back</button><button id="pipePlay" class="go" type="button">Play</button><button id="pipeNext" type="button">Next</button></div>
+</div>
+<div class="fig-note">Function names, field names and statuses are the lesson's own (<code>L2.ipynb</code> and the chapter spec's description of <code>course_lab/</code>). The <code>course_lab</code> modules themselves were not captured, so their internals are described, not shown — see the Lab tab.</div>
+</figure>
+<h3 style="margin-top:26px">The fourteen words you need</h3>
+<p>Each one gets the technical definition, then the same idea in the language of the diary, the clerk and the shelf from the walkthrough.</p>
+<div class="tablewrap"><table>
+<thead><tr><th style="width:170px">Term</th><th>What it means here</th><th style="width:220px">Concrete anchor</th></tr></thead>
+<tbody>
+<tr><td><strong>trace</strong></td><td>The recording of an agent's past run: conversation turns, tool calls, errors and the fixes that followed. The lesson breaks each one into six streams.<span class="plainline">The assistant's diary for one working day — not what it said, what it did.</span></td><td class="mono small">conversation turns · tool calls · skill uses · workflow steps · preferences · errors and fixes</td></tr>
+<tr><td><strong>episode</strong></td><td>One complete trace, with an <code>episode_id</code> and a <code>topic</code>. Six episodes on <code>run_test_suite</code> feed the lesson's engine.<span class="plainline">One page of the diary, dated and filed under the job it was about.</span></td><td class="mono small">ep-run_test_suite-001 … -006</td></tr>
+<tr><td><strong>topic</strong></td><td>The kind of job an episode belongs to. The engine works one topic at a time; the code sets the skill's topic from the episodes, never the model.<span class="plainline">The label on the drawer. The clerk only ever empties one drawer at a time.</span></td><td class="mono small">setup_dev_env · run_test_suite · add_api_endpoint · fix_failing_build · refactor_module</td></tr>
+<tr><td><strong>provenance</strong></td><td>The list of <code>episode_id</code> values the engine used to justify the skill. A skill you cannot trace back to episodes is a skill you cannot defend in review.<span class="plainline">The incident numbers stapled to the standing order.</span></td><td class="mono small">ep-run_test_suite-001 .. -006</td></tr>
+<tr><td><strong>induction engine</strong></td><td>The code that takes one topic's whole episode history and asks a language model for one reusable skill.<span class="plainline">The clerk who turns a month of shift logs into one page of standing orders.</span></td><td class="mono small"><code>induce_skill</code>, <code>induce_all</code></td></tr>
+<tr><td><strong><code>_SYSTEM</code></strong></td><td>The fixed instruction sheet sent to the model as the system message — the video calls it “the exact instruction given to the LLM” at 4:01. Cell 12 displays it with <code>engine_contract_html(_SYSTEM)</code>.<span class="plainline">The clerk's job description, pinned above the desk, identical every day.</span></td><td class="mono small">first message of every induction call</td></tr>
+<tr><td><strong><code>EnhancedSkillProposal</code></strong></td><td>The nine-field schema the model's JSON reply must fit: name, description, when_to_use, steps, skills_used, likely_tools, errors_and_fixes, provenance, topic.<span class="plainline">The nine-box form. A paragraph is not accepted.</span></td><td class="mono small">nine fields; <code>topic</code> set by code</td></tr>
+<tr><td><strong><code>errors_and_fixes</code></strong></td><td>A list of <code>{error, fix}</code> pairs summarising every mistake seen in the episodes. This is how yesterday's mistake travels forward into tomorrow's behaviour.<span class="plainline">The “wrong door — use this one instead” notes on the card.</span></td><td class="mono small">3 entries in v2, one per repeat offence</td></tr>
+<tr><td><strong>skill box</strong></td><td>The indexed, retrievable collection of <em>active</em> skills. The agent searches it by task and gets one recipe back. Pending and rejected skills are not in it.<span class="plainline">The shelf. Only stamped cards are filed; the in-tray is somewhere else.</span></td><td class="mono small"><code>index_active_skills</code> → <code>search_skill_box(box, task, k=1)</code></td></tr>
+<tr><td><strong>pending / active / superseded / rejected</strong></td><td>The four statuses a skill version can hold. Only <code>active</code> is retrievable. Approval moves pending → active and the prior active → superseded.<span class="plainline">In-tray · on the shelf · in the archive · in the bin with a note saying why.</span></td><td class="mono small">one active recipe per topic</td></tr>
+<tr><td><strong><code>run_dream</code></strong></td><td>The notebook's name for one induction pass run outside the agent's working path. It proposes; it does not edit live behaviour.<span class="plainline">The overnight shift, writing tomorrow's orders from today's reports while nobody is working.</span></td><td class="mono small">cell 13 → <code>pending</code></td></tr>
+<tr><td><strong><code>OracleSaver</code></strong></td><td>The checkpointer that records the candidate update from <code>run_dream</code> — the notebook prints “OracleSaver checkpointed one candidate update.”<span class="plainline">The clerk's carbon copy, filed before the draft goes anywhere.</span></td><td class="mono small">LangGraph Oracle DB</td></tr>
+<tr><td><strong>memory poisoning</strong></td><td>Incorrect or planted traces writing themselves into behaviour. Traces are data collected from the world; a planted instruction in one can be proposed as a skill. The human gate is what stops it.<span class="plainline">Someone slips a fake page into the diary. Without a reader at the gate, it becomes a rule.</span></td><td class="mono small">slide 3 · <code>MEMORY POISONING</code></td></tr>
+<tr><td><strong>Reflexion</strong></td><td>A correction loop where the correction is text. Here, the reviewer's decline reason is appended to the next induction prompt so the revised proposal addresses it.<span class="plainline">Returning a draft with margin notes, not shredding it.</span></td><td class="mono small"><code>induce_skill(..., feedback=reason)</code></td></tr>
+</tbody>
+</table></div>
+<p class="small">On the count of nine: the gap report lists nine fields with their descriptions. The chapter spec's mechanism line names the same nine and then <code>source</code>; the module itself was not captured, so nine — the count both documents agree on — is what this guide uses.</p></section><section class="panel" id="panel-practices" role="tabpanel" aria-labelledby="tab-practices" hidden>
+<h2>Eight practices, from one lesson</h2>
+<div class="callout blue"><strong>Read the weights honestly.</strong> This guide is built from a single source — one 6-minute lesson and its notebook. Every practice below therefore rests on <em>one</em> source, and the Desk's usual rule applies: say so plainly. What varies is not how many people agree but <em>which artefacts inside the lesson back it</em>: a transcript timestamp, a slide frame, a notebook cell. Filter by evidence type to see which practices you could verify by watching, by looking, or by running the code.</div>
+<div class="filters" id="tierFilter" role="group" aria-label="Filter by evidence type">
+  <button data-tier="all" aria-pressed="true">All 8</button>
+  <button data-tier="transcript" aria-pressed="false">Transcript</button>
+  <button data-tier="slide" aria-pressed="false">Slide</button>
+  <button data-tier="notebook" aria-pressed="false">Notebook</button>
+</div>
+<div class="concept" data-ev="transcript notebook">
+  <div class="chead"><span class="idx">01</span><span class="t">One topic in, one skill out.</span><span class="chip foundation">1 source</span><span class="chip">transcript 0:22–0:30</span><span class="chip">cell 12</span></div>
+  <div class="cbody"><p>The engine reads every episode about one kind of job and produces exactly one skill for it. Mixing jobs produces a recipe that fits none of them.</p><p class="got"><strong>In practice:</strong> Filter first, then induce. Cell 12 does exactly this — <code>run_test_episodes = [e for e in episodes if e["topic"] == "run_test_suite"]</code> — before calling <code>induce_all</code>. Mixed topics raise <code>ValueError</code>.</p></div>
+</div>
+<div class="concept" data-ev="transcript notebook">
+  <div class="chead"><span class="idx">02</span><span class="t">Keep <code>provenance</code> — never accept a skill that cannot name its episodes.</span><span class="chip foundation">1 source</span><span class="chip">transcript 0:44–1:25</span><span class="chip">cell 20</span></div>
+  <div class="cbody"><p>Proposals carry evidence for each change. The episode ids are how a reviewer checks the clerk's working, and how an approved skill can later be traced back if it turns out wrong.</p><p class="got"><strong>In practice:</strong> The v2 proposal lists <code>ep-run_test_suite-001 .. -006</code>. The notebook's wrap-up names provenance as one of the things the engine must distill. An empty provenance list is a decline.</p></div>
+</div>
+<div class="concept" data-ev="transcript slide notebook">
+  <div class="chead"><span class="idx">03</span><span class="t">Decline with a reason — the reason is the training signal.</span><span class="chip foundation">1 source</span><span class="chip">transcript 1:10–1:25</span><span class="chip">slide 3</span><span class="chip">cell 15</span></div>
+  <div class="cbody"><p>The transcript: “decline, giving the skill induction engine a reason so that it can generate a better proposed enhancement.” Slide 3's <code>DECLINE</code> pill reads “back to the engine, with a reason”.</p><p class="got"><strong>In practice:</strong> The review app in cell 15 has a <em>Review reason</em> box above Approve and Reject. The reason is passed as <code>feedback</code> into the next <code>induce_skill</code> call and appended to the prompt: “A human reviewer rejected the previous version with this feedback; revise the skill to address it.” Rejecting without a reason wastes the loop.</p></div>
+</div>
+<div class="concept" data-ev="transcript notebook">
+  <div class="chead"><span class="idx">04</span><span class="t">Never approve a non-latest version.</span><span class="chip foundation">1 source</span><span class="chip">transcript 4:27–4:59</span><span class="chip">cell 16–17</span></div>
+  <div class="cbody"><p>Approval is a state machine, not a copy. Approving v2 flips v1 to superseded. Approving an older version out of order would leave the topic with the wrong recipe active.</p><p class="got"><strong>In practice:</strong> The governance module guards this: you cannot approve a non-latest version and you cannot approve something already active — both raise <code>ValueError</code>. Cell 16 then re-indexes to “confirm the enhanced skill is now active, replacing the previous version.”</p></div>
+</div>
+<div class="concept" data-ev="slide notebook">
+  <div class="chead"><span class="idx">05</span><span class="t">Only <code>active</code> is retrievable — the box is a search index, not a folder.</span><span class="chip foundation">1 source</span><span class="chip">slide 1</span><span class="chip">cell 9–10</span></div>
+  <div class="cbody"><p>Slide 1 draws <code>PENDING HUMAN REVIEW</code> outside the <code>SKILL BOX</code>. A pending or rejected skill exists in storage but the agent cannot find it.</p><p class="got"><strong>In practice:</strong> Cell 10: <code>index_active_skills(connection=conn, mem=mem)</code> builds the store from active skills only, then <code>search_skill_box(skill_box, PAYOFF_TASK, k=1)</code>. If a skill is not showing up, check its status before you check the search.</p></div>
+</div>
+<div class="concept" data-ev="transcript notebook">
+  <div class="chead"><span class="idx">06</span><span class="t">Run the engine outside the agent's working path.</span><span class="chip foundation">1 source</span><span class="chip">transcript 0:44–1:10</span><span class="chip">cell 13</span></div>
+  <div class="cbody"><p>The transcript: “Now outside of the main agent's working path, we then run the skill induction engine.” It does not slow the agent down and it does not edit live behaviour.</p><p class="got"><strong>In practice:</strong> Cell 13's <code>run_dream(mem, run_test_episodes, complete=night, connection=conn)</code> is that separate pass; <code>OracleSaver</code> checkpoints the candidate and it lands <code>pending</code>. The agent keeps using v1 until a human acts.</p></div>
+</div>
+<div class="concept" data-ev="slide notebook">
+  <div class="chead"><span class="idx">07</span><span class="t">Quote the real error string — describe the bug the traces describe.</span><span class="chip foundation">1 source</span><span class="chip">slide 1</span><span class="chip">cell 6</span></div>
+  <div class="cbody"><p>The lesson's failure is <code>ModuleNotFoundError: No module named 'app' (wrong interpreter)</code>: bare <code>pytest</code> picked up the wrong Python. An earlier summary of this lesson described it as a missing <code>PATH</code> entry and taught a fix for a bug that never happened.</p><p class="got"><strong>In practice:</strong> Cell 6's <code>show_recurring_failure()</code> shows the real error before anything is induced. The v2 skill's <code>errors_and_fixes</code> entry quotes it. If your skill's error field does not match a string in the traces, the model has paraphrased.</p></div>
+</div>
+<div class="concept" data-ev="transcript notebook">
+  <div class="chead"><span class="idx">08</span><span class="t">Measure the payoff as a retrieval change on a fixed task.</span><span class="chip foundation">1 source</span><span class="chip">transcript 5:11–5:44</span><span class="chip">cell 19</span></div>
+  <div class="cbody"><p>“Behaviour adaptation” is operationally this: the same query returns a different skill. Not a feeling that the agent got better.</p><p class="got"><strong>In practice:</strong> Cell 10 captures <code>before_hit</code>; cell 19 re-indexes, captures <code>after_hit</code> on the identical <code>PAYOFF_TASK</code>, and <code>retrieval_improvement_html</code> puts them side by side. Before: v1, bare <code>pytest</code>, error. After: v2, <code>make test</code>, <em>212 passed</em>.</p></div>
+</div></section><section class="panel" id="panel-lab" role="tabpanel" aria-labelledby="tab-lab" hidden>
+<h2>The real notebook, cell by cell</h2>
+<p><code>L2.ipynb</code> is a 21-cell driver: ten code cells that call into a <code>course_lab</code> package, with markdown between them. Eight of those cells carry the argument. Each is shown <strong>verbatim</strong> below, with what it does and why it is there.</p>
+<div class="callout"><strong>What was and was not captured.</strong> The notebook was fetched whole and every code block on this tab is a copy of a real cell. The <code>course_lab/*.py</code> modules it imports — <code>m2_notebook</code>, <code>induction_engine</code>, <code>skill_governance</code>, <code>skill_vectorstore</code>, <code>coding_trace_synth</code> — were <em>not</em> captured. Where this tab says what one of them does, that description comes from the chapter spec, and no Python from those files is shown here. The BEFORE/AFTER values at the bottom are quoted from the spec's fixture block.</div>
+
+<div class="cellhead"><span class="cellno">Cell 3 · setup</span><span class="pill">what it does: <code>ensure_schema()</code>, <code>connect_stack()</code> → <code>mem, conn</code></span></div>
+<pre><code>import helper as _lesson_helper
+_lesson_helper.ensure_schema()
+
+import importlib
+from course_lab import m2_notebook
+
+importlib.reload(m2_notebook)
+from course_lab.m2_notebook import connect_stack
+
+mem, conn = connect_stack()</code></pre>
+<p class="small"><strong>Why it is there:</strong> two stores are opened. Oracle Agent Memory (<code>mem</code>) holds the traces; LangGraph Oracle DB (<code>conn</code>) runs the induction loop and checkpoints it. Everything later takes one or both. <span class="incode">In plain terms: the diary cabinet and the clerk's filing system, unlocked.</span></p>
+
+<div class="cellhead"><span class="cellno">Cell 6 · before</span><span class="pill">what it does: <code>show_recurring_failure()</code> → <code>PAYOFF_TASK, episodes</code></span></div>
+<pre><code>from course_lab.m2_notebook import show_recurring_failure
+
+PAYOFF_TASK, episodes = show_recurring_failure()</code></pre>
+<p class="small"><strong>Why it is there:</strong> the “before” state. It fixes the task the whole lesson will be measured on (<code>PAYOFF_TASK</code>) and shows the real error the v1 skill produces — <code>ModuleNotFoundError</code> from bare <code>pytest</code>. If you skip this cell you cannot later prove anything changed.</p>
+
+<div class="cellhead"><span class="cellno">Cell 8 · load traces</span><span class="pill">what it does: <code>trace_seed_summary(mem, episodes, LESSON_SKILLS)</code></span></div>
+<pre><code>from course_lab.coding_trace_synth import LESSON_SKILLS
+from course_lab.m2_notebook import print_trace_seed_summary, trace_seed_summary
+
+seed_summary = trace_seed_summary(mem, episodes, LESSON_SKILLS)
+print_trace_seed_summary(seed_summary)</code></pre>
+<p class="small"><strong>Why it is there:</strong> loads the six trace streams — conversation turns, tool calls, skill uses, workflow steps, preferences, errors and fixes — and the five starter skills (<code>brainstorming</code>, <code>writing-plans</code>, <code>run-the-tests</code>, <code>systematic-debugging</code>, <code>requesting-code-review</code>). Without traces in the store the engine has nothing to read.</p>
+
+<div class="cellhead"><span class="cellno">Cell 10 · skill box, before</span><span class="pill">what it does: <code>index_active_skills</code>, <code>search_skill_box(..., k=1)</code> → <code>before_hit</code></span></div>
+<pre><code>from course_lab.m2_notebook import (
+    build_skill_explorer_app, show_notebook_app, 
+    skill_explorer_preview_html,
+)
+from course_lab.skill_vectorstore import (index_active_skills, 
+    search_skill_box)
+
+skill_box = index_active_skills(connection=conn, mem=mem)
+before_hit = search_skill_box(skill_box, PAYOFF_TASK, k=1)[0]
+skill_app = build_skill_explorer_app(mem)
+show_notebook_app(skill_app, skill_explorer_preview_html(mem), 
+                  height=525)</code></pre>
+<p class="small"><strong>Why it is there:</strong> captures what the agent retrieves <em>before</em> induction. The box is built from <em>active</em> skills only, so this is also the proof that pending skills are invisible. <span class="incode">In plain terms: photograph the shelf before anyone touches it. <code>k=1</code> means “give me the single best match”.</span></p>
+
+<div class="cellhead"><span class="cellno">Cell 12 · the engine</span><span class="pill">what it does: shows <code>_SYSTEM</code>, runs <code>induce_all</code> on one topic</span></div>
+<pre><code>from IPython.display import HTML, display
+from course_lab.induction_engine import _SYSTEM, induce_all
+from course_lab.m2_notebook import (
+    engine_contract_html, induced_skill_preview_html, night_outputs,
+)
+
+night = night_outputs() 
+display(HTML(engine_contract_html(_SYSTEM)))
+run_test_episodes = [e for e in episodes if e["topic"] == "run_test_suite"]
+proposals = induce_all(run_test_episodes, complete=night)
+run_tests_proposal = proposals[0]
+display(HTML(induced_skill_preview_html(run_tests_proposal)))</code></pre>
+<p class="small"><strong>Why it is there:</strong> first it displays the exact instruction given to the model (<code>_SYSTEM</code>); then it filters the episodes to one topic and runs the engine on them. The text of <code>_SYSTEM</code> lives in <code>course_lab/induction_engine.py</code>, which was not captured, so it is not reproduced here. <code>night_outputs()</code> supplies the model replies the lesson recorded, so the cell is repeatable.</p>
+
+<div class="cellhead"><span class="cellno">Cell 13 · checkpoint</span><span class="pill">what it does: <code>run_dream(...)</code> → <code>pending</code></span></div>
+<pre><code>from course_lab.m2_notebook import run_dream
+
+pending = run_dream(mem, run_test_episodes, complete=night, 
+                    connection=conn)
+print("OracleSaver checkpointed one candidate update.")
+print(f"awaiting review: {pending[0].name} v{pending[0].version}")</code></pre>
+<p class="small"><strong>Why it is there:</strong> this is the induction pass run outside the agent's working path. It writes v2 as a <em>pending</em> candidate — awaiting review, not yet retrievable — and prints which name and version is waiting.</p>
+
+<div class="cellhead"><span class="cellno">Cell 15 · the human gate</span><span class="pill">what it does: <code>build_review_app(pending, mem=mem)</code></span></div>
+<pre><code>from course_lab.m2_notebook import (
+    build_review_app, review_preview_html, show_notebook_app,)
+
+review_app, review_state = build_review_app(pending, mem=mem)
+show_notebook_app(
+    review_app, 
+    review_preview_html(mem, pending, review_state), height=900)</code></pre>
+<p class="small"><strong>Why it is there:</strong> the review screen from the video: a <em>Review reason</em> box (“Explain why this change should be approved or rejected.”), a green <strong>Approve</strong> and a red <strong>Reject</strong>, and a <em>Compare Skill Versions</em> panel headed <code>$ skillbox diff run_test_suite</code> with BEFORE and AFTER cards carrying <span class="pill on">STATUS ACTIVE</span> <span class="pill">VERSION v1</span> pills. Approval here is the only thing that changes the agent's behaviour.</p>
+
+<div class="cellhead"><span class="cellno">Cell 19 · after</span><span class="pill">what it does: <code>after_hit</code>, <code>retrieval_improvement_html(...)</code></span></div>
+<pre><code>from IPython.display import HTML, display
+from course_lab.m2_notebook import retrieval_improvement_html
+
+skill_box = index_active_skills(connection=conn, mem=mem)
+after_hit = search_skill_box(skill_box, PAYOFF_TASK, k=1)[0]
+display(HTML(retrieval_improvement_html(PAYOFF_TASK, before_hit, 
+                                        after_hit)))</code></pre>
+<p class="small"><strong>Why it is there:</strong> proves the retrieval changed. Same store, same task, same <code>k=1</code>. The only variable is which skills are active — and that was decided by a person in cell 15.</p>
+
+<h3 style="margin-top:32px">The actual v1 → v2 diff</h3>
+<p>This is the lesson's punchline, quoted from the fixtures as the chapter spec recorded them. v1 is deliberately generic. v2 is what the engine drafted from six episodes on the topic.</p>
+<div class="two">
+  <div class="callout"><strong>BEFORE</strong> <span class="pill on">STATUS ACTIVE</span> <span class="pill">VERSION v1</span><br><span class="small mono">BASE_SKILLS["run-the-tests"]</span>
+<pre><code>find the test command -&gt; run it -&gt; report the result</code></pre>
+<p class="small">Three steps. Nothing about which command, nothing about what went wrong last time. Slide 1's card adds the red note: <em>- bare pytest chosen</em>.</p></div>
+  <div class="callout green"><strong>AFTER</strong> <span class="pill">VERSION v2</span> <span class="pill">pending → active on approval</span><br><span class="small mono">data/engine_outputs/night2.json["run_test_suite"]</span>
+<pre><code>name: run_project_test_suite
+1. Read the Makefile to locate the canonical test command if unknown
+2. Invoke the project's test command (make test), forwarding any filters such as -k
+3. Report the numeric result or failure summary
+4. Never invoke bare pytest or pytest directly on this repository
+errors_and_fixes: 3 entries, one per repeat offence
+provenance: ep-run_test_suite-001 .. -006</code></pre>
+<p class="small">Four steps — the video calls out “four steps” at 4:17 — plus three <code>errors_and_fixes</code> entries and six provenance ids. The first error entry, as the gap report quotes it: <em>ran bare <code>pytest</code>, hit ModuleNotFoundError because the wrong interpreter/environment was used</em> → <em>do not run bare pytest; use the project's test command (make test), which runs the project venv</em>.</p></div>
+</div>
+<p class="small">Glossary for this block: a <strong>Makefile</strong> is a project's file of named shortcuts, so <code>make test</code> runs whatever test command the project chose. A <strong>venv</strong> is the project's private copy of Python and its add-ons; running bare <code>pytest</code> outside it is why the code could not be found. <code>-k</code> is a filter that runs only tests whose names match.</p></section><section class="panel" id="panel-numbers" role="tabpanel" aria-labelledby="tab-numbers" hidden>
+<h2>Measured versus marketed</h2>
+<p>The Desk's rule: separate what was actually counted from what was claimed. This lesson is unusual — it makes no benchmark claims at all — so the right-hand column is short.</p>
+<div class="tablewrap"><table>
+<thead><tr><th style="width:190px">Measured</th><th>Value</th><th style="width:230px">Where it comes from</th></tr></thead>
+<tbody>
+<tr><td><strong>Lesson runtime</strong></td><td>367 seconds (6:07)</td><td class="small">video duration</td></tr>
+<tr><td><strong>Notebook cells</strong></td><td>21 (10 code, 11 markdown)</td><td class="small"><code>L2.ipynb</code></td></tr>
+<tr><td><strong>Trace types</strong></td><td>6 — conversation turns, tool calls, skill uses, workflow steps, preferences, errors and fixes</td><td class="small">cell 7; transcript 2:58–3:09</td></tr>
+<tr><td><strong>Starter skills</strong></td><td>5 — <code>brainstorming</code>, <code>writing-plans</code>, <code>run-the-tests</code>, <code>systematic-debugging</code>, <code>requesting-code-review</code></td><td class="small">cell 20; transcript 3:21–3:27</td></tr>
+<tr><td><strong>Topics</strong></td><td>5 — <code>setup_dev_env</code>, <code>run_test_suite</code>, <code>add_api_endpoint</code>, <code>fix_failing_build</code>, <code>refactor_module</code></td><td class="small">gap report inventory</td></tr>
+<tr><td><strong>Schema fields</strong></td><td>9 in <code>EnhancedSkillProposal</code></td><td class="small">gap report §4; chapter spec beat 4</td></tr>
+<tr><td><strong>Repeat episodes</strong></td><td>3 that ran bare <code>pytest</code> and hit <code>ModuleNotFoundError</code></td><td class="small">chapter spec beat 2</td></tr>
+<tr><td><strong>Provenance ids on v2</strong></td><td>6 — <code>ep-run_test_suite-001 .. -006</code></td><td class="small">fixture <code>night2.json</code></td></tr>
+<tr><td><strong>Steps in v2</strong></td><td>4 (v1 had 3)</td><td class="small">fixture; video at 4:17</td></tr>
+<tr><td><strong>Tests passed after</strong></td><td>212</td><td class="small"><code>run_tests("make test") -&gt; "212 passed"</code></td></tr>
+<tr><td><strong>Model settings</strong></td><td>default model <code>oci/xai.grok-4.3</code>, <code>temperature=0.0</code>, <code>response_format={"type": "json_object"}</code></td><td class="small">chapter spec beat 3 (<code>_default_complete</code>)</td></tr>
+</tbody>
+</table></div>
+<div class="tablewrap"><table>
+<thead><tr><th style="width:190px">Marketed</th><th>What was actually measured</th><th style="width:230px">What survives</th></tr></thead>
+<tbody>
+<tr><td><strong>—</strong></td><td>The lesson makes no benchmark claims: no percentage improvement, no speed-up, no comparison against another method. Its single demonstration is one fixed task retrieving v1 before and v2 after.</td><td class="small">Nothing to discount. The one number that carries the argument is <em>212 passed</em> where the suite previously errored — and that is a demonstration on synthetic traces, not a benchmark.</td></tr>
+</tbody>
+</table></div>
+<div class="callout green"><strong>The number worth remembering</strong> is not 212. It is <em>3</em> — the number of episodes that repeated the mistake before it was worth inducing. One failure is bad luck. The lesson's whole design only switches on when the same wrong turn shows up more than once on the same topic.</div></section><section class="panel" id="panel-gate" role="tabpanel" aria-labelledby="tab-gate" hidden>
+<h2>Why a human in the loop? Four things that can happen at the gate</h2>
+<p>Slide 3 of the lesson draws one card, two pills and three risks. The same proposal can go four ways depending on what the reviewer does — and on what was in the traces. Step through all four.</p>
+<figure>
+<svg id="gateSvg" viewBox="0 0 1000 340" role="img" aria-label="Four variants at the human gate: approve and promote, decline with a reason and revise, approve a bad skill and it compounds, a planted trace stopped at the gate.">
+  <rect x="0" y="0" width="1000" height="340" fill="#FFFFFF"/>
+  <defs><marker id="ard" viewBox="0 0 8 8" refX="6.4" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0.6 0.9 L7 4 L0.6 7.1 z" fill="#8C857A"/></marker></defs>
+  <g id="gateLayer"></g>
+</svg>
+<div class="fig-cap">
+  <div class="fig-nav" id="gateNav" role="tablist" aria-label="Gate outcomes"></div>
+  <div class="fig-text"><span class="fig-kick" id="gateKick">Outcome 1 of 4</span><h4 id="gateTitle">Loading…</h4><p id="gateBody"></p></div>
+  <div class="fig-ctrl"><button id="gatePrev" type="button">Back</button><button id="gatePlay" class="go" type="button">Play</button><button id="gateNext" type="button">Next</button></div>
+</div>
+<div class="fig-note">Labels are quoted verbatim from slide 3 (1:25–2:09): <code>Enhanced_SKILL.md</code>, <code>APPROVE</code> “promoted to the skill box”, <code>DECLINE</code> “back to the engine, with a reason”, <code>BAD SKILLS COMPOUND</code>, <code>MEMORY POISONING</code>, <code>ACCOUNTABILITY</code>. The token moving through is illustration.</div>
+</figure>
+<div class="two" style="margin-top:22px">
+  <div class="callout"><strong>The three risks, in the slide's words.</strong> <code>BAD SKILLS COMPOUND</code> — “an approved mistake is retrieved on every matching task, forever”. <code>MEMORY POISONING</code> — “incorrect or planted traces must not write themselves into behaviour”. <code>ACCOUNTABILITY</code> — “every active skill has an owner, a reason, and a date”.</div>
+  <div class="callout green"><strong>Why decline is not a bin.</strong> The reason typed into the review box is appended to the next induction prompt — <em>“A human reviewer rejected the previous version with this feedback; revise the skill to address it: &lt;reason&gt;”</em> — and the lesson ships a fixture, <code>reflected.json</code>, showing the revised output differs. <span class="incode">In code: <code>induce_skill(..., feedback=reason)</code>. The correction is text, applied at the next pass — the Reflexion pattern.</span></div>
+</div>
+<div class="tablewrap"><table>
+<thead><tr><th style="width:150px">Outcome</th><th>What happens to the skill</th><th>What happens to the agent</th><th style="width:190px">Guard</th></tr></thead>
+<tbody>
+<tr><td><strong>Approve</strong></td><td>pending → active; prior active → superseded; the base skill is marked promoted so the indexer drops it</td><td>Retrieves v2 on every matching task from now on</td><td>Read v1 beside v2 first; write the reason</td></tr>
+<tr><td><strong>Decline with reason</strong></td><td>Stays out of the box; the reason goes into the next prompt</td><td>Keeps using v1, unchanged</td><td>Always give the reason — it is the signal</td></tr>
+<tr><td><strong>Approve a bad skill</strong></td><td>Becomes active like any other</td><td>Repeats the approved mistake on every matching task, forever</td><td><code>demote_from_skill_box</code> reverses it and restores the prior version</td></tr>
+<tr><td><strong>Planted trace</strong></td><td>Proposed like any other — the engine cannot tell</td><td>Nothing, <em>if</em> the gate holds</td><td>The human reads provenance and errors_and_fixes before approving</td></tr>
+</tbody>
+</table></div></section><section class="panel" id="panel-pitfalls" role="tabpanel" aria-labelledby="tab-pitfalls" hidden>
+<h2>Five anti-patterns</h2>
+<p>Each of these was either warned against in the lesson or committed by an earlier summary of it that the gap report audited.</p>
+<ol class="anti">
+<li><strong>Approving without reading.</strong> Approval turns a proposal into behaviour the agent reuses on every matching task. The review screen puts v1 and v2 side by side for a reason. If you did not compare them, you did not review.</li>
+<li><strong>Describing the bug as a missing <code>PATH</code> when it is the wrong interpreter.</strong> The trace says <code>ModuleNotFoundError: No module named 'app' (wrong interpreter)</code>. An earlier chapter invented a skill that exported a <code>PATH</code> entry — a fix for a bug that never happened. Quote the error string; do not infer the cause from a half-built slide.</li>
+<li><strong>Treating the skill box as a folder.</strong> It is an indexed retrieval surface built from <em>active</em> skills. Pending and rejected skills are not in it. Approval is a state change (pending → active, active → superseded), not a file copy.</li>
+<li><strong>Rejecting without a reason.</strong> The reason is appended to the next induction prompt. A bare reject throws away the only signal the engine gets from a human.</li>
+<li><strong>Letting the model set <code>topic</code>.</strong> <code>induce_skill</code> sets topic from the episodes it was given. If the model could relabel what it was generalising from, one topic's skill could quietly claim another topic's jobs.</li>
+</ol>
+<h2 style="margin-top:34px">The one-turn action card</h2>
+<p>If you take one thing from this guide into a project instructions file, take this.</p>
+<ol class="anti">
+<li>Does the failure repeat across episodes on <em>one</em> topic, with the same error string? If not, stop — fix it by hand.</li>
+<li>Gather that topic's episodes only. Never mix topics into one induction call.</li>
+<li>Run the engine outside the live path. Check the draft has all nine fields, a non-empty <code>provenance</code>, and an <code>errors_and_fixes</code> entry that quotes the real error.</li>
+<li>Read v1 beside v2. Confirm the draft's <code>topic</code> was set by code, not by the model.</li>
+<li>Approve or decline — and write the reason either way. Decline's reason feeds the next draft; approve's reason is the accountability record.</li>
+<li>Re-index. Re-run the same fixed task. Compare <code>before_hit</code> with <code>after_hit</code>. If retrieval did not change, behaviour did not change.</li>
+</ol></section><section class="panel" id="panel-sources" role="tabpanel" aria-labelledby="tab-sources" hidden>
+<h2>Sources</h2>
+<p>One lesson, read completely: the full transcript, four captured slide frames, and the notebook fetched whole. The supporting Python package was not fetched and is marked as such — nothing from it is quoted as code in this guide.</p>
+<div class="tablewrap"><table>
+<thead><tr><th style="width:190px">Source</th><th>What it is</th><th style="width:120px">Status</th></tr></thead>
+<tbody>
+<tr><td><a href="https://learn.deeplearning.ai/courses/building-adaptive-ai-agents/lesson/9i82mn/behavior-adaptation%3A-trajectory-to-skill-learning">Lesson 3 video</a></td><td><em>Behavior Adaptation: Trajectory-to-Skill Learning</em>, Building Adaptive AI Agents, DeepLearning.AI × Oracle. 6:07. Slides 0:13–2:09, notebook screencast 2:09–6:02.</td><td class="small">transcript read in full</td></tr>
+<tr><td><code>L2.ipynb</code></td><td>The 21-cell notebook. Every code block on the Lab tab is a verbatim cell.</td><td class="small">fetched</td></tr>
+<tr><td><code>slides/01-skill-induction.jpg</code></td><td>“Skill induction”, 0:13–0:44. <code>RAW TRACE</code> → <code>INDUCTION ENGINE</code> (“trace → procedure”) → <code>SKILL BOX</code> / <code>SKILL.md</code> → <code>PENDING HUMAN REVIEW</code>. Strapline: “Turn what happened into what to do next.”</td><td class="small">captured frame</td></tr>
+<tr><td><code>slides/02-skill-induction-loop.jpg</code></td><td>“The skill induction loop”, 0:44–1:25. <code>SKILL BOX</code> → <code>More Traces</code> (<code>New Errors</code> / <code>New fixes</code> / <code>User input</code>) → <code>INDUCTION ENGINE</code> (“more traces → Enhanced skill”) → <code>Enhanced_SKILL.md</code> (“+ read the Makefile”, “+ use make test”) → <code>PENDING HUMAN REVIEW</code>.</td><td class="small">captured frame</td></tr>
+<tr><td><code>slides/03-why-human-in-the-loop.jpg</code></td><td>“Why a human in the loop?”, 1:25–2:09. <code>APPROVE</code> / <code>DECLINE</code> and the three risk cards.</td><td class="small">captured frame</td></tr>
+<tr><td><code>slides/04-notebook-human-review.jpg</code></td><td>The review screen from the notebook screencast: Review reason, Approve / Reject, <code>$ skillbox diff run_test_suite</code>, BEFORE card with <code>STATUS ACTIVE</code> / <code>VERSION v1</code>.</td><td class="small">captured frame</td></tr>
+<tr><td><code>course_lab/induction_engine.py</code></td><td>Holds <code>_SYSTEM</code>, <code>EnhancedSkillProposal</code>, <code>induce_skill</code>, <code>induce_all</code>. Described from the chapter spec only.</td><td class="small">not fetched</td></tr>
+<tr><td><code>course_lab/skill_governance.py</code></td><td>Holds <code>approve_skills</code>, <code>_promote_superseded_base</code>, <code>demote_from_skill_box</code>. Described from the chapter spec only.</td><td class="small">not fetched</td></tr>
+<tr><td><code>course_lab/m2_notebook.py</code>, <code>skill_vectorstore.py</code>, <code>coding_trace_synth.py</code></td><td>Notebook helpers, the vector store, and the synthetic trace fixtures (<code>SCENES</code>, <code>LESSON_SKILLS</code>). Described from the chapter spec only.</td><td class="small">not fetched</td></tr>
+<tr><td><code>data/engine_outputs/night2.json</code>, <code>reflected.json</code></td><td>The v2 proposal and the revised-after-decline proposal. Values quoted from the chapter spec's fixture block.</td><td class="small">not fetched</td></tr>
+</tbody>
+</table></div>
+<p class="small">Sourcing rule for this guide: every claim carries a transcript timestamp, a slide frame, or a notebook cell. Where a module was not captured, the guide says what the spec says it does and shows no code from it. The three animations reproduce the slides' node labels verbatim in the Technical register.</p></section>
+</main>
+<script>
+(function(){
+
+const NS = "http://www.w3.org/2000/svg";
+const mk = (n, a) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); return e; };
+const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+
+function stepper(opts){
+  const { navId, kickId, titleId, bodyId, prevId, playId, nextId, steps, apply, dwell } = opts;
+  const nav = document.getElementById(navId);
+  let cur = -1, playing = false, timer = null, tmo = [];
+  const clear = () => { while (tmo.length) clearTimeout(tmo.pop()); };
+  steps.forEach((_, i) => {
+    const b = document.createElement("button");
+    b.className = "dot"; b.type = "button"; b.textContent = i + 1;
+    b.setAttribute("role", "tab"); b.setAttribute("aria-label", "Step " + (i + 1));
+    b.addEventListener("click", () => { stop(); go(i); });
+    nav.appendChild(b);
+  });
+  function go(i){
+    clear(); cur = (i + steps.length) % steps.length;
+    const s = steps[cur];
+    document.getElementById(kickId).textContent = s.k + " · " + (cur + 1) + " of " + steps.length;
+    document.getElementById(titleId).textContent = s.t;
+    document.getElementById(bodyId).innerHTML = s.b;
+    [...nav.querySelectorAll(".dot")].forEach((d, n) => { d.setAttribute("aria-current", n === cur); d.classList.toggle("seen", n <= cur); });
+    document.getElementById(prevId).disabled = cur === 0;
+    apply(cur, (fn, ms) => tmo.push(setTimeout(fn, ms)));
+  }
+  function stop(){ playing = false; clearTimeout(timer); document.getElementById(playId).textContent = "Play"; }
+  function play(){
+    playing = true; document.getElementById(playId).textContent = "Pause";
+    const tick = () => { if (!playing) return; if (cur >= steps.length - 1) { stop(); return; } go(cur + 1); timer = setTimeout(tick, dwell); };
+    timer = setTimeout(tick, dwell);
+  }
+  document.getElementById(nextId).addEventListener("click", () => { stop(); go(cur + 1); });
+  document.getElementById(prevId).addEventListener("click", () => { stop(); go(cur - 1); });
+  document.getElementById(playId).addEventListener("click", () => { if (playing) stop(); else { if (cur >= steps.length - 1) go(0); play(); } });
+  go(0);
+  return { go: (i) => { stop(); go(i); }, restart: () => { stop(); go(0); if (!reduce) play(); } };
+}
+
+/* ── shared helpers ── */
+const L = id => document.getElementById(id);
+const setOp = (el, v) => el.style.opacity = v;
+const at = (el, x, y) => el.setAttribute("transform", `translate(${x},${y})`);
+function countTo(el, to, ms){
+  const t0 = performance.now();
+  (function step(now){
+    const k = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - k, 3);
+    el.textContent = Math.round(to * e);
+    if(k < 1) requestAnimationFrame(step);
+  })(t0);
+}
+function txt(layer, x, y, s, fill, size, weight, anchor, family){
+  const t = mk("text", { x, y, "font-family":family || "var(--font-mono)", "font-size":size || "10.5", fill:fill || "#1A1A18",
+    "font-weight":weight || "400", "text-anchor":anchor || "start" });
+  t.textContent = s; layer.appendChild(t); return t;
+}
+
+/* — the two characters, drawn by hand — */
+function scruff(layer, fill, calm){
+  const g = mk("g", { transform:"translate(110,366)", style:"transition:transform .38s ease-in-out" });
+  g.appendChild(mk("ellipse", { cx:0, cy:17, rx:18, ry:4, fill:"#1A1A18", opacity:".10" }));
+  g.appendChild(mk("path", { d:"M-15 8 C-20 -2 -13 -12 -1 -12 C11 -12 18 -3 15 8 C13 14 5 16 -1 16 C-8 16 -13 14 -15 8 Z",
+    fill, stroke:"#1A1A18", "stroke-width":1.7, "stroke-linejoin":"round" }));
+  g.appendChild(mk("path", { d: calm ? "M-6 -11 L-7 -18 M3 -12 L4 -19" : "M-10 -9 L-14 -17 M-4 -12 L-5 -21 M3 -12 L4 -20 M10 -9 L15 -17",
+    stroke:"#1A1A18", "stroke-width":1.5, "stroke-linecap":"round" }));
+  g.appendChild(mk("path", { d:"M-9 15 L-11 23 M-2 16 L-2 24 M6 15 L8 23", stroke:"#1A1A18", "stroke-width":1.6, "stroke-linecap":"round" }));
+  g.appendChild(mk("circle", { cx:-4.5, cy:-1, r:3.4, fill:"#fff", stroke:"#1A1A18", "stroke-width":1.3 }));
+  g.appendChild(mk("circle", { cx:6.5,  cy:-1, r:3.4, fill:"#fff", stroke:"#1A1A18", "stroke-width":1.3 }));
+  g.appendChild(mk("circle", { cx:-4.5, cy:-1, r:1.4, fill:"#1A1A18" }));
+  g.appendChild(mk("circle", { cx:6.5,  cy:-1, r:1.4, fill:"#1A1A18" }));
+  if(calm){
+    g.appendChild(mk("path", { d:"M-1.1 -1 L3.1 -1 M-7.9 -1 L-12 -3 M9.9 -1 L14 -3", stroke:"#1A1A18", "stroke-width":1.1 }));
+    g.appendChild(mk("path", { d:"M-2 7 q3 2 6 -1", stroke:"#1A1A18", "stroke-width":1.3, fill:"none", "stroke-linecap":"round" }));
+    const ch = mk("g", { transform:"translate(17,6) rotate(-12)" });
+    ch.appendChild(mk("path", { d:"M0 -9 L16 -9 L16 7 L0 7 Z", fill:"#FFFFFF", stroke:"#1A1A18", "stroke-width":1.5 }));
+    ch.appendChild(mk("path", { d:"M3 -5 L13 -5 M3 -1 L11 -1 M3 3 L13 3", stroke:"#46606F", "stroke-width":1.2, "stroke-linecap":"round" }));
+    g.appendChild(ch);
+  } else {
+    g.appendChild(mk("path", { d:"M-1 6 q2 3 4 0", stroke:"#1A1A18", "stroke-width":1.3, fill:"none", "stroke-linecap":"round" }));
+    const mag = mk("g", { transform:"translate(18,4) rotate(24)" });
+    mag.appendChild(mk("circle", { cx:0, cy:0, r:8, fill:"#46606F", opacity:".13" }));
+    mag.appendChild(mk("circle", { cx:0, cy:0, r:8, fill:"none", stroke:"#1A1A18", "stroke-width":1.9 }));
+    mag.appendChild(mk("path", { d:"M5.5 6.5 L12 13", stroke:"#1A1A18", "stroke-width":2.5, "stroke-linecap":"round" }));
+    g.appendChild(mag);
+  }
+  layer.appendChild(g); return g;
+}
+
+/* ── HERO: an eight-step story, in two registers ───── */
+let LANG = (() => { try { return localStorage.getItem("skillinduction.lang") === "tech" ? "tech" : "plain"; } catch (e) { return "plain"; } })();
+const isP = () => LANG === "plain";
+
+/* every swappable bit of canvas text registers itself here */
+const SWAP = [];
+function label(layer, x, y, tech, plain, fill, size, weight, anchor){
+  const t = mk("text", { x, y, "font-family":"var(--font-mono)", "font-size":size || "10.5", fill,
+                         "letter-spacing":"0.5", "font-weight":weight || "400", "text-anchor":anchor || "start" });
+  t.textContent = isP() ? plain : tech;
+  SWAP.push({ el:t, tech, plain });
+  layer.appendChild(t); return t;
+}
+function applyLang(){ SWAP.forEach(o => o.el.textContent = isP() ? o.plain : o.tech); }
+
+const lyTrace = L("lyTrace"), lyStreams = L("lyStreams"), lyEngine = L("lyEngine"), lyDraft = L("lyDraft"),
+      lyPending = L("lyPending"), lyBox = L("lyBox"), lyGate = L("lyGate"), lyResult = L("lyResult"),
+      lyAnt = L("lyAnt"), lyRev = L("lyRev"), lyPanel = L("lyPanel"), lyMode = L("lyMode");
+
+/* — the raw trace card, from slide 1 — */
+function traceCard(x, y){
+  const g = mk("g", { style:"transition:opacity .45s ease" });
+  g.appendChild(mk("rect", { x, y, width:180, height:150, rx:8, fill:"#1B1F2A" }));
+  [["#E0574B",0],["#E3B341",1],["#3FA37A",2]].forEach(([c,i]) => g.appendChild(mk("circle", { cx:x+14+i*11, cy:y+13, r:3, fill:c })));
+  label(g, x+90, y+40, "RAW TRACE", "THE AGENT'S DIARY", "#C9A45C", "10", "700", "middle");
+  txt(g, x+18, y+64, "$ pytest", "#E6E4DC", "11");
+  g.appendChild(mk("rect", { x:x+14, y:y+73, width:152, height:22, rx:3, fill:"#B7412F" }));
+  txt(g, x+90, y+88, "ModuleNotFoundError", "#FFFFFF", "10", "700", "middle");
+  txt(g, x+18, y+118, "inspect Makefile", "#B9B6AD", "10");
+  txt(g, x+18, y+138, "$ make test -> PASS", "#E6E4DC", "10.5", "700");
+  lyTrace.appendChild(g); return g;
+}
+const tc3 = traceCard(64, 28), tc2 = traceCard(52, 36), tc1 = traceCard(40, 44);
+const epCap = label(lyTrace, 40, 204, "3 of 6 episodes · topic run_test_suite", "3 of 6 working days on this one job", "#9C3B2E", "9.5", "600");
+
+/* — the six streams — */
+const STREAMS = [
+  ["conversation turns", "what was said"], ["tool calls", "what it ran"], ["skill uses", "which recipes it used"],
+  ["workflow steps", "the order it worked in"], ["preferences", "how the user likes it"], ["errors and fixes", "mistakes + fixes"]
+];
+const streamEls = STREAMS.map(([t, p], i) => {
+  const g = mk("g", { style:"transition:opacity .4s ease" });
+  const x = 40 + (i % 2) * 150, y = 216 + Math.floor(i / 2) * 26;
+  g.appendChild(mk("rect", { x, y, width:140, height:20, rx:10, fill: i === 5 ? "#F7E8E4" : "#F3EFE6", stroke: i === 5 ? "#B7412F" : "#C9C2B4" }));
+  label(g, x+70, y+13.5, t, p, i === 5 ? "#9C3B2E" : "#3B3833", "8.5", "600", "middle");
+  lyStreams.appendChild(g); return g;
+});
+
+/* — the engine — */
+lyEngine.appendChild(mk("path", { d:"M250 112 L392 112", stroke:"#8C857A", "stroke-width":1.6, "marker-end":"url(#arh)" }));
+lyEngine.appendChild(mk("rect", { x:395, y:90, width:200, height:110, rx:8, fill:"#E8F0F8", stroke:"#3F6E9A", "stroke-width":1.6 }));
+label(lyEngine, 495, 128, "INDUCTION", "THE", "#2B5C8A", "14", "700", "middle");
+label(lyEngine, 495, 146, "ENGINE", "RULE-WRITER", "#2B5C8A", "14", "700", "middle");
+label(lyEngine, 495, 178, "trace → procedure", "what happened → what to do", "#2B5C8A", "10.5", "600", "middle");
+lyEngine.appendChild(mk("path", { d:"M597 145 L614 145", stroke:"#8C857A", "stroke-width":1.6, "marker-end":"url(#arh)" }));
+
+/* — the draft skill: nine fields — */
+lyDraft.appendChild(mk("rect", { x:395, y:225, width:210, height:190, rx:6, fill:"#FFFFFF", stroke:"#2E7D6B", "stroke-width":1.4 }));
+lyDraft.appendChild(mk("rect", { x:395, y:215, width:132, height:18, rx:3, fill:"#2E7D6B" }));
+label(lyDraft, 461, 228, "Enhanced_SKILL.md", "THE IMPROVED RECIPE", "#FFFFFF", "8.5", "700", "middle");
+const FIELDS = [
+  ["name", "name", "run_project_test_suite", "run the project's tests"],
+  ["description", "what it does", "", ""],
+  ["when_to_use", "when to use it", "", ""],
+  ["steps", "the steps", "+ read the Makefile", "+ read the shortcuts file"],
+  ["skills_used", "recipes used", "+ use make test", "+ the right door"],
+  ["likely_tools", "tools it needs", "", ""],
+  ["errors_and_fixes", "mistakes + fixes", "×3", "×3"],
+  ["provenance", "which diary days", "ep-001 … 006", "days 1–6"],
+  ["topic", "the job", "run_test_suite", "running the tests"]
+];
+const fieldEls = FIELDS.map(([t, p, vt, vp], i) => {
+  const g = mk("g", { style:"transition:opacity .35s ease" });
+  const y = 251 + i * 17, hot = i === 6 || i === 7;
+  g.appendChild(mk("circle", { cx:406, cy:y - 3.5, r:2.6, fill: hot ? "#2E7D6B" : "#C9C2B4" }));
+  label(g, 414, y, t, p, hot ? "#2E7D6B" : "#3B3833", "9", hot ? "700" : "400");
+  if(vt) label(g, 598, y, vt, vp, i === 3 || i === 4 ? "#2E7D6B" : "#8C857A", "8", i === 3 || i === 4 ? "700" : "400", "end");
+  lyDraft.appendChild(g); return g;
+});
+
+/* — pending / approved — */
+const pendBox = mk("g", { style:"transition:opacity .4s ease" });
+pendBox.appendChild(mk("rect", { x:395, y:425, width:210, height:40, rx:6, fill:"#FBF3DF", stroke:"#B8892E", "stroke-width":1.4 }));
+label(pendBox, 500, 450, "PENDING HUMAN REVIEW", "WAITING FOR A PERSON", "#9A6F20", "11", "700", "middle");
+lyPending.appendChild(pendBox);
+const stamp = mk("g", { transform:"translate(500,445) rotate(-6)", style:"transition:opacity .4s ease" });
+stamp.appendChild(mk("rect", { x:-98, y:-15, width:196, height:30, rx:4, fill:"#FFFFFF", stroke:"#2E7D6B", "stroke-width":2 }));
+label(stamp, 0, 4.5, "APPROVED · reason recorded", "STAMPED · reason written down", "#2E7D6B", "10", "700", "middle");
+lyPending.appendChild(stamp);
+
+/* — the skill box, from slide 1 — */
+lyBox.appendChild(mk("rect", { x:620, y:30, width:340, height:215, rx:12, fill:"#FFFFFF", stroke:"#2B5C8A", "stroke-width":1.6 }));
+lyBox.appendChild(mk("rect", { x:725, y:19, width:130, height:22, rx:3, fill:"#1F4E8C" }));
+label(lyBox, 790, 34, "SKILL BOX", "THE APPROVED SHELF", "#FFFFFF", "10", "700", "middle");
+const shelfCap = label(lyBox, 636, 58, "5 active skills · indexed", "five recipes on the shelf", "#8C857A", "8.5");
+const SKILLS = ["brainstorming", "writing-plans", "run-the-tests", "systematic-debugging", "requesting-code-review"];
+const skillEls = SKILLS.map((s, i) => {
+  const g = mk("g", { style:"transition:opacity .35s ease" });
+  const y = 78 + i * 24;
+  g.appendChild(mk("rect", { x:636, y:y - 9, width:8, height:8, rx:1.5, fill: i === 2 ? "#B7412F" : "#6a9bcc" }));
+  txt(g, 650, y, s, i === 2 ? "#9C3B2E" : "#3B3833", "9.5", i === 2 ? "700" : "400");
+  lyBox.appendChild(g); return g;
+});
+/* v1 card */
+const v1 = mk("g", { style:"transition:opacity .45s ease" });
+v1.appendChild(mk("rect", { x:790, y:58, width:156, height:168, rx:6, fill:"#FFFFFF", stroke:"#B7412F", "stroke-width":1.4 }));
+v1.appendChild(mk("rect", { x:790, y:48, width:74, height:18, rx:3, fill:"#B7412F" }));
+label(v1, 827, 61, "SKILL.md", "RECIPE CARD", "#FFFFFF", "8.5", "700", "middle");
+txt(v1, 800, 92, "name: run-the-tests", "#1A1A18", "9.5", "600");
+txt(v1, 800, 110, "find the test command", "#3B3833", "9.5");
+txt(v1, 800, 126, "run it", "#3B3833", "9.5");
+txt(v1, 800, 142, "report the result", "#3B3833", "9.5");
+txt(v1, 800, 166, "- bare pytest chosen", "#B7412F", "9.5", "700");
+v1.appendChild(mk("rect", { x:798, y:186, width:140, height:20, rx:10, fill:"#FFFFFF", stroke:"#3FA37A" }));
+const v1pill = label(v1, 868, 199.5, "STATUS ACTIVE · VERSION v1", "IN USE · version 1", "#2E7D6B", "7.5", "700", "middle");
+lyBox.appendChild(v1);
+/* v2 card, hidden until approval */
+const v2 = mk("g", { style:"transition:opacity .45s ease" });
+v2.appendChild(mk("rect", { x:782, y:50, width:170, height:180, rx:6, fill:"#FFFFFF", stroke:"#2E7D6B", "stroke-width":1.6 }));
+v2.appendChild(mk("rect", { x:782, y:40, width:112, height:18, rx:3, fill:"#2E7D6B" }));
+label(v2, 838, 53, "Enhanced_SKILL.md", "IMPROVED RECIPE", "#FFFFFF", "8.5", "700", "middle");
+txt(v2, 792, 84, "name: run_project_test_suite", "#1A1A18", "8.5", "600");
+txt(v2, 792, 104, "+ read the Makefile", "#2E7D6B", "9.5", "700");
+txt(v2, 792, 120, "+ use make test", "#2E7D6B", "9.5", "700");
+txt(v2, 792, 136, "report the result", "#3B3833", "9.5");
+label(v2, 792, 156, "never bare pytest", "never the wrong door", "#9C3B2E", "9", "600");
+label(v2, 792, 171, "errors_and_fixes ×3", "3 mistakes noted", "#8C857A", "7.5");
+label(v2, 792, 184, "provenance 001…006", "6 diary days cited", "#8C857A", "7.5");
+v2.appendChild(mk("rect", { x:792, y:198, width:150, height:20, rx:10, fill:"#2E7D6B" }));
+label(v2, 867, 211.5, "STATUS ACTIVE · VERSION v2", "IN USE · version 2", "#FFFFFF", "7.5", "700", "middle");
+lyBox.appendChild(v2);
+
+/* — the gate: approve / decline, from slide 3 — */
+lyGate.appendChild(mk("rect", { x:630, y:275, width:96, height:26, rx:13, fill:"#2E7D6B" }));
+label(lyGate, 678, 292, "APPROVE", "STAMP IT", "#FFFFFF", "10", "700", "middle");
+label(lyGate, 678, 318, "promoted to the skill box", "goes onto the shelf", "#3B3833", "8.5", "400", "middle");
+lyGate.appendChild(mk("rect", { x:800, y:275, width:96, height:26, rx:13, fill:"#B7412F" }));
+label(lyGate, 848, 292, "DECLINE", "SEND BACK", "#FFFFFF", "10", "700", "middle");
+label(lyGate, 848, 318, "back to the engine, with a reason", "back to the clerk, with notes", "#3B3833", "8.5", "400", "middle");
+const apArrow = mk("path", { d:"M678 273 L678 251", stroke:"#2E7D6B", "stroke-width":2, "marker-end":"url(#arg)", style:"transition:opacity .4s ease" });
+lyGate.appendChild(apArrow);
+const decPath = mk("path", { d:"M798 288 C 730 288, 660 335, 609 335", fill:"none", stroke:"#B7412F", "stroke-width":1.6, "stroke-dasharray":"5 4", "marker-end":"url(#arr)", style:"transition:opacity .4s ease" });
+lyGate.appendChild(decPath);
+const decLab = label(lyGate, 700, 352, "reason → next prompt", "notes → next draft", "#B7412F", "8.5", "600", "middle");
+
+/* — the result — */
+lyResult.appendChild(mk("rect", { x:620, y:400, width:250, height:62, rx:8, fill:"#1B1F2A" }));
+label(lyResult, 620, 392, "retrieved: run_project_test_suite v2", "found on the shelf: the improved recipe", "#2E7D6B", "8.5", "600");
+txt(lyResult, 634, 424, "$ make test", "#E6E4DC", "11");
+const passTxt = txt(lyResult, 634, 448, "212 passed", "#3FA37A", "13", "700");
+
+/* — the two characters — */
+const ant = scruff(lyAnt, "#C4633C", false);
+const rev = scruff(lyRev, "#3F7050", true);
+
+/* — the tally — */
+lyPanel.appendChild(mk("rect", { x:40, y:304, width:330, height:158, rx:3, fill:"#FAF9F6", stroke:"#D6CBB8" }));
+label(lyPanel, 58, 326, "MEASURED · FROM THE LESSON", "COUNTED · FROM THE LESSON", "#8C857A", "9.5");
+function tally(x, y, tech, plain){
+  const v = mk("text", { x, y, "font-family":"var(--font-mono)", "font-size":"24", fill:"#8C857A", "font-weight":"600" });
+  v.textContent = "not yet"; v.setAttribute("font-size", "9"); lyPanel.appendChild(v);
+  label(lyPanel, x, y + 15, tech, plain, "#8C857A", "8");
+  return v;
+}
+const tEp = tally(58, 366, "REPEAT EPISODES", "REPEAT MORNINGS"), tSt = tally(168, 366, "TRACE TYPES", "DIARY STREAMS"),
+      tSk = tally(268, 366, "STARTER SKILLS", "RECIPES ON SHELF"), tFd = tally(58, 428, "SCHEMA FIELDS", "BOXES ON THE FORM"),
+      tPs = tally(168, 428, "TESTS PASSED", "CHECKS PASSED");
+function setTally(el, n, animate){
+  if(n == null){ el.textContent = "not yet"; el.setAttribute("font-size", "9"); el.setAttribute("fill", "#8C857A"); return; }
+  el.setAttribute("font-size", "24"); el.setAttribute("fill", "#1A1A18");
+  if(animate && !reduce) countTo(el, n, 1400); else el.textContent = n;
+}
+const modeTxt = label(lyMode, 40, 18, "", "", "#8C857A", "9.5");
+
+/* — the eight steps, told twice — */
+const STEPS = [
+{ m:"t:0:13 · SLIDE 1 · RAW TRACE", mp:"0:13 · THE DIARY PAGE",
+  tk:"The mistake", tt:"The agent runs bare pytest and it fails",
+  tb:"On this repository the agent types <code>pytest</code> on its own and gets <em>ModuleNotFoundError: No module named 'app' (wrong interpreter)</em>. The tests are fine. Bare <code>pytest</code> picks up the wrong Python, outside the project's virtual environment. The trace records the recovery too: inspect the Makefile, run <code>make test</code>, <em>212 passed</em>.",
+  pk:"The mistake", pt:"The assistant takes the wrong turn",
+  pb:"Imagine an assistant that has to run the project's checks every morning. It picks the obvious-looking door — a command called <code>pytest</code> — and hits a wall: <em>ModuleNotFoundError</em>, the computer saying “I can't find the code you asked for”. The checks were fine; the door was wrong. It backtracks, reads the project's list of shortcuts (the Makefile), uses the right one (<code>make test</code>), and 212 checks pass.<span class='tj'>a <em>trace</em> is the recording of all that — every command, every error, every fix — written down as it happened.</span>",
+  ep:[null,null,null,null,null] },
+{ m:"t:0:13 · 3 OF 6 EPISODES · ok=False", mp:"0:13 · THREE MORNINGS RUNNING",
+  tk:"Repeats", tt:"Three episodes, same wrong interpreter",
+  tb:"The mistake is only worth a skill because it recurs. Three separate episodes on the topic <code>run_test_suite</code> make the identical wrong call — <code>run_tests(\"pytest\")</code> with <code>ok=False</code> — and recover the same way. A one-off would never be induced.",
+  pk:"Repeats", pt:"Same wrong turn, three mornings running",
+  pb:"One bad morning is bad luck. Three mornings, same corner, same wrong turn — that is a habit, and habits can be written down and corrected. The lesson's diary holds six working days on this one job; three of them contain the mistake.<span class='tj'>each working day is an <em>episode</em>; the job it belongs to is its <em>topic</em> (<code>run_test_suite</code>). Only repeated failures on one topic get turned into a skill.</span>",
+  ep:[3,null,null,null,null] },
+{ m:"t:2:58 · NB CELL 8 · SIX STREAMS · FIVE SKILLS", mp:"2:58 · SIX KINDS OF ENTRY",
+  tk:"Recorded", tt:"Six streams go into the store",
+  tb:"Cell 8 loads the traces into Oracle Agent Memory broken into six streams — conversation turns, tool calls, skill uses, workflow steps, preferences, errors and fixes — alongside five starter skills already active in the skill box: <code>brainstorming</code>, <code>writing-plans</code>, <code>run-the-tests</code>, <code>systematic-debugging</code>, <code>requesting-code-review</code>.",
+  pk:"Recorded", pt:"The diary has six kinds of entry",
+  pb:"The diary is not just a transcript of what was said. It also lists what the assistant ran, which recipes it used, the order it worked in, how the user likes things done, and every mistake with its fix. Six kinds of entry. And on the shelf already sit five approved recipe cards — including the thin one for running tests that keeps causing the trouble.<span class='tj'>the store is <em>Oracle Agent Memory</em>; the five cards are the <em>starter skills</em>, indexed so the agent can search them by task.</span>",
+  ep:[3,6,5,null,null] },
+{ m:"t:0:22 · induce_skill · temperature=0.0", mp:"0:22 · THE CLERK SITS DOWN",
+  tk:"The engine", tt:"One topic's episodes go to the induction engine",
+  tb:"The induction engine reads every episode on one topic and asks a language model for exactly one skill — temperature 0, JSON object response, default model <code>oci/xai.grok-4.3</code>. The prompt is two messages: a fixed system contract (<code>_SYSTEM</code>) and <code>\"Topic: run_test_suite\\nEpisodes: …\"</code>. Mixed topics raise <code>ValueError</code>.",
+  pk:"The rule-writer", pt:"A clerk turns the diary into standing orders",
+  pb:"Now a clerk sits down with every diary page about this one job and writes a single page of instructions: what to do, in what order, and what not to do. The clerk works from what actually happened, not from what anyone remembers. One job in, one page out.<span class='tj'>the clerk is the <em>induction engine</em>. It is a language model given a fixed instruction sheet (<code>_SYSTEM</code>) plus the episodes, with its randomness dial set to zero (temperature 0) and told to answer in a fixed data format (JSON).</span>",
+  ep:[3,6,5,null,null] },
+{ m:"t:0:26 · EnhancedSkillProposal · 9 FIELDS", mp:"0:26 · THE NINE-BOX FORM",
+  tk:"The draft", tt:"Nine fields, two of which are the point",
+  tb:"The reply is validated against <code>EnhancedSkillProposal</code>: name, description, when_to_use, steps, skills_used, likely_tools, <em>errors_and_fixes</em>, <em>provenance</em>, topic. The two in bold are why the lesson exists — one carries yesterday's mistake forward, the other lists the episode ids that justify every line. <code>topic</code> is set by the code, never by the model.",
+  pk:"The draft", pt:"A form with nine boxes, not a free essay",
+  pb:"The clerk cannot hand back a paragraph. The page is a form with nine boxes, and two of them matter most: <em>mistakes and what fixed them</em>, so tomorrow's assistant knows the wrong door by name, and <em>which diary days this came from</em>, so anyone can check the clerk's working. The clerk is not allowed to fill in the box that says which job this is — the code does that.<span class='tj'>the form is the <code>EnhancedSkillProposal</code> schema; the two boxes are <code>errors_and_fixes</code> and <code>provenance</code>.</span>",
+  ep:[3,6,5,9,null] },
+{ m:"t:0:44 · NB CELL 13 · run_dream → pending", mp:"0:44 · THE IN-TRAY",
+  tk:"Pending", tt:"It lands pending — invisible to retrieval",
+  tb:"<code>run_dream</code> runs the pass outside the agent's working path and <code>OracleSaver</code> checkpoints one candidate update: <code>run-the-tests</code> v2, status <code>pending</code>. Only <code>active</code> skills are indexed, so the agent cannot retrieve v2 yet. v1 stays active until a human acts.",
+  pk:"Waiting", pt:"The page goes into the in-tray, not onto the shelf",
+  pb:"The new page does not go straight onto the shelf. It goes into an in-tray marked <em>waiting for a person</em>. The assistant carries on using the old card and cannot see the new one at all. Nothing about its behaviour has changed yet — and that is deliberate.<span class='tj'>the pass is <code>run_dream</code>, run <em>outside</em> the agent's live work; the in-tray is the <code>pending</code> status, which the search index ignores.</span>",
+  ep:[3,6,5,9,null] },
+{ m:"t:1:10 · SLIDE 3 · APPROVE / DECLINE", mp:"1:10 · THE STAMP",
+  tk:"The gate", tt:"Approve with a reason, or decline with one",
+  tb:"A reviewer reads v1 beside v2 and either approves — pending → active, prior active → superseded, base skill promoted so the indexer drops it — or declines with a reason. The reason is appended to the next induction prompt: <em>“A human reviewer rejected the previous version with this feedback; revise the skill to address it.”</em> Decline is an instruction, not a bin.",
+  pk:"The gate", pt:"A person reads it and stamps it — or sends it back with notes",
+  pb:"Someone sits down with the old card and the new page side by side. Stamp it, and it goes on the shelf while the old card goes to the archive — the shelf never holds two cards for one job. Send it back, and the notes in the margin are handed to the clerk, who must address them in the next draft. Either way, the person writes down why.<span class='tj'>approve = <code>approve_skills</code> flips <code>pending → active</code> and the old version to <code>superseded</code>; decline = the reason is passed as <code>feedback</code> into the next <code>induce_skill</code> call.</span>",
+  ep:[3,6,5,9,null] },
+{ m:"t:5:11 · NB CELL 19 · after_hit", mp:"5:11 · THE RIGHT TURN",
+  tk:"The payoff", tt:"Same task, different skill, green suite",
+  tb:"Re-index and search the box with the identical <code>PAYOFF_TASK</code>. Before, it returned v1 and the agent ran bare <code>pytest</code>. After, it returns <code>run_project_test_suite</code> v2 — “Never invoke bare pytest” — and the suite reports <em>212 passed</em>. The query did not change. The retrieved skill did.",
+  pk:"The payoff", pt:"Same corner, correct turn",
+  pb:"The next morning the assistant is given exactly the same job. It reaches for the shelf, finds the new card, reads “never use the bare pytest door”, takes the right one, and 212 checks pass. Nobody changed the question. They changed what the assistant finds when it looks.<span class='tj'>measured as a retrieval change on a fixed task: <code>before_hit</code> versus <code>after_hit</code> from <code>search_skill_box</code>.</span>",
+  ep:[3,6,5,9,212] }
+];
+/* the stepper reads k/t/b — resolve them from the current register */
+STEPS.forEach(s => {
+  Object.defineProperty(s, "k", { get(){ return isP() ? s.pk : s.tk; } });
+  Object.defineProperty(s, "t", { get(){ return isP() ? s.pt : s.tt; } });
+  Object.defineProperty(s, "b", { get(){ return isP() ? s.pb : s.tb; } });
+});
+
+let heroCur = 0, prevTally = [null,null,null,null,null];
+function heroApply(i, later){
+  heroCur = i;
+  const st = STEPS[i];
+  modeTxt.textContent = isP() ? st.mp : st.m;
+  const sw = SWAP.find(o => o.el === modeTxt); if(sw){ sw.tech = st.m; sw.plain = st.mp; }
+  /* trace cards */
+  setOp(tc1, 1); setOp(tc2, i >= 1 ? 1 : 0); setOp(tc3, i >= 1 ? 1 : 0); setOp(epCap, i >= 1 ? 1 : 0);
+  /* streams */
+  setOp(lyStreams, i >= 2 ? 1 : 0);
+  if(i === 2 && !reduce) streamEls.forEach((g, n) => { g.style.opacity = 0; later(() => g.style.opacity = 1, 120 + n * 140); });
+  else streamEls.forEach(g => g.style.opacity = 1);
+  /* engine */
+  setOp(lyEngine, i >= 3 ? 1 : 0);
+  /* draft */
+  setOp(lyDraft, i >= 4 ? 1 : 0);
+  if(i === 4 && !reduce) fieldEls.forEach((g, n) => { g.style.opacity = 0; later(() => g.style.opacity = 1, 150 + n * 130); });
+  else fieldEls.forEach(g => g.style.opacity = 1);
+  /* pending / stamp */
+  setOp(lyPending, i >= 5 ? 1 : 0); setOp(pendBox, i >= 6 ? .25 : 1); setOp(stamp, i >= 6 ? 1 : 0);
+  /* box */
+  setOp(lyBox, i >= 2 ? 1 : 0);
+  if(i === 2 && !reduce) skillEls.forEach((g, n) => { g.style.opacity = 0; later(() => g.style.opacity = 1, 300 + n * 120); });
+  else skillEls.forEach(g => g.style.opacity = 1);
+  setOp(v1, i >= 6 ? .35 : 1);
+  v1pill.textContent = i >= 6 ? (isP() ? "RETIRED · version 1" : "SUPERSEDED · VERSION v1") : (isP() ? "IN USE · version 1" : "STATUS ACTIVE · VERSION v1");
+  const pw = SWAP.find(o => o.el === v1pill); if(pw){ pw.tech = i >= 6 ? "SUPERSEDED · VERSION v1" : "STATUS ACTIVE · VERSION v1"; pw.plain = i >= 6 ? "RETIRED · version 1" : "IN USE · version 1"; }
+  if(i === 6 && !reduce){ setOp(v2, 0); later(() => setOp(v2, 1), 900); } else setOp(v2, i >= 6 ? 1 : 0);
+  /* gate */
+  setOp(lyGate, i >= 5 ? 1 : 0); setOp(apArrow, i >= 6 ? 1 : 0); setOp(decPath, i === 6 ? 1 : 0); setOp(decLab, i === 6 ? 1 : 0);
+  /* result */
+  setOp(lyResult, i >= 7 ? 1 : 0);
+  /* characters */
+  setOp(lyAnt, i <= 3 || i === 7 ? 1 : 0); setOp(lyRev, i >= 5 && i <= 6 ? 1 : 0);
+  if(i === 0){ at(ant, 300, 130); }
+  else if(i === 1){ at(ant, 300, 130); if(!reduce){ later(() => at(ant, 285, 150), 500); later(() => at(ant, 300, 130), 1300); later(() => at(ant, 285, 150), 2100); later(() => at(ant, 300, 130), 2900); } }
+  else if(i === 2 || i === 3){ at(ant, 330, 180); }
+  else if(i === 7){ at(ant, 900, 300); if(!reduce){ later(() => at(ant, 900, 375), 700); } }
+  at(rev, 930, 400);
+  /* tally */
+  st.ep.forEach((n, k) => {
+    const el = [tEp, tSt, tSk, tFd, tPs][k];
+    setTally(el, n, n != null && prevTally[k] == null);
+  });
+  prevTally = st.ep.slice();
+}
+
+const hero = stepper({
+  navId:"storyNav", kickId:"stKick", titleId:"stTitle", bodyId:"stBody",
+  prevId:"stPrev", playId:"stPlay", nextId:"stNext", dwell: 6500,
+  steps: STEPS, apply: heroApply
+});
+
+/* language toggle, appended to the hero's dot rail */
+const nav = L("storyNav");
+const langBox = document.createElement("div");
+langBox.className = "langtoggle";
+langBox.innerHTML = '<button type="button" data-lang="plain">Plain English</button><button type="button" data-lang="tech">Technical</button>';
+nav.appendChild(langBox);
+function markLang(){
+  langBox.querySelectorAll("[data-lang]").forEach(b2 => b2.setAttribute("aria-pressed", b2.dataset.lang === LANG));
+}
+langBox.addEventListener("click", e => {
+  const b2 = e.target.closest("[data-lang]"); if(!b2) return;
+  LANG = b2.dataset.lang;
+  try { localStorage.setItem("skillinduction.lang", LANG); } catch (err) {}
+  applyLang(); markLang(); hero.go(heroCur);
+});
+markLang();
+
+/* ── MECHANISM: five stages ─────────────────────────── */
+(function(){
+  const stagesG = L("pipeStages"), detail = L("pipeDetail");
+  ["01 TRACES STORED","02 BUILD THE PROMPT","03 VALIDATE","04 CHECKPOINT","05 APPROVE"].forEach((s, i) => {
+    const t = mk("text", { x: 44 + i * 192, y: 26, "font-family":"var(--font-mono)", "font-size":"10.5",
+      "letter-spacing":"2", fill:"#8C857A", class:"stagelbl", style:"transition:fill .4s ease" });
+    t.textContent = s; stagesG.appendChild(t);
+  });
+  const box = (g, x, y, w, h, fill, stroke) => g.appendChild(mk("rect", { x, y, width:w, height:h, rx:8, fill, stroke, "stroke-width":1.4 }));
+  const arrow = (g, d, col) => g.appendChild(mk("path", { d, fill:"none", stroke:col || "#8C857A", "stroke-width":1.6, "marker-end":"url(#arp)" }));
+  const D = [0,1,2,3,4].map(() => { const g = mk("g", { style:"transition:opacity .45s ease", opacity:"0" }); detail.appendChild(g); return g; });
+
+  /* 1 · traces stored */
+  (function(g){
+    const cyl = (x, y, w, h, lab, sub) => {
+      g.appendChild(mk("path", { d:`M${x} ${y+12} v${h-24} a${w/2} 12 0 0 0 ${w} 0 v-${h-24}`, fill:"#F3EFE6", stroke:"#8C857A", "stroke-width":1.4 }));
+      g.appendChild(mk("ellipse", { cx:x+w/2, cy:y+12, rx:w/2, ry:12, fill:"#FFFFFF", stroke:"#8C857A", "stroke-width":1.4 }));
+      txt(g, x+w/2, y+h+20, lab, "#1A1A18", "11", "700", "middle");
+      txt(g, x+w/2, y+h+36, sub, "#8C857A", "9", "400", "middle");
+    };
+    cyl(90, 60, 200, 150, "Oracle Agent Memory", "mem · holds the traces");
+    cyl(700, 60, 200, 150, "LangGraph Oracle DB", "conn · runs the loop, checkpoints it");
+    for(let i = 0; i < 6; i++){
+      const y = 92 + i * 18;
+      g.appendChild(mk("rect", { x:110, y:y-9, width:160, height:14, rx:3, fill:"#FFFFFF", stroke:"#C9C2B4" }));
+      txt(g, 118, y+1.5, "ep-run_test_suite-00" + (i+1), "#3B3833", "8.5");
+      if(i < 3) g.appendChild(mk("circle", { cx:262, cy:y-2, r:3, fill:"#B7412F" }));
+    }
+    txt(g, 190, 250, "6 episodes on one topic · 3 carry the error", "#9C3B2E", "9", "600", "middle");
+    txt(g, 495, 120, "mem, conn = connect_stack()", "#1A1A18", "12", "600", "middle");
+    txt(g, 495, 142, "cell 3", "#8C857A", "9.5", "400", "middle");
+    txt(g, 495, 190, "six streams per episode: conversation · tool_calls (ok flag) · skills_used", "#3B3833", "9", "400", "middle");
+    txt(g, 495, 206, "errors [{error, fix}] · workflow · preferences · plus topic and episode_id", "#3B3833", "9", "400", "middle");
+    txt(g, 495, 300, "Stage 1 · the diary is in the cabinet, one page per working day, filed by job", "#8C857A", "9.5", "400", "middle");
+  })(D[0]);
+
+  /* 2 · build the prompt */
+  (function(g){
+    box(g, 60, 55, 300, 60, "#F3EFE6", "#8C857A");
+    txt(g, 76, 80, "role: system", "#8C857A", "9.5");
+    txt(g, 76, 100, "content: _SYSTEM", "#1A1A18", "11.5", "700");
+    box(g, 60, 128, 300, 78, "#F3EFE6", "#8C857A");
+    txt(g, 76, 152, "role: user", "#8C857A", "9.5");
+    txt(g, 76, 172, "content: \"Topic: run_test_suite", "#1A1A18", "11", "700");
+    txt(g, 76, 190, "          Episodes: <json>\"", "#1A1A18", "11", "700");
+    arrow(g, "M370 130 L470 130");
+    box(g, 480, 80, 200, 100, "#E8F0F8", "#3F6E9A");
+    txt(g, 580, 112, "INDUCTION", "#2B5C8A", "13", "700", "middle");
+    txt(g, 580, 130, "ENGINE", "#2B5C8A", "13", "700", "middle");
+    txt(g, 580, 160, "induce_skill(episodes, complete=…)", "#2B5C8A", "9", "600", "middle");
+    [["oci/xai.grok-4.3", 700, 70], ["temperature=0.0", 700, 100], ["response_format=", 700, 130], ["{'type': 'json_object'}", 700, 148]].forEach(([s, x, y], i) => {
+      if(i !== 3) g.appendChild(mk("rect", { x, y:y-14, width:230, height:22, rx:11, fill:"#FFFFFF", stroke:"#C9C2B4" }));
+      txt(g, x+115, y+1, s, "#3B3833", "9.5", i === 3 ? "400" : "600", "middle");
+    });
+    txt(g, 815, 195, "mixed topics → ValueError", "#9C3B2E", "10", "700", "middle");
+    txt(g, 815, 211, "one topic in, one skill out", "#8C857A", "9", "400", "middle");
+    txt(g, 495, 300, "Stage 2 · the clerk's pinned job description, then the one drawer's pages, then no guessing", "#8C857A", "9.5", "400", "middle");
+  })(D[1]);
+
+  /* 3 · validate */
+  (function(g){
+    box(g, 60, 60, 150, 140, "#1B1F2A", "#1B1F2A");
+    txt(g, 135, 90, "JSON reply", "#C9A45C", "10", "700", "middle");
+    txt(g, 76, 118, "{ \"name\": …,", "#E6E4DC", "9.5");
+    txt(g, 76, 136, "  \"steps\": […],", "#E6E4DC", "9.5");
+    txt(g, 76, 154, "  \"provenance\": […],", "#E6E4DC", "9.5");
+    txt(g, 76, 172, "  … }", "#E6E4DC", "9.5");
+    arrow(g, "M220 130 L300 130");
+    txt(g, 260, 118, "validate", "#8C857A", "9", "400", "middle");
+    box(g, 310, 48, 360, 220, "#FFFFFF", "#2E7D6B");
+    txt(g, 490, 72, "EnhancedSkillProposal", "#2E7D6B", "12", "700", "middle");
+    const F = [["name","snake_case verb phrase"],["description","one sentence"],["when_to_use","one sentence"],["steps","imperative strings"],
+      ["skills_used","skills consulted on this kind of problem"],["likely_tools","tool names this task usually needs"],
+      ["errors_and_fixes","{error, fix} for every mistake seen"],["provenance","the episode_id values you used"],["topic","set by induce_skill, not the LLM"]];
+    g.ticks = F.map(([n, d], i) => {
+      const y = 96 + i * 19, hot = i === 6 || i === 7;
+      const t = mk("g", { style:"transition:opacity .3s ease" });
+      t.appendChild(mk("path", { d:`M326 ${y-3} l3 3 l6 -7`, fill:"none", stroke: hot ? "#2E7D6B" : "#8C857A", "stroke-width":1.8, "stroke-linecap":"round" }));
+      txt(t, 342, y, n, hot ? "#2E7D6B" : "#1A1A18", "10", hot ? "700" : "600");
+      txt(t, 470, y, d, "#8C857A", "8");
+      g.appendChild(t); return t;
+    });
+    box(g, 690, 90, 250, 90, "#F7E8E4", "#B7412F");
+    txt(g, 815, 116, "if the reply does not fit", "#9C3B2E", "10", "700", "middle");
+    txt(g, 815, 136, "it is not a skill — the schema is", "#3B3833", "9", "400", "middle");
+    txt(g, 815, 152, "the gate before the human gate", "#3B3833", "9", "400", "middle");
+    txt(g, 495, 300, "Stage 3 · the form has nine boxes; a paragraph, however good, is sent back", "#8C857A", "9.5", "400", "middle");
+  })(D[2]);
+
+  /* 4 · checkpoint */
+  (function(g){
+    g.appendChild(mk("path", { d:"M60 120 L940 120", stroke:"#C9C2B4", "stroke-width":1.4, "stroke-dasharray":"6 5" }));
+    txt(g, 60, 108, "the agent's working path — never touched by this stage", "#8C857A", "9");
+    g.appendChild(mk("path", { d:"M60 140 L940 140", stroke:"#C9C2B4", "stroke-width":1.4, "stroke-dasharray":"6 5" }));
+    box(g, 80, 175, 330, 70, "#E8F0F8", "#3F6E9A");
+    txt(g, 245, 200, "run_dream(mem, run_test_episodes,", "#2B5C8A", "10.5", "600", "middle");
+    txt(g, 245, 218, "complete=night, connection=conn)", "#2B5C8A", "10.5", "600", "middle");
+    txt(g, 245, 236, "cell 13 · runs outside the working path", "#8C857A", "8.5", "400", "middle");
+    arrow(g, "M420 210 L500 210");
+    box(g, 510, 175, 170, 70, "#F3EFE6", "#8C857A");
+    txt(g, 595, 205, "OracleSaver", "#1A1A18", "11.5", "700", "middle");
+    txt(g, 595, 224, "checkpointed one candidate", "#8C857A", "8.5", "400", "middle");
+    arrow(g, "M690 210 L760 210");
+    box(g, 770, 170, 170, 80, "#FBF3DF", "#B8892E");
+    txt(g, 855, 196, "run-the-tests v2", "#1A1A18", "11", "700", "middle");
+    txt(g, 855, 216, "PENDING HUMAN REVIEW", "#9A6F20", "9.5", "700", "middle");
+    txt(g, 855, 236, "not indexed · not retrievable", "#8C857A", "8.5", "400", "middle");
+    txt(g, 495, 60, "v1 stays active until v2 is approved · enhanced skills are versioned per topic", "#3B3833", "10", "600", "middle");
+    txt(g, 495, 300, "Stage 4 · the overnight shift files a carbon copy; the day shift's card is untouched", "#8C857A", "9.5", "400", "middle");
+  })(D[3]);
+
+  /* 5 · approve — the state machine */
+  (function(g){
+    const st = (x, y, lab, fill, stroke, col) => { box(g, x, y, 130, 40, fill, stroke); txt(g, x+65, y+25, lab, col, "11", "700", "middle"); };
+    st(70, 90, "pending", "#FBF3DF", "#B8892E", "#9A6F20");
+    st(300, 90, "active", "#E6F2EC", "#2E7D6B", "#2E7D6B");
+    st(530, 90, "superseded", "#F3EFE6", "#8C857A", "#686256");
+    st(70, 190, "rejected", "#F7E8E4", "#B7412F", "#9C3B2E");
+    arrow(g, "M205 110 L295 110", "#2E7D6B"); txt(g, 250, 100, "approve_skills", "#2E7D6B", "8.5", "600", "middle");
+    arrow(g, "M435 110 L525 110", "#8C857A"); txt(g, 480, 100, "prior active of same topic", "#8C857A", "8", "400", "middle");
+    arrow(g, "M135 135 L135 185", "#B7412F"); txt(g, 148, 165, "with a reason", "#9C3B2E", "8.5", "600");
+    g.appendChild(mk("path", { d:"M365 135 C 365 175, 240 175, 210 135", fill:"none", stroke:"#8C857A", "stroke-width":1.4, "stroke-dasharray":"5 4", "marker-end":"url(#arp)" }));
+    txt(g, 330, 188, "demote_from_skill_box · restores the prior version", "#686256", "8.5", "400", "middle");
+    box(g, 700, 70, 240, 80, "#FFFFFF", "#8C857A");
+    txt(g, 820, 95, "base skill run-the-tests", "#1A1A18", "10", "700", "middle");
+    txt(g, 820, 113, "→ promoted", "#2E7D6B", "10", "700", "middle");
+    txt(g, 820, 131, "so the indexer drops it: one recipe per job", "#8C857A", "8.5", "400", "middle");
+    box(g, 700, 170, 240, 80, "#F7E8E4", "#B7412F");
+    txt(g, 820, 194, "three guards raise ValueError", "#9C3B2E", "10", "700", "middle");
+    txt(g, 820, 212, "unknown id · non-latest version", "#3B3833", "9", "400", "middle");
+    txt(g, 820, 228, "already not pending", "#3B3833", "9", "400", "middle");
+    txt(g, 365, 250, "only active is retrievable", "#2E7D6B", "10", "700", "middle");
+    txt(g, 495, 300, "Stage 5 · the stamp moves one card onto the shelf and one into the archive — never two on the shelf", "#8C857A", "9.5", "400", "middle");
+  })(D[4]);
+
+  const stage = (n) => [...stagesG.children].forEach((t, i) => t.setAttribute("fill", i === n ? "#C4633C" : "#8C857A"));
+
+  stepper({
+    navId:"pipeNav", kickId:"pipeKick", titleId:"pipeTitle", bodyId:"pipeBody",
+    prevId:"pipePrev", playId:"pipePlay", nextId:"pipeNext", dwell: 5600,
+    steps: [
+      { k:"Traces stored", t:"Two stores open; six episodes on one topic sit in the first",
+        b:"Cell 3 opens <em>Oracle Agent Memory</em> (the traces) and <em>LangGraph Oracle DB</em> (the loop). Each episode carries conversation, tool calls with an ok flag, skills used, errors as <code>{error, fix}</code> pairs, workflow, preferences, a topic and an episode id. Six episodes belong to <code>run_test_suite</code>; three of them carry the bare-<code>pytest</code> error.<span class='tj'>a store is just a place data is kept and can be searched. Two are used because one holds what happened and the other runs and records the induction loop.</span>" },
+      { k:"Build the prompt", t:"induce_skill sends two messages and turns the randomness off",
+        b:"A fixed system message, <code>_SYSTEM</code>, then a user message: <code>Topic: run_test_suite</code> followed by the episodes as JSON. Default model <code>oci/xai.grok-4.3</code>, <em>temperature 0.0</em>, response forced to a JSON object. If the episodes span more than one topic the call raises <code>ValueError</code> before any model is asked.<span class='tj'>temperature is the model's randomness dial; zero means the same input gives the same draft. JSON is a plain-text format for structured data — boxes with names, not prose.</span>" },
+      { k:"Validate", t:"The reply must fit EnhancedSkillProposal — nine fields",
+        b:"name, description, when_to_use, steps, skills_used, likely_tools, <em>errors_and_fixes</em>, <em>provenance</em>, topic. The first seven describe the recipe; the two in bold carry the mistake forward and make it auditable. <code>topic</code> is written by <code>induce_skill</code> from the episodes, so the model cannot relabel what it generalised from.<span class='tj'>a schema is a fixed list of required boxes. Validation means checking every box is present and the right shape before anything else happens.</span>" },
+      { k:"Checkpoint", t:"run_dream proposes v2 pending — off the agent's path",
+        b:"Cell 13: <code>run_dream(mem, run_test_episodes, complete=night, connection=conn)</code>. <em>OracleSaver</em> checkpoints one candidate update, and the notebook prints “awaiting review: run-the-tests v2”. Enhanced skills are versioned per topic; v1 stays active until v2 is approved. Nothing the agent does today is affected.<span class='tj'>a checkpoint is a saved record you can come back to. “Outside the working path” means the agent is not paused or slowed while this runs.</span>" },
+      { k:"Approve", t:"approve_skills is a state machine, not a copy",
+        b:"<code>approve_skills(mem, ids, store=\"enhanced\")</code>: pending → <em>active</em>; the prior active version of the same topic → <em>superseded</em>; the matching base skill is marked <em>promoted</em> so the indexer drops it and the agent never holds two recipes for one job. Three guards raise <code>ValueError</code>: unknown id, non-latest version, already not pending. <code>demote_from_skill_box</code> reverses it and restores the prior version.<span class='tj'>a state machine is a thing with a fixed set of states and fixed allowed moves between them. Only <code>active</code> is retrievable.</span>" }
+    ],
+    apply(i, later){
+      stage(i);
+      D.forEach((g, n) => g.style.opacity = n === i ? 1 : 0);
+      if(i === 2){ const ticks = D[2].ticks; if(!reduce){ ticks.forEach((t, n) => { t.style.opacity = 0; later(() => t.style.opacity = 1, 200 + n * 160); }); } else ticks.forEach(t => t.style.opacity = 1); }
+    }
+  });
+})();
+
+/* ── THE GATE: four outcomes ────────────────────────── */
+(function(){
+  const layer = L("gateLayer");
+  const box = (g, x, y, w, h, fill, stroke, sw) => g.appendChild(mk("rect", { x, y, width:w, height:h, rx:8, fill, stroke, "stroke-width":sw || 1.4 }));
+  let g = null, tok = null;
+  function draw(v){
+    if (g) g.remove();
+    g = mk("g", {}); layer.appendChild(g);
+    /* the proposal card, from slide 3 */
+    const planted = v === 3, bad = v === 2;
+    box(g, 400, 22, 200, 70, "#FFFFFF", planted ? "#1A1A18" : "#2E7D6B", 1.6);
+    g.appendChild(mk("rect", { x:400, y:12, width:118, height:18, rx:3, fill: planted ? "#1A1A18" : "#2E7D6B" }));
+    txt(g, 459, 25, "Enhanced_SKILL.md", "#FFFFFF", "8.5", "700", "middle");
+    txt(g, 412, 56, bad ? "+ a wrong step, approved anyway" : planted ? "+ planted instruction from a trace" : "+ use make test", bad ? "#9C3B2E" : planted ? "#1A1A18" : "#2E7D6B", "10.5", "700");
+    txt(g, 412, 76, planted ? "built from a poisoned trace" : "built from yesterday's traces", planted ? "#9C3B2E" : "#3B3833", "9.5");
+    /* two branches */
+    g.appendChild(mk("path", { d:"M470 94 L292 128", stroke:"#B8892E", "stroke-width":1.4, "marker-end":"url(#ard)" }));
+    g.appendChild(mk("path", { d:"M530 94 L708 128", stroke:"#B8892E", "stroke-width":1.4, "marker-end":"url(#ard)" }));
+    const ap = v === 0 || v === 2, dec = v === 1 || v === 3;
+    g.appendChild(mk("rect", { x:200, y:132, width:120, height:28, rx:14, fill:"#2E7D6B", opacity: ap ? 1 : .3 }));
+    txt(g, 260, 151, "APPROVE", "#FFFFFF", "11", "700", "middle");
+    txt(g, 260, 178, "promoted to the skill box", "#3B3833", "9.5", "400", "middle").setAttribute("opacity", ap ? 1 : .4);
+    g.appendChild(mk("rect", { x:680, y:132, width:120, height:28, rx:14, fill:"#B7412F", opacity: dec ? 1 : .3 }));
+    txt(g, 740, 151, "DECLINE", "#FFFFFF", "11", "700", "middle");
+    txt(g, 740, 178, "back to the engine, with a reason", "#3B3833", "9.5", "400", "middle").setAttribute("opacity", dec ? 1 : .4);
+    /* the two destinations */
+    box(g, 40, 200, 180, 56, "#FFFFFF", "#2B5C8A", 1.6);
+    g.appendChild(mk("rect", { x:88, y:191, width:84, height:16, rx:3, fill:"#1F4E8C" }));
+    txt(g, 130, 203, "SKILL BOX", "#FFFFFF", "8.5", "700", "middle");
+    txt(g, 130, 232, v === 2 ? "run_project_test_suite v2 · active" : "run_project_test_suite v2", v === 2 ? "#9C3B2E" : "#1A1A18", "9", "600", "middle");
+    txt(g, 130, 247, v === 0 ? "active · owner · reason · date" : v === 2 ? "retrieved on every matching task" : "unchanged · v1 still active", v === 0 ? "#2E7D6B" : v === 2 ? "#9C3B2E" : "#8C857A", "8.5", "400", "middle");
+    box(g, 780, 200, 180, 56, "#E8F0F8", "#3F6E9A", 1.6);
+    txt(g, 870, 222, "INDUCTION ENGINE", "#2B5C8A", "10.5", "700", "middle");
+    txt(g, 870, 242, v === 1 ? "feedback=reason → revised draft" : v === 3 ? "reason: trace is not trustworthy" : "idle", v === 1 || v === 3 ? "#2B5C8A" : "#8C857A", "8.5", "400", "middle");
+    /* repeated retrieval, variant 3 */
+    if(v === 2){
+      for(let i = 0; i < 7; i++){
+        const x = 240 + i * 26;
+        g.appendChild(mk("rect", { x, y:214, width:18, height:22, rx:2, fill: "#F7E8E4", stroke:"#B7412F" }));
+        txt(g, x+9, 229, "✗", "#B7412F", "10", "700", "middle");
+      }
+      txt(g, 470, 252, "task · task · task · task · … forever", "#9C3B2E", "9", "600", "middle");
+    }
+    /* stop sign, variant 4 */
+    if(v === 3){
+      g.appendChild(mk("circle", { cx:500, cy:140, r:22, fill:"#FFFFFF", stroke:"#B7412F", "stroke-width":3 }));
+      g.appendChild(mk("path", { d:"M488 128 L512 152 M512 128 L488 152", stroke:"#B7412F", "stroke-width":3, "stroke-linecap":"round" }));
+      txt(g, 500, 178, "stopped at the gate — a person read it first", "#9C3B2E", "9.5", "700", "middle");
+    }
+    /* the three risks, from slide 3 */
+    const RISKS = [["BAD SKILLS COMPOUND", "an approved mistake is retrieved", "on every matching task, forever", "#B7412F", "#F7E8E4", 2],
+                   ["MEMORY POISONING", "incorrect or planted traces must not", "write themselves into behaviour", "#1A1A18", "#F3EFE6", 3],
+                   ["ACCOUNTABILITY", "every active skill has", "an owner, a reason, and a date", "#1F4E8C", "#E8F0F8", 0]];
+    RISKS.forEach(([lab, l1, l2, col, fill, hot], i) => {
+      const x = 40 + i * 310, on = hot === v;
+      const rg = mk("g", { opacity: on ? 1 : .32 });
+      box(rg, x, 280, 300, 50, on ? fill : "#FFFFFF", col, on ? 1.8 : 1.2);
+      rg.appendChild(mk("rect", { x, y:270, width:lab.length * 6.2 + 14, height:18, rx:3, fill:col }));
+      txt(rg, x+7, 283, lab, "#FFFFFF", "9", "700");
+      txt(rg, x+150, 306, l1, "#3B3833", "8.5", "400", "middle");
+      txt(rg, x+150, 320, l2, "#3B3833", "8.5", "400", "middle");
+      g.appendChild(rg);
+    });
+    /* token */
+    tok = mk("circle", { cx:500, cy:60, r:7, fill: planted || bad ? "#B7412F" : "#3F7050", opacity:"0",
+      style:"transition:cx .6s ease-in-out,cy .6s ease-in-out,opacity .3s ease" });
+    g.appendChild(tok);
+  }
+  const PATHS = [
+    [[260,146],[130,228]],
+    [[740,146],[870,228],[500,60]],
+    [[260,146],[130,228],[470,228]],
+    [[500,140]]
+  ];
+  stepper({
+    navId:"gateNav", kickId:"gateKick", titleId:"gateTitle", bodyId:"gateBody",
+    prevId:"gatePrev", playId:"gatePlay", nextId:"gateNext", dwell: 5800,
+    steps: [
+      { k:"Approve", t:"Approved with a reason — promoted to the skill box",
+        b:"The reviewer reads v1 beside v2, writes why, and approves. <code>APPROVE</code> → “promoted to the skill box”: pending becomes <em>active</em>, the old version becomes <em>superseded</em>, and the agent retrieves v2 from now on. The reason is not decoration — <code>ACCOUNTABILITY</code>: every active skill has an owner, a reason, and a date." },
+      { k:"Decline", t:"Declined with a reason — the engine revises",
+        b:"<code>DECLINE</code> → “back to the engine, with a reason”. The reason is appended to the next induction prompt — <em>“A human reviewer rejected the previous version with this feedback; revise the skill to address it”</em> — and the engine drafts again. The fixture <code>reflected.json</code> shows the revised output differs. The agent keeps v1 meanwhile.<span class='tj'>this is the Reflexion pattern: the correction is text, applied at the next pass, via <code>induce_skill(..., feedback=reason)</code>.</span>" },
+      { k:"A bad approve", t:"Approve a wrong skill and it compounds",
+        b:"Approval turns a proposal into behaviour. If the reviewer stamps a skill with a wrong step in it, <code>BAD SKILLS COMPOUND</code>: “an approved mistake is retrieved on every matching task, forever”. The only remedy is <code>demote_from_skill_box</code>, which reverses the approval and restores the prior version — after the damage has started." },
+      { k:"A planted trace", t:"Memory poisoning — stopped at the gate, or not at all",
+        b:"Traces are data collected from the world. If one contains a planted instruction, the engine will faithfully propose it — it cannot tell. <code>MEMORY POISONING</code>: “incorrect or planted traces must not write themselves into behaviour”. The human gate is the only thing between that trace and permanent behaviour, and <code>provenance</code> is how the reviewer sees which episodes to distrust." }
+    ],
+    apply(i, later){
+      draw(i);
+      const p = PATHS[i];
+      if (reduce){ tok.style.opacity = 1; const last = p[p.length - 1]; tok.setAttribute("cx", last[0]); tok.setAttribute("cy", last[1]); return; }
+      later(() => { tok.style.opacity = 1; }, 220);
+      p.forEach(([x, y], n) => later(() => { tok.setAttribute("cx", x); tok.setAttribute("cy", y); }, 500 + n * 700));
+    }
+  });
+})();
+
+
+(function(){
+  const bar = document.querySelector(".tabbar");
+  const select = (id, push) => {
+    bar.querySelectorAll("[data-tab]").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === id));
+    document.querySelectorAll(".panel").forEach(p => { p.hidden = p.id !== "panel-" + id; });
+    if (push) history.replaceState(null, "", "#" + id);
+  };
+  bar.addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if (!b) return; select(b.dataset.tab, true); window.scrollTo({ top: bar.offsetTop - 90, behavior: reduce ? "auto" : "smooth" }); });
+  bar.addEventListener("keydown", e => {
+    const btns = [...bar.querySelectorAll("[data-tab]")];
+    const i = btns.findIndex(b => b.getAttribute("aria-selected") === "true");
+    if (e.key === "ArrowRight" || e.key === "ArrowLeft"){
+      const n = (i + (e.key === "ArrowRight" ? 1 : -1) + btns.length) % btns.length;
+      btns[n].focus(); select(btns[n].dataset.tab, true); e.preventDefault();
+    }
+  });
+  const initial = location.hash.replace("#", "");
+  if (initial && document.getElementById("panel-" + initial)) select(initial, false);
+
+  const filt = document.getElementById("tierFilter");
+  filt.addEventListener("click", e => {
+    const b = e.target.closest("[data-tier]"); if (!b) return;
+    const t = b.dataset.tier;
+    filt.querySelectorAll("[data-tier]").forEach(x => x.setAttribute("aria-pressed", x === b));
+    document.querySelectorAll("#panel-practices .concept").forEach(c => { c.classList.toggle("hide", !(t === "all" || (c.dataset.ev || "").split(" ").includes(t))); });
+  });
+})();
+
+})();
+</script>
+</body>
+</html>

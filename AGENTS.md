@@ -1,0 +1,296 @@
+# publish-learning-guide
+
+> Portable copy of the `publish-learning-guide` skill. The canonical file is `SKILL.md`;
+> every other file in this bundle is the same body with the wrapper each tool expects.
+> Regenerate them all from `SKILL.md` rather than editing them one at a time.
+
+**When to use:** The full loop for turning new material into a published guide on agent-tech-desk: research, weight, write, animate, cheat-sheet, register, gate, deploy. Use whenever Soma hands over a corpus, book, paper set or research dump for the Desk.
+
+# Publish a learning guide to the Agent Tech Desk
+
+Soma hands over material. This runs the whole way to a deployed page, without
+stopping to ask. **`npm run deploy` is authorised** — it is a step in the loop,
+not a decision point. The only thing that stops a deploy is a red gate.
+
+Run the loop once per item. When several arrive together, run it once per item
+rather than batching them into one guide — one item, one slug, one archive entry.
+
+---
+
+## The loop
+
+```
+0 intake → 1 research → 2 weight → 3 write → 4 animate → 5 cheat sheet
+        → 6 register → 7 gate → 8 ship → 9 report → back to 0
+```
+
+### 0 · Intake
+
+Establish four things before writing anything. Infer them from the material;
+only ask if genuinely undecidable.
+
+- **Slug** — lowercase, hyphens. Becomes `/guides/<slug>`. Short and durable.
+- **Title** — how Soma will look for it in six months, not a description.
+- **Source** — where the material came from, one line. Goes in the archive.
+- **Phase** — Foundations, Building, or Scaling. Match the shelf's own logic.
+
+### 1 · Research before format
+
+Exhaust the material first. Read every transcript, chapter or paper. Search the
+web for anything the material asserts about the present-day world — versions,
+prices, licences, whether a project still exists. **Do not open an output-format
+skill or write a line of the page until the facts are in hand.**
+
+Where the material is a directory of files, extract the data into JSON first and
+generate the page from that JSON. It removes transcription error and makes the
+cheat sheet and the animations derive from the same source as the prose.
+
+### 2 · Weight the claims
+
+Where the material has many sources, every substantive claim carries the number
+of **distinct** sources that make it — never how often one source repeats itself.
+Tier them (≥8 / 5–7 / 3–4 / 1–2) and say plainly when a claim rests on one
+source. Cite the identifiers inline, linked.
+
+Separate **measured** from **marketed** in its own table: the claim, what was
+actually measured, and what survives. Never restate a vendor ratio as a finding.
+If a headline number's baseline is something nobody does, say so.
+
+### 3 · Write the guide — as sub-tabs, never one long scroll
+
+`content/book-guides/<slug>.html`. Body only — `build.mjs` wraps it in the site
+bar and adds the `/bookshelf`, `/ide`, `/tutor` links. No navigation markup.
+
+The file needs `</head>` and `<body>` for the wrapper's replacements to land.
+Define the site tokens in its own `<style>` (copy the `:root` block from any
+existing guide) so it matches the Desk rather than inventing a palette.
+
+**The page is a set of sub-tabs.** A guide of this size read as one scroll is
+unusable, and Soma has said so directly. Build a sticky `.tabbar` of
+`role="tab"` buttons over `role="tabpanel"` sections toggled with the `hidden`
+attribute. Left/right arrows move between tabs; the selected tab writes a hash
+so a tab is deep-linkable; the first tab is open at rest.
+
+The tab set that works, in this order:
+
+1. **Walkthrough** — the animated story, plus one paragraph restating it in prose.
+2. **Decide** — when this applies and when it does not.
+3. **Anatomy** — the mechanism animation, then the vocabulary table.
+4. **Practices** — the weighted list, with a tier filter.
+5. **Tools** — or whatever the material's landscape is.
+6. **Numbers** — measured versus marketed.
+7. A second animated section where the material has another shape worth showing.
+8. **Pitfalls** — anti-patterns and the one-turn action card.
+9. **Sources** — every one, linked, with whatever failed to fetch marked.
+
+Within a tab: an `<h2>`, then content. No table of contents — the tabs are it.
+
+**Two registers, always.** Plain English leads; technical naming arrives after
+the idea has landed, in a marked aside (`<span class="incode">In code: …</span>`).
+Soma has said explicitly that unexplained terms like `grep` or `middleware` make
+a guide useless to her. A term's first appearance is either in plain English or
+immediately glossed — no exceptions.
+
+Every glossary term gets both: the technical definition, then the same idea in
+the analogy, on a `<span class="plainline">`.
+
+### 4 · Build the animations — on the page, not in a chat artifact
+
+A guide without its explainer animations is not finished, and a walkthrough that
+exists only in a chat artifact has not shipped. **Port it into the guide file.**
+This has been got wrong once already: the manual said animate, the page went out
+as static text, and Soma had to point at it.
+
+**Three figures is the shape that works:**
+
+- **The argument** — an eight-step story that proves the guide's thesis. This is
+  the Walkthrough tab and the most important thing on the page.
+- **The mechanism** — how the thing is built or how it runs, five or so stages.
+- **The alternative shape** — the other pattern the material contrasts, four or
+  so variants with work flowing through each.
+
+Give all three the **same control idiom**, so learning one teaches the others.
+Write the stepper once and reuse it.
+
+**Hard constraints on the Desk.** The page is static HTML served by a Worker.
+No artifact runtime, no `claude.use`, no database. No external scripts — the
+animation is hand-written CSS transitions plus a small `requestAnimationFrame`
+counter. This is a feature: it cannot break at load.
+
+**The specification, as built and approved:**
+
+- **A step-through story, not a loop.** Each step is a frame that makes a single
+  point. It teaches; it does not decorate.
+- **Every step's point written out under the canvas** — a kicker (`Step 3 of 8`),
+  a heading, and one short paragraph. Never leave the viewer to infer it.
+- **Controls:** numbered step dots (clickable, `aria-current`), Back, Play/Pause,
+  Next. Play dwells 5–7s per step — long enough to read.
+- **A Plain English ⟷ Technical toggle** on the main story that swaps the
+  narration *and* the labels on the canvas. Plain English is the default.
+  Register every swappable text node in one array and re-apply on toggle;
+  persist the choice in `localStorage`, wrapped in try/catch.
+- **Pure white canvas** (`#FFFFFF`) with its own pinned dark ink, in both light
+  and dark mode. Soma asked for this twice. The figure is a printed plate; it
+  does not follow the viewer's theme.
+- **A hand-drawn character**, fully inside the frame with margin, that acts out
+  the argument. Two characters where the story contrasts two approaches — the
+  scruffy one that searches, the calm one that consults a map. Draw them in SVG
+  paths with `stroke-linecap: round` and slight irregularity.
+- **Real measured numbers** in a panel, counting up on the step where they are
+  earned. Label what has not been counted yet rather than showing an empty box.
+- **Resting state is the finished frame.** Everything readable without
+  scrolling or interaction; honour `prefers-reduced-motion` by snapping.
+- **A caption** naming what is illustration and what is measurement.
+
+Before writing SVG, decide what each picture must *prove*. If a figure only
+restates its heading, cut it and write a diagram instead.
+
+**Retrofitting.** Existing guides without animations are a separate pass — one
+guide per commit, same gates, same ship sequence. Do not bundle a retrofit into
+a new guide's commit.
+
+### 5 · Cheat sheet — decision-first
+
+`content/book-guides/<slug>-cheatsheet.md`. The `-cheatsheet.md` suffix is
+load-bearing; it is how the build finds it.
+
+**Derivation rule: only what she would act on.** The decision table, the
+commands, the thresholds, the numbers, the anti-patterns. No explanation — the
+guide holds that. If it does not fit on one screen, cut prose, never rows.
+
+Open with `# Title — cheat sheet`, an italic provenance line, **Core idea** and
+**Read when**. Then tables. Close with a `- [ ]` checklist.
+
+Only the Markdown subset in `md2html()` (`scripts/build.mjs`) renders: headings,
+tables, lists, task lists, fenced code, inline emphasis. Nothing else.
+
+### 6 · Register it — two places, both required
+
+**The shelf.** One `<div class="book">` inside the `<div class="shelf">` of the
+chosen phase in `content/book-guides/index.html`. The parser
+(`parseBookshelf()`) is regex and **whitespace-intolerant** — copy an existing
+entry and edit in place; never reformat the file.
+
+```html
+<div class="book"><div class="n">N</div><div><span class="role">ROLE</span><h3>TITLE</h3><p class="small">SOURCE · N pages · N cards</p><p>BLURB</p><p class="small"><strong>Read when:</strong> WHEN</p><div class="lv"><i style="width:48px;background:var(--accent-3)"></i>8 foundation<i style="width:90px;background:var(--accent-2)"></i>15 intermediate<i style="width:60px;background:var(--accent)"></i>10 advanced</div><div class="links"><a class="go" href="SLUG.html">Open the guide</a> <a href="SLUG-cheatsheet.md">Cheat sheet (Markdown)</a></div></div></div>
+```
+
+Constraints: `<div class="n">` digits only · the blurb must match `</p><p>…</p>`
+directly after the meta line · level bars must match
+`<i style="width:Npx;background:var(--accent…)"></i>N word` · the `<a class="go">`
+href must end `.html` · bar width = count × 6.
+
+After editing, prove the parser still sees it before building.
+
+**The archive sidecar.** Append one object to `content/guides.json`:
+
+```json
+{ "slug": "…", "title": "…", "role": "…", "source": "…", "dateAdded": "YYYY-MM-DD", "tags": ["phase"] }
+```
+
+`dateAdded` is the day it first ships and never changes on a later edit. Never
+reorder the file by hand — `/archive` sorts by date.
+
+**A new top-level page** (not a guide) needs two more registrations: `NAV` in
+`scripts/build.mjs` and `PAGES` in `worker/index.js`. Guide pages need neither —
+the worker already serves any extensionless `/guides/<slug>`.
+
+### 7 · Gate — then actually look at the page
+
+```bash
+npm run build
+npm run check      # build · order · archive · serve · secrets · ide · constructs
+```
+
+All seven must pass. The counts derive from `content/book-guides/index.html`, so
+the shelf can grow — if you ever see a hard-coded book count reappear, fix it to
+derive, counting `<div class="book">` rather than `<h3>`.
+
+**The gates cannot see whether the page is any good.** A guide that is a wall of
+text passes every one of them. So before shipping, open the built page in a
+headless browser and confirm with screenshots that: the tabs switch, the
+walkthrough advances and its narration changes with it, the language toggle
+swaps both the narration and the canvas labels, and the console is clean. If you
+cannot show a screenshot of an animation running, it is not done.
+
+A red gate stops the loop. Fix it; never deploy around it.
+
+### 8 · Ship
+
+```bash
+cd ~/Desktop/Claude/agent-tech-desk
+lsof -ti:8787                # a stale wrangler dev serves an old bundle and lies
+npx wrangler whoami          # must be the pinned pixelartinc account
+npm run build && npm run check
+npm run deploy               # authorised — note the Version ID
+curl -s https://agent-tech-desk.pixelartinc.workers.dev/api/tutor/health
+curl -s -o /dev/null -w "%{http_code}\n" https://agent-tech-desk.pixelartinc.workers.dev/guides/<slug>
+curl -s -o /dev/null -w "%{http_code}\n" https://agent-tech-desk.pixelartinc.workers.dev/archive
+git add -A && git commit && git push origin main
+```
+
+Then add an `EVIDENCE` line to `GATES.md` in the style of the existing ones,
+naming the Version ID **actually serving traffic**. If you redeploy after
+writing it, update it.
+
+### 9 · Report, then loop
+
+Guide URL, cheat-sheet URL, archive position, Version ID, gate output, and what
+each animation argues. Then return to step 0 for the next item.
+
+---
+
+## Which shell can do what — verified, and it matters
+
+Two different machines answer to "her computer". Using the wrong one wastes a
+turn on an error that looks like a permissions problem and is not.
+
+| | `mcp__remote-devices__device_bash` | Desktop Commander `start_process` |
+|---|---|---|
+| Runs in | an isolated sandbox VM | **her actual Mac** (`/Users/somapym`) |
+| Repo | mounted at `$HOME/mnt/agent-tech-desk` | `~/Desktop/Claude/agent-tech-desk` |
+| SSH keys | **absent**, no agent forwarded | present |
+| `wrangler` | **will not load** (miniflare/workerd fails) | authenticated |
+| Good for | reading, editing, `npm run build`, six of seven gates | **`npm run check` in full, `npm run deploy`, `git push`** |
+
+So: edit and build through either, but **push and deploy through Desktop
+Commander**. The `serve` gate also needs the real machine. Do git-heavy work
+there too — the sandbox cannot unlink inside `.git`, and the stale `.lock` files
+it leaves behind will break the next checkout.
+
+Deleting in the mounted folder needs `device_request_delete_permission` — and it
+does need it, because `npm run build` starts by clearing `public/`.
+
+---
+
+## Non-negotiables
+
+1. **A Worker with a static-assets binding, not Cloudflare Pages.** Never run
+   `wrangler pages deploy`; never create a Pages project. `pages project list`
+   returning zero is correct.
+2. **`public/` is build output** — git-ignored, never committed. `content/` is
+   the only source. A clean checkout has no `public/` until you build.
+3. **Never edit code in the Cloudflare dashboard.** It patches bundled output;
+   the next deploy silently reverts it. This already cost a day.
+4. **Never reference** `private-do-not-upload`, `books-md`, or
+   `Formulaite-Agent-Lab-with-books` — the build gate fails on them. The books
+   are copyrighted and not in the repo.
+5. **Never commit, echo or log `.dev.vars`.** The `MODEL_API_KEY` secret already
+   exists on the Worker and persists across deploys. Do not re-add it.
+6. **Never weaken SSH or TLS config** to get a push through. If credentials are
+   not reachable, use the other shell or hand Soma the one command.
+7. **"Formulaite Agent Lab" and `cosmetic-ai-assistant` are different projects.**
+   Do not conflate them with the Desk.
+8. **Never ship a guide that is one long scroll, and never ship one whose
+   animations live only in a chat artifact.** Both have happened. Green gates are
+   not evidence the page works — a screenshot of it working is.
+
+---
+
+## Extension sections
+
+Soma adds material to this manual over time. Each addition goes in its own
+section below this line, titled by what it governs, and does not edit the loop
+above unless it explicitly supersedes a step.
+
+<!-- ADDITIONS BELOW -->
