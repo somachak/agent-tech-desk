@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+</head>
+<body>
+<title>The Graph Engineering Atlas</title>
+<style>
+:root{color-scheme:light;
+ --surface:#faf9f5;--surface-2:#f2f0e9;--surface-3:#e8e6dc;--surface-ink:#141413;--line:#d9d7cc;--line-soft:#e8e6dc;
+ --ink:#141413;--ink-2:#5c5b57;--ink-3:#6b6a65;--on-ink:#faf9f5;
+ --accent:#d97757;--accent-2:#6a9bcc;--accent-3:#788c5d;
+ --font-head:"Poppins",Arial,sans-serif;--font-body:"Lora",Georgia,serif;--font-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--surface);color:var(--ink-2);font-family:var(--font-body);font-size:17px;line-height:1.7}
+main{max-width:980px;margin:0 auto;padding:36px 22px 90px}
+h1,h2,h3,h4{font-family:var(--font-head);color:var(--ink);line-height:1.2;margin:0 0 10px;text-wrap:balance}
+h1{font-size:38px;letter-spacing:-.02em;font-weight:600}
+h2{font-size:25px;font-weight:600;margin-top:44px;border-top:1px solid var(--line);padding-top:24px}
+h3{font-size:18px;font-weight:600}
+p{margin:0 0 12px;max-width:70ch}
+strong{color:var(--ink)}
+a{color:var(--ink);text-decoration-color:var(--accent);text-underline-offset:3px}
+code,.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+code{font-size:.86em;background:var(--surface-3);padding:1px 5px;border-radius:5px;color:var(--ink)}
+.small{font-size:14px;color:var(--ink-3)}
+.eyebrow{font-family:var(--font-mono);color:var(--ink-3);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase}
+.who{font-family:var(--font-mono);font-size:13.5px;color:var(--ink-3);margin-bottom:18px}
+.toc{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:16px 20px;margin:24px 0 8px}
+.toc strong{font-family:var(--font-head);display:block;margin-bottom:6px}
+.toc ol{margin:0;padding-left:20px;columns:2;column-gap:28px}
+.toc li{margin:3px 0;break-inside:avoid}
+.callout{background:var(--surface-2);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:12px;padding:14px 18px;margin:16px 0}
+.callout.green{border-left-color:var(--accent-3)}
+.callout.blue{border-left-color:var(--accent-2)}
+.note{background:var(--surface-3);border-radius:12px;padding:13px 18px;margin:16px 0;font-size:15.5px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:760px){.two{grid-template-columns:1fr}.toc ol{columns:1}}
+.two .callout{margin:0}
+ol.story{padding-left:22px;max-width:74ch}
+ol.story li{margin:0 0 16px}
+.incode{display:block;margin-top:7px;padding-top:6px;border-top:1px dashed var(--line);font-size:14.5px;color:var(--ink-3)}
+.tierhead{margin-top:32px;font-size:17px;color:var(--ink)}
+.concept{border:1px solid var(--line);border-radius:14px;margin:12px 0;overflow:hidden;background:var(--surface-2)}
+.chead{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;padding:12px 18px;border-bottom:1px solid var(--line)}
+.chead .idx{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-3)}
+.chead .t{font-family:var(--font-head);font-weight:600;color:var(--ink);font-size:16.5px;flex:1;min-width:220px}
+.chip{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.04em;padding:2px 8px;border-radius:999px;background:var(--surface-3);color:var(--ink-3);white-space:nowrap}
+.chip.foundation{background:#e6ece0;color:#4c6440}
+.chip.intermediate{background:#e2eaf3;color:#3f5f80}
+.chip.advanced{background:#f5e3da;color:#9a4d2c}
+.cbody{padding:14px 18px;background:var(--surface)}
+.cbody p{margin:0 0 10px}
+.cbody p:last-child{margin:0}
+.got{font-size:15.5px}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 14px;margin:0;font-size:15.5px}
+.kv dt{font-family:var(--font-mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);padding-top:3px}
+.kv dd{margin:0}
+@media(max-width:640px){.kv{grid-template-columns:1fr}}
+.tablewrap{overflow-x:auto;margin:14px 0}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th{font-family:var(--font-head);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);text-align:left;padding:7px 9px;border-bottom:1px solid var(--line)}
+td{padding:9px 9px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+.plainline{display:block;margin-top:6px;padding-left:10px;border-left:2px solid var(--line);font-size:14px;color:var(--ink-3)}
+ol.anti{padding-left:22px;max-width:74ch}
+ol.anti li{margin:6px 0}
+ul{padding-left:22px;max-width:74ch}
+ul li{margin:5px 0}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+<main>
+<span class="eyebrow">Guide 15 · research synthesis</span>
+<h1>The Graph Engineering Atlas</h1>
+<p class="who">22 YouTube transcripts, April–August 2026 · 33 weighted practices · 6 tools · 12 anti-patterns</p>
+<p><strong>Core idea:</strong> a coding agent with no index answers architecture questions by opening files until it guesses. A code knowledge graph records what calls what, once, so the same question becomes a path lookup. The reproducible saving is <em>tool calls</em>, not tokens — and almost every headline ratio in this field is measured against a baseline nobody actually uses.</p>
+
+<div class="callout blue"><strong>How this guide is weighted.</strong> Every practice carries the number of <em>distinct</em> sources that argue for it — not how loudly any one of them says it. Weight 17 means seventeen creators, mostly reviewing different tools, landed on the same instruction. Weight 1 means one person said it once; several of those are the sharpest items here.</div>
+
+<nav class="toc"><strong>On this page</strong><ol><li><a href="#plain">Start here, in plain English</a></li><li><a href="#two-senses">The two things “graph engineering” means</a></li><li><a href="#gate">Should this repo have a graph at all?</a></li><li><a href="#anatomy">Anatomy of a build, and the eight words</a></li><li><a href="#practices">The 33 weighted practices</a></li><li><a href="#tools">The tool landscape</a></li><li><a href="#reality">Which headline numbers survive</a></li><li><a href="#anti">Twelve anti-patterns</a></li><li><a href="#turn">The agent-turn card</a></li><li><a href="#sources">All 23 sources</a></li></ol></nav>
+
+<h2 id="plain">Start here, in plain English</h2>
+<p>No jargon in this section. It is a house with pipes in it, and it explains the whole idea before any technical term appears.</p>
+<ol class="story"><li><strong>One question about a house you have never seen</strong><br>Turn on the bathroom tap — which boiler is heating that water? It is a question about <strong>what is joined to what</strong>, not about what anything is called. Everything below turns on that distinction.</li><li><strong>Way one — reading every label in the house</strong><br>You walk round reading every label and sticker. Five things say HOT WATER on them. The boiler's own label just says BOILER, so it never comes up — even though it is the answer. Labels tell you what things are <em>called</em>, not what they are <em>joined to</em>. <span class="incode">In code this is <code>grep</code>: search every file for a word.</span></li><li><strong>Way two — reading only the signs on the doors</strong><br>So you ignore labels and read door signs instead. One door says <em>bathroom</em>. But the pipe junction that actually joins that tap to the boiler is in the cupboard under the stairs — a door nobody would ever label bathroom. Signs tell you where things <em>live</em>, not what they are <em>joined to</em>. <span class="incode">In code this is <code>glob</code>: pick files by name, like <code>**/*auth*</code>.</span></li><li><strong>So you start opening cupboards</strong><br>Labels failed and signs failed, so there is nothing left but opening cupboards one at a time and hoping. Forty goes, seventeen cupboards actually opened, and the junction was still missed. <span class="incode">This is what a coding agent does to your repo with no index — and it cost $1.41 for that single question on a real codebase.</span></li><li><strong>A plumber draws the house — once</strong><br>Someone walks the house properly and writes down two things: a <strong>dot</strong> for every fitting, and a <strong>line</strong> for every pipe joining two of them. Careful looking rather than guessing, and it only happens once. <span class="incode">The dots are functions and files; the lines are one function calling another. The thing that does the walking is a parser, and it runs offline and free.</span></li><li><strong>The line is the bit labels could never show</strong><br>Bathroom tap → mixer valve → riser pipe → the boiler. Nobody wrote the word <em>bathroom</em> on the boiler and no door sign gave it away. The drawing knows anyway, because it recorded what is joined to what instead of what everything is called.</li><li><strong>Now you just follow the line</strong><br>Put a finger on the tap and follow the pipe. Two moves, no cupboards opened, and you are standing at the boiler. <span class="incode">On the real codebase: 2 tool calls instead of 40, zero files opened, 36 cents instead of $1.41.</span></li><li><strong>Why it is cheaper — and what did not change</strong><br>Nothing magic happened. The looking was done once and written down, so it never has to be repeated. Notice which number collapsed: <strong>how many times it had to go and look</strong>. Money saved is argued over across all 22 sources; the collapse in rummaging is the one finding that holds everywhere.</li></ol>
+
+<h2 id="two-senses">The two things “graph engineering” means</h2>
+<p>The most-watched sources and the most useful ones are not discussing the same thing. Mixing them up is the commonest confusion in the material.</p>
+<div class="two">
+  <div class="callout"><strong>A code / knowledge graph</strong> — 19 of 22 sources. A persistent index of the repo: functions, files, imports, call edges, optionally docs and PDFs. Answers <em>what connects to what</em>. Pay once at index, cheap per query. Blind to runtime, reflection and <code>eval</code>.</div>
+  <div class="callout green"><strong>An agent workflow DAG</strong> — 3 of 22, and they are the viral ones. A shape for the work: planner → parallel workers → skeptic → merge → human gate. Answers <em>what can run at the same time, and who checks it</em>. More tokens, less wall clock. It will not index your repo.</div>
+</div>
+<div class="note">A viral title promising to 10× your agent is usually the second sense — a way of writing prompts. It will not stop your agent grepping through forty files. Each practice below is tagged with which sense it belongs to.</div>
+
+<h2 id="gate">Should this repo have a graph at all?</h2>
+<p>Three sources say independently: under roughly 20 files, indexing is pure overhead — just read the files. Build one when several of these hold.</p>
+<ul>
+<li>The repo is too big to hold reliably in one context window.</li>
+<li>You ask cross-file or cross-module relationship questions — auth to DB, route to controller, what calls X.</li>
+<li>Your agent keeps entering grep/glob exploration loops: many tool calls, partial answers.</li>
+<li>You will ask architectural questions repeatedly, across sessions. This is what amortises the build.</li>
+<li>Non-code artefacts — design docs, PDFs, recordings — need to link to code symbols.</li>
+<li>A risky refactor is coming and you want blast radius first.</li>
+</ul>
+<div class="callout"><strong>Do not</strong> build one for a repo under about 20 files, for a single-file keyword lookup, for runtime, race-condition or performance debugging where the graph is structurally blind, or when the agent already has the exact files open.</div>
+
+<h2 id="anatomy">Anatomy of a build, and the eight words</h2>
+<p>Every tool here shares one skeleton: <strong>source files → parse → nodes → edges → communities and hubs</strong>. Real figures from one build: 357 code files, 53 docs and 7 images became 4,041 nodes, 20,900 edges and 185 communities in about twelve minutes.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Term</th><th>What it means, and the same idea in plain English</th><th>Concrete anchor</th></tr></thead>
+<tbody><tr><td><strong>tree-sitter</strong></td><td>An incremental parser that builds a syntax tree per file. Local, deterministic, offline, no API key — this is why the code pass of a graph build is free.<span class="plainline">The surveyor who walks the house and writes down exactly what is there. No opinions, no guessing, and free.</span></td><td class="mono small">36 grammars / 79 extensions (Graphify); 158 languages (codebase-memory-mcp); 20 of 34 languages moved to compiled Rust parsers in CodeGraph v1.5</td></tr><tr><td><strong>Leiden / Louvain</strong></td><td>Community-detection algorithms. They cluster the graph by connection density, so you get the modules your code actually has, not the ones your folder names claim.<span class="plainline">Grouping rooms by which ones are actually plumbed together — not by which floor the estate agent put them on.</span></td><td class="mono small">185 communities from 4,041 nodes; 67 communities from 591 doc concepts</td></tr><tr><td><strong>god node / hub</strong></td><td>The highest-degree entities. Read these first — they are the architectural spine, and they are where a refactor hurts.<span class="plainline">The main junction in the airing cupboard. Everything runs through it, so it is the first thing to look at and the worst thing to move.</span></td><td class="mono small"><code>extract</code> with 47 connections; <code>build_graph</code> with 32</td></tr><tr><td><strong>confidence tag</strong></td><td>Per-edge provenance: extracted (the parser saw it), inferred (probably), ambiguous (a model guessed). Treat anything below extracted as a lead, not a fact.<span class="plainline">The difference between “I traced this pipe with my hand” and “I think it probably goes that way”. Worth knowing which is which before you cut anything.</span></td><td class="mono small">extracted = 1.0; inferred = 0.55–0.95; GitNexus lets Cypher filter on &gt; 0.8</td></tr><tr><td><strong>content-addressed cache</strong></td><td>Files are hashed; only changed hashes get re-parsed. This is the mechanism behind incremental update in every tool here.<span class="plainline">You only re-survey the rooms that got redecorated.</span></td><td class="mono small">SHA-256 (Graphify / GitNexus / CodeGraph); XXH3 (codebase-memory-mcp)</td></tr><tr><td><strong>dynamic-dispatch synthesis</strong></td><td>Resolving edges a parser cannot see statically: callbacks, event-emitter string keys, React state updates driving a child re-render, C function pointers. Only synthesises an edge when the whole flow closes end to end.<span class="plainline">Some pipes only carry water when a valve opens. A good surveyor notes those too — but only when they can follow the whole run.</span></td><td class="mono small">CodeGraph only, of the tools compared head to head</td></tr><tr><td><strong>blast radius</strong></td><td>The transitive set of things reachable from a change. The query you run before a refactor, not after the tests go red.<span class="plainline">Before you cut a pipe: what stops working upstairs?</span></td><td class="mono small">A 5-layer dependency chain resolved in sub-milliseconds (codebase-memory-mcp)</td></tr><tr><td><strong>MCP</strong></td><td>The protocol that lets the agent call the index as a tool. Without it the graph is a file the agent has to be told to read — which it will forget to do.<span class="plainline">The doorbell. Without it the assistant has the drawing in a drawer and never thinks to open it.</span></td><td class="mono small">1 tool (CodeGraph explorer) vs 17 tools (GitNexus) — fewer is easier for an agent to actually pick</td></tr></tbody>
+</table></div>
+
+<h2 id="practices">The 33 weighted practices</h2>
+
+<h3 class="tierhead">Tier S — eight or more sources agree</h3>
+<p class="small">Do these first. Nothing else on this page is worth doing until these are in place.</p>
+
+<div class="concept">
+  <div class="chead"><span class="idx">01</span><span class="t">Build the graph once; query it across sessions instead of re-learning the repo.</span>
+    <span class="chip foundation">weight 17</span>
+    <span class="chip ch">code graph</span>
+  </div>
+  <div class="cbody">
+    <p>Left alone, an agent rediscovers your architecture from scratch every single session — the equivalent of rehiring a junior every morning. A persistent index turns that recurring cost into a one-off.</p>
+    <p class="got"><strong>In practice:</strong> Build from the project root, then load the graph summary at session start rather than the file tree. Seventeen of twenty-two transcripts open with this argument; it is the closest thing to consensus in the whole corpus.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=Owv503rTqYY">Owv503rTqYY</a> · <a href="https://www.youtube.com/watch?v=WNru_PFycT8">WNru_PFycT8</a> · <a href="https://www.youtube.com/watch?v=EKbQ5sajVxA">EKbQ5sajVxA</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a> · <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=dNLM94o-HTw">dNLM94o-HTw</a> · <a href="https://www.youtube.com/watch?v=rgYnZqi2GmA">rgYnZqi2GmA</a> · <a href="https://www.youtube.com/watch?v=mWLDn49_8HA">mWLDn49_8HA</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=LVnKcfHHaFM">LVnKcfHHaFM</a> · <a href="https://www.youtube.com/watch?v=wBAlh70Quk8">wBAlh70Quk8</a> · <a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a> · <a href="https://www.youtube.com/watch?v=Ynv_WYO_slw">Ynv_WYO_slw</a> · <a href="https://www.youtube.com/watch?v=nvJ1M_GRj8Q">nvJ1M_GRj8Q</a></p>
+  </div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="idx">02</span><span class="t">Treat token and tool-call cost as a first-class reason to reach for a map.</span>
+    <span class="chip foundation">weight 16</span>
+    <span class="chip ch">code graph</span>
+  </div>
+  <div class="cbody">
+    <p>The graph is not an intelligence upgrade. It is a cost structure — it replaces stuffing raw files into context with a targeted lookup.</p>
+    <p class="got"><strong>In practice:</strong> The reproducible win is tool calls, not tokens: 40 → 2, 52 file reads → 3, zero file reads across seven repos. Token deltas are contested and occasionally negative. Treat the one-off build (200k–400k tokens with full image and document extraction) as capital expenditure, not running cost.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=mBePcvqLX88">mBePcvqLX88</a> · <a href="https://www.youtube.com/watch?v=rgYnZqi2GmA">rgYnZqi2GmA</a> · <a href="https://www.youtube.com/watch?v=Ynv_WYO_slw">Ynv_WYO_slw</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=EKbQ5sajVxA">EKbQ5sajVxA</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=mWLDn49_8HA">mWLDn49_8HA</a> · <a href="https://www.youtube.com/watch?v=dNLM94o-HTw">dNLM94o-HTw</a> · <a href="https://www.youtube.com/watch?v=LVnKcfHHaFM">LVnKcfHHaFM</a> · <a href="https://www.youtube.com/watch?v=Owv503rTqYY">Owv503rTqYY</a> · <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a> · <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a> · <a href="https://www.youtube.com/watch?v=WNru_PFycT8">WNru_PFycT8</a></p>
+  </div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="idx">03</span><span class="t">Wire the graph into the agent — skill, MCP or hook — so structural lookup happens by default.</span>
+    <span class="chip foundation">weight 14</span>
+    <span class="chip ch">code graph</span>
+  </div>
+  <div class="cbody">
+    <p>A graph the agent has to be reminded about is a graph the agent will not use. Every transcript that reports a disappointing result has this failure somewhere in it.</p>
+    <p class="got"><strong>In practice:</strong> <code>graphify claude install</code> adds an always-on session hook that reads the report before touching files. CodeGraph's installer writes your MCP config directly. codebase-memory-mcp goes furthest: it auto-patches Claude Code, Zed and Cursor with a pre-tool-use hook that intercepts raw grep and injects graph structure into the result.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=Ynv_WYO_slw">Ynv_WYO_slw</a> · <a href="https://www.youtube.com/watch?v=dNLM94o-HTw">dNLM94o-HTw</a> · <a href="https://www.youtube.com/watch?v=mWLDn49_8HA">mWLDn49_8HA</a> · <a href="https://www.youtube.com/watch?v=Owv503rTqYY">Owv503rTqYY</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a> · <a href="https://www.youtube.com/watch?v=rgYnZqi2GmA">rgYnZqi2GmA</a> · <a href="https://www.youtube.com/watch?v=EKbQ5sajVxA">EKbQ5sajVxA</a> · <a href="https://www.youtube.com/watch?v=wBAlh70Quk8">wBAlh70Quk8</a> · <a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a> · <a href="https://www.youtube.com/watch?v=LVnKcfHHaFM">LVnKcfHHaFM</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a></p>
+  </div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="idx">04</span><span class="t">Query relationships — calls, imports, paths — instead of grepping for architecture.</span>
+    <span class="chip foundation">weight 10</span>
+    <span class="chip ch">code graph</span>
+  </div>
+  <div class="cbody">
+    <p>Grep answers “where does this string appear”. Architecture questions are “what reaches what”, and no amount of string matching composes into that answer.</p>
+    <p class="got"><strong>In practice:</strong> The corpus's standing example: “how does the auth middleware connect to the DB pool” in a 200-file project costs an unaided agent 15+ tool calls and ~4,000 tokens across 40 matches and 15 files — and it still misses the wiring callback. Reserve grep for a known string in a known file.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=LVnKcfHHaFM">LVnKcfHHaFM</a> · <a href="https://www.youtube.com/watch?v=Owv503rTqYY">Owv503rTqYY</a> · <a href="https://www.youtube.com/watch?v=EKbQ5sajVxA">EKbQ5sajVxA</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a> · <a href="https://www.youtube.com/watch?v=rgYnZqi2GmA">rgYnZqi2GmA</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a></p>
+  </div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="idx">05</span><span class="t">Keep it fresh — manual update, git hooks, or an OS file watcher.</span>
+    <span class="chip foundation">weight 10</span>
+    <span class="chip ch">code graph</span>
+  </div>
+  <div class="cbody">
+    <p>A stale graph is worse than no graph: it answers confidently about code that no longer exists.</p>
+    <p class="got"><strong>In practice:</strong> Three models, in ascending order of how little you have to think about it. <b>Manual</b>: <code>graphify update</code>, <code>npx gitnexus analyze</code> — put the command in CLAUDE.md so the agent runs it. <b>Git hook</b>: <code>graphify hook install</code> rebuilds on commit and branch switch. <b>Watcher</b>: CodeGraph's native FSEvents / inotify / ReadDirectoryChangesW with a 2s debounce — ~0.3s to resync 4,000 files, ~0.4s on 27,000. When a tool names a stale file, read that file raw and trust the rest of the graph.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=LVnKcfHHaFM">LVnKcfHHaFM</a> · <a href="https://www.youtube.com/watch?v=rgYnZqi2GmA">rgYnZqi2GmA</a> · <a href="https://www.youtube.com/watch?v=WNru_PFycT8">WNru_PFycT8</a> · <a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a> · <a href="https://www.youtube.com/watch?v=wBAlh70Quk8">wBAlh70Quk8</a> · <a href="https://www.youtube.com/watch?v=Owv503rTqYY">Owv503rTqYY</a> · <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a></p>
+  </div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="idx">06</span><span class="t">Index docs, PDFs, images and video into the same graph when non-code context matters.</span>
+    <span class="chip foundation">weight 10</span>
+    <span class="chip ch">code graph</span>
+  </div>
+  <div class="cbody">
+    <p>Design intent usually lives outside the code. If the spec and the implementation are in different systems, no graph over the code alone can connect them.</p>
+    <p class="got"><strong>In practice:</strong> Optional install extras cover PDF, office formats, video transcription and local inference. This is also where the token cost lives — the code pass is free via tree-sitter, the non-code pass is an LLM pass. Scale reference: 171 documentation pages became 591 concept nodes across 67 communities.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=WNru_PFycT8">WNru_PFycT8</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=dNLM94o-HTw">dNLM94o-HTw</a> · <a href="https://www.youtube.com/watch?v=mWLDn49_8HA">mWLDn49_8HA</a> · <a href="https://www.youtube.com/watch?v=EKbQ5sajVxA">EKbQ5sajVxA</a> · <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a></p>
+  </div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="idx">07</span><span class="t">Index once, query many — amortise the extraction.</span>
+    <span class="chip foundation">weight 9</span>
+    <span class="chip ch">code graph</span>
+  </div>
+  <div class="cbody">
+    <p>The economics only work if you ask more than a handful of questions against the same index. One-off questions never reach break-even.</p>
+    <p class="got"><strong>In practice:</strong> First build: 1–3 minutes on 150 files; ~12 minutes on 357 code files plus docs and images; under 12 minutes for the Linux kernel's 70k files and 6.4M relationships on 2 cores and 6GB. Everything after that should be a cheap lookup against cached JSON or SQLite.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=WNru_PFycT8">WNru_PFycT8</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a> · <a href="https://www.youtube.com/watch?v=EKbQ5sajVxA">EKbQ5sajVxA</a> · <a href="https://www.youtube.com/watch?v=rgYnZqi2GmA">rgYnZqi2GmA</a></p>
+  </div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="idx">08</span><span class="t">Parse code with local tree-sitter / AST before spending anything on an LLM pass.</span>
+    <span class="chip foundation">weight 8</span>
+    <span class="chip ch">code graph</span>
+  </div>
+  <div class="cbody">
+    <p>Structure is a parsing problem, not a language-model problem. Anything you can get deterministically, you should get deterministically.</p>
+    <p class="got"><strong>In practice:</strong> Offline, free, no API key, same answer every run. 36 grammars and 79 extensions in one tool; 158 languages in another; 20 of 34 languages moved to compiled Rust parsers with claimed byte-identical output in CodeGraph v1.5. Reserve LLM tokens for docs, media and semantic enrichment. Unsupported across every tool here: Haskell, OCaml, F#, Clojure.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a> · <a href="https://www.youtube.com/watch?v=WNru_PFycT8">WNru_PFycT8</a> · <a href="https://www.youtube.com/watch?v=LVnKcfHHaFM">LVnKcfHHaFM</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a></p>
+  </div>
+</div>
+<h3 class="tierhead">Tier A — five to seven sources</h3>
+<p class="small">Real consensus, narrower application. Adopt these once the Tier S habits hold.</p>
+
+<div class="concept">
+  <div class="chead"><span class="idx">09</span><span class="t">Cluster the graph to find the modules your folder names hide.</span>
+    <span class="chip intermediate">weight 7</span>
+    <span class="chip ch">code graph</span>
+  </div>
+  <div class="cbody">
+    <p>Directory structure records what someone intended two years ago. Connection density records what the code actually does now.</p>
+    <p class="got"><strong>In practice:</strong> Leiden or Louvain community detection over the node graph. 4,041 nodes collapsed to 185 communities in one build; 664 nodes to 55 in another; 591 doc concepts to 67. Use <code>--cluster-only</code> to redraw boundaries without re-running extraction.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a> · <a href="https://www.youtube.com/watch?v=Owv503rTqYY">Owv503rTqYY</a> · <a href="https://www.youtube.com/watch?v=WNru_PFycT8">WNru_PFycT8</a> · <a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a> · <a href="https://www.youtube.com/watch?v=rgYnZqi2GmA">rgYnZqi2GmA</a></p>
+  </div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="idx">10</span><span class="t">Export for humans, not only for agents.</span>
+    <span class="chip intermediate">weight 7</span>
+    <span class="chip ch">code graph</span>
+  </div>
+  <div class="cbody">
+    <p>You will make better calls about a codebase you can see. And a graph you can show a colleague is worth more than one only an agent reads.</p>
+    <p class="got"><strong>In practice:</strong> HTML graph coloured by community (clickable, filterable, searchable), Obsidian vault with wiki-links, SVG for GitHub or Notion, GraphML for Gephi, direct Neo4j push. Read <code>GRAPH_REPORT.md</code> yourself before asking the agent anything — it lists god nodes, insights and suggested queries.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=mWLDn49_8HA">mWLDn49_8HA</a> · <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a> · <a href="https://www.youtube.com/watch?v=yYSTsKo8moU">yYSTsKo8moU</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a></p>
+  </div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="idx">11</span><span class="t">Install on the platform you actually use — the paths genuinely differ.</span>
+    <span class="chip intermediate">weight 7</span>
+    <span class="chip ch">code graph</span>
+  </div>
+  <div class="cbody">
+    <p>“It supports Claude Code” and “it registered itself correctly in your Claude Code” are different statements. The install variant is what determines whether the tool is ever called.</p>
+    <p class="got"><strong>In practice:</strong> Named targets across the corpus: Claude Code, Codex, Cursor, OpenCode, Antigravity, OpenClaw, Hermes, Gemini CLI, GitHub Copilot, Aider, Kilocode, Amp. Choose global vs per-project deliberately — a project-scoped install keeps a client repo's index out of everything else.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a> · <a href="https://www.youtube.com/watch?v=rgYnZqi2GmA">rgYnZqi2GmA</a> · <a href="https://www.youtube.com/watch?v=dNLM94o-HTw">dNLM94o-HTw</a> · <a href="https://www.youtube.com/watch?v=wBAlh70Quk8">wBAlh70Quk8</a> · <a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a></p>
+  </div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="idx">12</span><span class="t">Run an impact / blast-radius query before a large refactor.</span>
+    <span class="chip intermediate">weight 6</span>
+    <span class="chip ch">code graph</span>
+  </div>
+  <div class="cbody">
+    <p>“What breaks if I change X” is the question a graph exists to answer, and the one you least want to answer by watching CI go red.</p>
+    <p class="got"><strong>In practice:</strong> GitNexus adds cross-repo blast radius for microservices and a contract registry. CodeGraph pipes a diff into <code>codegraph affected</code> so CI runs only reachable tests. codebase-memory-mcp resolves a 5-layer dependency chain in sub-milliseconds. Always pair the query with the tests — the graph cannot see runtime.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a> · <a href="https://www.youtube.com/watch?v=LVnKcfHHaFM">LVnKcfHHaFM</a> · <a href="https://www.youtube.com/watch?v=Owv503rTqYY">Owv503rTqYY</a> · <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a></p>
+  </div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="idx">13</span><span class="t">Prefer relationship structure to vector similarity for architectural questions.</span>
+    <span class="chip intermediate">weight 6</span>
+    <span class="chip ch">code graph</span>
+  </div>
+  <div class="cbody">
+    <p>Embeddings answer “what reads like this”. A graph answers “what reaches this”. For architecture, only the second one is the question.</p>
+    <p class="got"><strong>In practice:</strong> A React component and a database schema rarely embed near each other yet may be critically linked. Worth noting that CodeGraph ships no vector store, no embeddings and requires no API key — deliberately. Keep vector RAG for prose and semantics, where it is genuinely better.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a> · <a href="https://www.youtube.com/watch?v=WNru_PFycT8">WNru_PFycT8</a> · <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a> · <a href="https://www.youtube.com/watch?v=EKbQ5sajVxA">EKbQ5sajVxA</a> · <a href="https://www.youtube.com/watch?v=JWhICz1QR8M">JWhICz1QR8M</a> · <a href="https://www.youtube.com/watch?v=yYSTsKo8moU">yYSTsKo8moU</a></p>
+  </div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="idx">14</span><span class="t">Compile a durable knowledge artefact instead of re-reading raw folders.</span>
+    <span class="chip intermediate">weight 5</span>
+    <span class="chip ch">code graph</span>
+  </div>
+  <div class="cbody">
+    <p>A model reading raw notes produces the most probable answer, which is another way of saying the generic one. A compiled artefact is what makes a later session specific.</p>
+    <p class="got"><strong>In practice:</strong> A Karpathy-style LLM wiki, a <code>GRAPH_REPORT.md</code>, an ontology graph folder that persists between sessions. The compiled thing — not the raw corpus — is what future sessions should read first.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=EKbQ5sajVxA">EKbQ5sajVxA</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a> · <a href="https://www.youtube.com/watch?v=yYSTsKo8moU">yYSTsKo8moU</a></p>
+  </div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="idx">15</span><span class="t">Tag edges by confidence and treat guessed links as provisional.</span>
+    <span class="chip intermediate">weight 5</span>
+    <span class="chip ch">code graph</span>
+  </div>
+  <div class="cbody">
+    <p>A graph mixes facts the parser saw with links a model inferred. Editing production code as if those are the same thing is how a clean refactor breaks something invisible.</p>
+    <p class="got"><strong>In practice:</strong> <b>extracted</b> = 1.0 (the parser saw it) · <b>inferred</b> = 0.55–0.95 · <b>ambiguous</b> = an LLM's guess. Filter where the tool allows — GitNexus lets Cypher queries require confidence &gt; 0.8. Verify anything below <em>extracted</em> before you act on it.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=WNru_PFycT8">WNru_PFycT8</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a></p>
+  </div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="idx">16</span><span class="t">Design multi-step agent work as a graph: parallelise the independent, gate the irreversible.</span>
+    <span class="chip intermediate">weight 5</span>
+    <span class="chip ch">workflow DAG</span>
+  </div>
+  <div class="cbody">
+    <p>Most agent workflows are written as a chain because that is how you type them, not because the work depends that way.</p>
+    <p class="got"><strong>In practice:</strong> Planner → parallel workers → skeptic → merge → human approval. Put the gate before the expensive or irreversible decision: customer emails, public posts, code deploys, refunds, production data. Keep it light for a private memo. Anthropic's named patterns map onto this directly — prompt chaining, routing, parallelisation, orchestrator, evaluator-optimizer.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=JWhICz1QR8M">JWhICz1QR8M</a> · <a href="https://www.youtube.com/watch?v=5nB8Rs4l0_M">5nB8Rs4l0_M</a> · <a href="https://www.youtube.com/watch?v=mBePcvqLX88">mBePcvqLX88</a> · <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a></p>
+  </div>
+</div>
+<h3 class="tierhead">Tier B — three or four sources</h3>
+<p class="small">Judgement calls the corpus mostly agrees on. Worth knowing; not worth arguing about.</p>
+
+<div class="concept">
+  <div class="chead"><span class="idx">17</span><span class="t">Scope the index on big repos.</span>
+    <span class="chip advanced">weight 4</span>
+    <span class="chip ch">code graph</span>
+  </div>
+  <div class="cbody">
+    <p>Indexing everything is rarely what you want, and it is always the slowest and most expensive option.</p>
+    <p class="got"><strong>In practice:</strong> Above ~200 files one tool stops and asks you to pick subfolders; above ~500, scope by hand regardless. Not a hard ceiling — the Linux kernel indexes fine — but a prompt to decide what you actually want mapped.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=Ynv_WYO_slw">Ynv_WYO_slw</a> · <a href="https://www.youtube.com/watch?v=rgYnZqi2GmA">rgYnZqi2GmA</a></p>
+  </div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="idx">18</span><span class="t">Read the god nodes first.</span>
+    <span class="chip advanced">weight 4</span>
+    <span class="chip ch">code graph</span>
+  </div>
+  <div class="cbody">
+    <p>The highest-degree entities are the architectural spine. They are the fastest route into an unfamiliar codebase and the place a refactor does the most damage.</p>
+    <p class="got"><strong>In practice:</strong> One build's top node, <code>extract</code>, had 47 connections; <code>build_graph</code> had 32. They sit at the top of <code>GRAPH_REPORT.md</code>. A useful follow-up query: why this node bridges multiple subsystems.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=Owv503rTqYY">Owv503rTqYY</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a></p>
+  </div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="idx">19</span><span class="t">Transcribe local audio and video with Faster-Whisper before linking media into the graph.</span>
+    <span class="chip advanced">weight 4</span>
+    <span class="chip ch">code graph</span>
+  </div>
+  <div class="cbody">
+    <p>Recordings carry decisions that never made it into a doc. Transcription is the cheap step that makes them linkable to code symbols.</p>
+    <p class="got"><strong>In practice:</strong> A free local pass, run before the LLM extraction pass rather than instead of it. Install the video extra; point it at the folder of recordings; let the graph link the resulting text to the symbols it names.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a></p>
+  </div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="idx">20</span><span class="t">Run the weight test on every edge of a workflow graph.</span>
+    <span class="chip advanced">weight 3</span>
+    <span class="chip ch">workflow DAG</span>
+  </div>
+  <div class="cbody">
+    <p>Sequential steps that do not depend on each other are pure waiting. You are paying wall-clock for an ordering nothing required.</p>
+    <p class="got"><strong>In practice:</strong> At every edge ask: <em>“does this actually need the result of the one before it?”</em> If no, the connection is useless — run them simultaneously. Roughly 2× faster on the two-research-step example. Start every workflow as a chain, because it is easiest to test, then re-engineer.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=5nB8Rs4l0_M">5nB8Rs4l0_M</a> · <a href="https://www.youtube.com/watch?v=JWhICz1QR8M">JWhICz1QR8M</a> · <a href="https://www.youtube.com/watch?v=mBePcvqLX88">mBePcvqLX88</a></p>
+  </div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="idx">21</span><span class="t">Measure the token claims against your own agent loop.</span>
+    <span class="chip advanced">weight 3</span>
+    <span class="chip ch">code graph</span>
+  </div>
+  <div class="cbody">
+    <p>Every headline ratio in this space depends on a baseline chosen by the vendor. Yours is different.</p>
+    <p class="got"><strong>In practice:</strong> One tester's controlled rerun of ten identical questions in two sessions: 120,000 tokens without the graph vs 113,000 with — about 8%, against a marketed 71.5×. The honest win was answer quality. Log your own runs before you standardise on anything.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=Ynv_WYO_slw">Ynv_WYO_slw</a></p>
+  </div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="idx">22</span><span class="t">Choose between tools by job: multimodal vs auto-sync depth vs multi-repo power.</span>
+    <span class="chip advanced">weight 3</span>
+    <span class="chip ch">code graph</span>
+  </div>
+  <div class="cbody">
+    <p>These are not competitors so much as different shapes. Picking by popularity gets you the wrong shape confidently.</p>
+    <p class="got"><strong>In practice:</strong> Mixed content plus human visualisation → Graphify-class. Pure code with zero-maintenance freshness → CodeGraph-class. Cross-service impact and Cypher → GitNexus-class, licence permitting. Wiki UX over graph maths → Understand-Anything-class. You can run more than one.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=Ynv_WYO_slw">Ynv_WYO_slw</a></p>
+  </div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="idx">23</span><span class="t">Skip the graph entirely on tiny projects.</span>
+    <span class="chip advanced">weight 3</span>
+    <span class="chip ch">code graph</span>
+  </div>
+  <div class="cbody">
+    <p>Below a certain size the index is maintenance you pay for and never recover. Three transcripts say this independently, and the tools' own authors agree.</p>
+    <p class="got"><strong>In practice:</strong> Under roughly 20 files, just read them. Also skip for single-file keyword lookup, and for runtime, race-condition or performance debugging, where the graph is structurally blind.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a> · <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a></p>
+  </div>
+</div>
+<h3 class="tierhead">Tier C — one or two sources</h3>
+<p class="small">Thin evidence, often the sharpest advice on the page. Treat each as a lead to test, not a rule.</p>
+
+<div class="concept">
+  <div class="chead"><span class="idx">24</span><span class="t">Respect .gitignore — keep node_modules, dist and build artefacts out of the index.</span>
+    <span class="chip advanced">weight 1</span>
+    <span class="chip ch">code graph</span>
+  </div>
+  <div class="cbody">
+    <p>Indexing dependencies inflates build time, blows out the node count, and buries your own code in noise you will then pay to query around.</p>
+    <p class="got"><strong>In practice:</strong> All three head-to-head tools honour ignore files by default. Check what was actually indexed after your first build: if the node count looks implausible for the repo, this is why.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a></p>
+  </div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="idx">25</span><span class="t">Handle staleness explicitly: read the dirty file, trust the rest.</span>
+    <span class="chip advanced">weight 1</span>
+    <span class="chip ch">code graph</span>
+  </div>
+  <div class="cbody">
+    <p>Partial staleness is the normal state of a watched index. The right response is surgical, not a full rebuild.</p>
+    <p class="got"><strong>In practice:</strong> CodeGraph surfaces an explicit warning naming the stale file. Read that file raw, keep using the graph for everything else, and let the watcher catch up rather than blocking on a re-index.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a></p>
+  </div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="idx">26</span><span class="t">Pipe a git diff into codegraph affected to run only impacted tests.</span>
+    <span class="chip advanced">weight 2</span>
+    <span class="chip ch">code graph</span>
+  </div>
+  <div class="cbody">
+    <p>The graph already knows what your change can reach. Running the whole suite is throwing that away.</p>
+    <p class="got"><strong>In practice:</strong> <code>git diff | codegraph affected</code> returns the reachable test files. This is the highest-leverage CI use of a code graph in the corpus and the one with the clearest payback.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a> · <a href="https://www.youtube.com/watch?v=LVnKcfHHaFM">LVnKcfHHaFM</a></p>
+  </div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="idx">27</span><span class="t">Do not delegate exploration to a sub-agent that cannot see the graph.</span>
+    <span class="chip advanced">weight 1</span>
+    <span class="chip ch">code graph</span>
+  </div>
+  <div class="cbody">
+    <p>The sub-agent will grep. You then pay for the index and the grepping, and the index provides nothing.</p>
+    <p class="got"><strong>In practice:</strong> Named plainly in the corpus: if the parent delegates and the sub-agent reads files directly, the graph becomes pure overhead — it only helps on direct queries. Keep exploration in the agent that holds the MCP tool.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a></p>
+  </div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="idx">28</span><span class="t">Remember static analysis cannot see runtime, reflection or eval.</span>
+    <span class="chip advanced">weight 2</span>
+    <span class="chip ch">code graph</span>
+  </div>
+  <div class="cbody">
+    <p>The graph describes what the code says, not what it does. Dynamic imports, reflection and eval are invisible to every tool here.</p>
+    <p class="got"><strong>In practice:</strong> CodeGraph's dynamic-dispatch synthesis narrows the gap — callbacks, <code>.on</code>/<code>.emit</code> string keys, React <code>setState</code> → child re-render, C function pointers — and only synthesises an edge when the flow closes end to end. It does not close the gap. Keep the debugger and the test suite.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a></p>
+  </div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="idx">29</span><span class="t">Intercept raw grep with a pre-tool hook and augment it with graph structure.</span>
+    <span class="chip advanced">weight 1</span>
+    <span class="chip ch">code graph</span>
+  </div>
+  <div class="cbody">
+    <p>The most reliable way to make an agent use the graph is to make grep itself return graph-aware results.</p>
+    <p class="got"><strong>In practice:</strong> The codebase-memory-mcp pattern: the MCP interface auto-patches Claude Code, Zed and Cursor configs with a pre-tool-use hook that catches raw grep calls and injects graph data into the result. Reported effect: 80,000 → 500 tokens on a structural query.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a></p>
+  </div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="idx">30</span><span class="t">Keep chat and entity memory in a separate local Memory MCP from your code graph.</span>
+    <span class="chip advanced">weight 1</span>
+    <span class="chip ch">code graph</span>
+  </div>
+  <div class="cbody">
+    <p>They answer different questions and go stale on different clocks. Merging them makes both harder to reason about.</p>
+    <p class="got"><strong>In practice:</strong> The reference Memory MCP stores entities, relations and observations as local JSON. Note the gap: the official snippet does not document how to enable persistence or where the store lives — you add those lines. In the corpus it is Claude Desktop only.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=qeru0ZdudD4">qeru0ZdudD4</a></p>
+  </div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="idx">31</span><span class="t">Trial a wiki-style tool against a graph-style tool on your own repo before standardising.</span>
+    <span class="chip advanced">weight 2</span>
+    <span class="chip ch">code graph</span>
+  </div>
+  <div class="cbody">
+    <p>The head-to-head that exists was run on someone else's SaaS. Which UX suits you is not a fact you can inherit.</p>
+    <p class="got"><strong>In practice:</strong> On the same question, the wiki-style tool traced file provenance and drew a step-by-step flowchart; the graph-style tool returned a table plus file and rule text. Build cost differed (~200k tokens vs roughly half); per-query cost and time were about the same. The tester preferred the flowchart.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=Ynv_WYO_slw">Ynv_WYO_slw</a> · <a href="https://www.youtube.com/watch?v=Owv503rTqYY">Owv503rTqYY</a></p>
+  </div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="idx">32</span><span class="t">Check the licence before work use.</span>
+    <span class="chip advanced">weight 2</span>
+    <span class="chip ch">code graph</span>
+  </div>
+  <div class="cbody">
+    <p>The most feature-rich tool in the comparison is the one you cannot ship commercially. Finding that out after standardising is expensive.</p>
+    <p class="got"><strong>In practice:</strong> GitNexus is PolyForm Noncommercial 1.0 — “44,000 stars you can't ship at work.” CodeGraph is MIT. Graphify is called MIT in one comparison and Apache 2.0 in another; the two videos disagree, so check the repo yourself rather than either transcript.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a> · <a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a></p>
+  </div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="idx">33</span><span class="t">Budget for multi-agent DAGs costing far more tokens, even when they are faster.</span>
+    <span class="chip advanced">weight 1</span>
+    <span class="chip ch">workflow DAG</span>
+  </div>
+  <div class="cbody">
+    <p>Parallelism buys wall clock with tokens. That is a good trade sometimes and a terrible one often, and the difference is whether you noticed you were making it.</p>
+    <p class="got"><strong>In practice:</strong> Citing Anthropic's multi-agent research: a single agent uses ~4× the tokens of a regular chat; a multi-agent system ~15×. In the 108-agent deep-research example, ~20k tokens per agent put input cost near $10 at Opus 5 pricing — closer to $1 with prompt caching.</p>
+    <p class="small">Sources: <a href="https://www.youtube.com/watch?v=mBePcvqLX88">mBePcvqLX88</a></p>
+  </div>
+</div>
+
+<h2 id="tools">The tool landscape</h2>
+<p>Six products appear across the corpus. They are less competitors than different shapes of one idea — and the comparison sources are blunt that stars, batches and README claims are not selection criteria.</p>
+
+<div class="concept">
+  <div class="chead"><span class="t">Graphify</span><span class="chip ch">MIT / Apache 2.0 — disputed</span></div>
+  <div class="cbody"><dl class="kv"><dt>Shape</dt><dd>Python; tree-sitter for code (36 grammars) plus an LLM pass for everything else; 7-stage pipeline into a networkx graph with Leiden clustering</dd><dt>Outputs</dt><dd><code>graph.html</code>, <code>GRAPH_REPORT.md</code>, <code>graph.json</code> in <code>graphify_out/</code>; optional Obsidian, SVG, GraphML, Neo4j</dd><dt>Freshness</dt><dd><code>graphify update</code> (changed files only) or <code>graphify hook install</code> for commit / branch switch</dd><dt>Standout</dt><dd>The only one here that maps code, docs, PDFs and media into a single graph a human can look at</dd><dt>Watch out</dt><dd>The non-code pass costs real tokens; the 71.5× claim has been quietly dropped from the README; ASR mangles the package name constantly</dd></dl></div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="t">CodeGraph</span><span class="chip ch">MIT</span></div>
+  <div class="cbody"><dl class="kv"><dt>Shape</dt><dd>Standalone binary; 5 layers — native file watcher → tree-sitter → dynamic-dispatch synthesis → SQLite with WAL and FTS5 → one daemon. No embeddings, no API key</dd><dt>Outputs</dt><dd><code>.codegraph/</code> with a SQLite DB (nodes, edges, files); a single <code>codegraph explorer</code> MCP tool</dd><dt>Freshness</dt><dd>OS watchers with 2s debounce; ~0.3s per 4,000 files. Names the stale file when it is behind</dd><dt>Standout</dt><dd>The most credible benchmark set in the corpus, and the only tool that synthesises callback and event-emitter edges</dd><dt>Watch out</dt><dd>Code only — no PDFs, docs or notes. Useless the moment a sub-agent explores without the MCP</dd></dl></div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="t">GitNexus</span><span class="chip ch">PolyForm Noncommercial</span></div>
+  <div class="cbody"><dl class="kv"><dt>Shape</dt><dd>Node.js; a 15+ phase DAG pipeline, 44 node types, 21 relationship types, embedded graph DB with vector support, Leiden communities, execution flows as queryable process nodes</dd><dt>Outputs</dt><dd><code>.gitnexus/</code> per repo; 17 specialised MCP tools; Cypher with confidence filters</dd><dt>Freshness</dt><dd>Manual <code>npx gitnexus analyze</code>; post-tool hooks detect staleness and prompt a re-index</dd><dt>Standout</dt><dd>Multi-repo and cross-service blast radius, with a contract registry — nothing else here does this</dd><dt>Watch out</dt><dd>Licence blocks commercial use. README describes in-browser WASM; the shipped package is an HTTP client against a local Node server on port 4747. Publishes no benchmarks</dd></dl></div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="t">Understand-Anything</span><span class="chip ch">Not stated in corpus</span></div>
+  <div class="cbody"><dl class="kv"><dt>Shape</dt><dd>A Claude Code marketplace plugin, project-scoped; wiki / knowledge-base UX rather than graph maths</dd><dt>Outputs</dt><dd><code>/understand</code>, <code>/understand dashboard</code>, <code>/understand explain</code>, <code>/understand ignore</code></dd><dt>Freshness</dt><dd><code>/understand auto updates</code> on commit</dd><dt>Standout</dt><dd>Its explanations traced file provenance and produced a step-by-step flowchart — the tester preferred them</dd><dt>Watch out</dt><dd>~200k tokens for a full dashboard, roughly double the Graphify build. No documented local-model option, so code goes to whatever provider your IDE uses</dd></dl></div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="t">codebase-memory-mcp</span><span class="chip ch">Not stated in corpus</span></div>
+  <div class="cbody"><dl class="kv"><dt>Shape</dt><dd>158 languages; tree-sitter phase then a custom LSP-hybrid resolution engine (parameter binding, generics, JSDoc inference); gRPC / tRPC / HTTP route detection; Louvain communities</dd><dt>Outputs</dt><dd>SQLite with WAL; MCP interface that auto-patches Claude Code, Zed and Cursor configs</dd><dt>Freshness</dt><dd>Background watcher keyed on XXH3 content hashes; only changed files re-index</dd><dt>Standout</dt><dd>The pre-tool-use hook that intercepts raw grep — the most reliable way to make an agent actually use the index</dd><dt>Watch out</dt><dd>One transcript covers it in depth. The evidence base is thinner than everything above, however good the numbers look</dd></dl></div>
+</div>
+<div class="concept">
+  <div class="chead"><span class="t">Neo4j / Cypher</span><span class="chip ch">—</span></div>
+  <div class="cbody"><dl class="kv"><dt>Shape</dt><dd>A graph database you push into, rather than a code-indexing tool. Graphify exports to it; GitNexus speaks Cypher natively</dd><dt>Outputs</dt><dd>Whatever you query — this is the power-user escape hatch</dd><dt>Freshness</dt><dd>Whatever feeds it</dd><dt>Standout</dt><dd>Expressive queries, and a shared graph a team can point at</dd><dt>Watch out</dt><dd>Setup cost buys nothing an export cannot, unless you genuinely need shared or expressive querying</dd></dl></div>
+</div>
+<div class="note"><strong>Shared design patterns across all three head-to-head tools:</strong> tree-sitter parsing · content-addressed caching · a tool protocol as the agent interface · confidence tags on edges · index-once/query-many · ignore-file hygiene. If you ever build your own, that is the skeleton the field converged on.</div>
+
+<h2 id="reality">Which headline numbers survive</h2>
+<p>Almost every number in this space is real <em>and</em> misleading, because the baseline does the work.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>The claim</th><th>What was actually measured</th><th>What survives</th></tr></thead>
+<tbody><tr><td><strong>71.5× fewer tokens</strong><span class="plainline">Graphify, repeated as 70× / 71×</span></td><td>A 52-file corpus. Naive load ≈ 123,000 tokens; a graph-neighbourhood read ≈ 1,700 tokens per query. The denominator is pasting fifty-two raw files into context — a workflow almost nobody uses.</td><td>Very little as a token claim. One tester re-ran ten identical questions in two sessions: <strong>120k without vs 113k with — about 8%</strong>. The honest win was answer quality. The claim has since been dropped from the README.</td></tr><tr><td><strong>94% fewer tool calls, 77% faster</strong><span class="plainline">CodeGraph, vendor benchmark</span></td><td>VS Code repo: 52 file reads down to 3; 6 tool calls and 0 file reads on the Swift compiler, 25,000+ files indexed in minutes.</td><td>Directionally confirmed by an independent harness — but see the row below for the footnotes the promotion omits.</td></tr><tr><td><strong>89% fewer calls, 69% fewer tokens, 60% cheaper</strong><span class="plainline">independent, 7 repos, median of 4 runs</span></td><td>Revalidated 21 July 2026. VS Code 2 vs 40 calls; Django 2 vs 29; a third repo 3 vs 57. Zero file reads on all seven. Cost per question $3.04→$0.40 and $1.81→$0.40 on two repos.</td><td>The most credible set in the corpus — with its own footnotes: Excalidraw took <strong>36s with the graph vs 23s with grep</strong>; one repo cost <strong>3¢ more</strong>; on small repos grep wins on wall clock while still burning 5–10× the tokens.</td></tr><tr><td><strong>99% token reduction</strong><span class="plainline">codebase-memory-mcp</span></td><td>80,000 → 500 tokens per structural query; the Linux kernel's 28M lines indexed in 3 minutes; 83% semantic answer quality at half the tool calls.</td><td>Single-source. Promising, but thinner evidence than the rest of this table.</td></tr><tr><td><strong>58% fewer tool calls</strong><span class="plainline">comparison video, 7 codebases</span></td><td>Source of the figure not stated. The illustrative example: “how does the auth middleware connect to the DB pool” in a 200-file project costs an unaided agent 15+ calls and ~4,000 tokens — and it still misses the wiring callback.</td><td>Take the example, not the percentage. The missed callback is the real argument.</td></tr><tr><td><strong>“Unlimited memory” / “local RAG”</strong><span class="plainline">video titles</span></td><td>What they describe is a persistent graph or report on disk.</td><td>Nothing about context length changes. Rename it “a map that survives the session” and the claim becomes true.</td></tr><tr><td><strong>Retrieval benchmarks</strong><span class="plainline">Graphify's current numbers</span></td><td>LoCoMo, 300 questions: recall@10 of 0.497 vs Mem0 at 0.048 and SuperMemory at 0.149, with 90.6% judge agreement.</td><td>Recall is genuinely strong. But it <strong>loses on QA accuracy — 45.3% vs SuperMemory's 49.7%</strong> — and ties plain dense retrieval on LongMemEval. Finding the right neighbourhood is not the same as answering better.</td></tr><tr><td><strong>Stars, downloads, YC batch</strong><span class="plainline">across the corpus</span></td><td>100,000 GitHub stars, 5M downloads, 5,000 signups in 10 days. Star counts quoted for the same tool range from 16k to 37k, weeks apart.</td><td>Not a selection criterion, and two sources say so directly. One tool with 44,000 stars carries a licence you cannot ship at work.</td></tr></tbody>
+</table></div>
+<div class="callout green"><strong>The number worth chasing.</strong> Across the corpus the token deltas are contested and the tool-call deltas are not. Zero file reads on seven of seven repos, 40 calls down to 2, 52 file reads down to 3. Fewer tool calls means less agent thrash and fewer chances to wander off — which is also the mechanism behind every “better answer quality” remark. Benchmark that, on your own repo, before you standardise on anything.</div>
+
+<h2 id="anti">Twelve anti-patterns</h2>
+<ol class="anti"><li>Blind grep/glob loops as the default architecture strategy.</li><li>Trusting an inflated <em>N</em>× token claim without measuring your own sessions.</li><li>Skipping the rebuild after a big refactor, a branch switch, or a mass rename.</li><li>Indexing a tiny repo where reading the files is cheaper than maintaining a graph.</li><li>Assuming the graph sees runtime behaviour — dynamic imports, reflection, <code>eval</code>. It does not. Still test and debug.</li><li>Letting sub-agents explore without the index while the parent holds it.</li><li>Pasting an entire corpus into context and calling that your “without graph” baseline.</li><li>Choosing by stars or a viral title instead of multimodal vs auto-sync vs multi-repo fit.</li><li>Ignoring licence constraints on commercial use.</li><li>Confusing a workflow DAG with a code knowledge graph — you often need both, for different problems.</li><li>Indexing <code>node_modules</code>, <code>dist</code> and build artefacts. Respect the ignore rules.</li><li>Treating inferred or ambiguous edges as compile-time truth when editing production code.</li></ol>
+
+<h2 id="turn">The agent-turn card</h2>
+<p>If you take one thing from this guide into a project instructions file, take this.</p>
+<ol class="anti"><li>Is this a structural, multi-file, or repeated question? If not, skip the graph entirely.</li><li>Is an index present and fresh for <em>this branch</em>? If not, build or update it — scoped.</li><li>Consult the graph report or the index before any mass file read.</li><li>Answer from relationships; open only the files the graph names.</li><li>Changing architecture? Run an impact / blast-radius query, then the tests.</li><li>Multi-step work? Use a DAG: parallel where the weight test allows, plus a check node and a human gate where it matters.</li></ol>
+
+<h2 id="sources">All 23 sources</h2>
+<p>Transcripts were fetched via English captions with a fallback; one failed outright and is marked. Dates cluster April–August 2026, with a single 2025 outlier about chat memory rather than code indexing.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>ID</th><th>Title</th><th>Views</th><th>Uploaded</th><th>Transcript</th></tr></thead>
+<tbody><tr><td class="mono"><a href="https://www.youtube.com/watch?v=JWhICz1QR8M">JWhICz1QR8M</a></td><td>Why Graph Engineering will 10x your Claude/Codex</td><td class="mono small">193,271</td><td class="mono small">3 Aug 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=HQEm4rBKdec">HQEm4rBKdec</a></td><td>Graphify Solves Claude's Biggest Limitation (Finally)</td><td class="mono small">172,403</td><td class="mono small">18 May 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=mWLDn49_8HA">mWLDn49_8HA</a></td><td>Graphify + Obsidian + Claude Code = CHEAT CODE</td><td class="mono small">121,087</td><td class="mono small">8 Jun 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=BkHps04qGgc">BkHps04qGgc</a></td><td>Graphify: Instant Knowledge Graph for Claude Code / Antigravity (FREE)</td><td class="mono small">100,492</td><td class="mono small">15 Apr 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=Owv503rTqYY">Owv503rTqYY</a></td><td>Claude Code + Graphify = Insane Agentic OS</td><td class="mono small">88,677</td><td class="mono small">8 Jun 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=mBePcvqLX88">mBePcvqLX88</a></td><td>Graph Engineering explained in 8min..</td><td class="mono small">79,739</td><td class="mono small">30 Jul 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=Ynv_WYO_slw">Ynv_WYO_slw</a></td><td>Understand-Anything vs Graphify: I Tested Both on My SaaS</td><td class="mono small">70,032</td><td class="mono small">27 May 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=rgYnZqi2GmA">rgYnZqi2GmA</a></td><td>Graphify + Claude Code: The Solution For Big Repos</td><td class="mono small">61,309</td><td class="mono small">28 Apr 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=WNru_PFycT8">WNru_PFycT8</a></td><td>This Tool Fixes AI Coding at Scale with 70x Fewer Tokens (Graphify)</td><td class="mono small">59,384</td><td class="mono small">29 Apr 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=EKbQ5sajVxA">EKbQ5sajVxA</a></td><td>Claude Code + Graphify = Local Rag (Unlimited Memory)</td><td class="mono small">57,809</td><td class="mono small">9 Apr 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=5nB8Rs4l0_M">5nB8Rs4l0_M</a></td><td>Stanford's Graph Method Explained: How to 10x Your Claude Productivity</td><td class="mono small">51,658</td><td class="mono small">20 Aug 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=yYSTsKo8moU">yYSTsKo8moU</a></td><td>Fix Karpathy's LLM Wiki with a Knowledge Graph | Claude Code + Obsidian + InfraNodus</td><td class="mono small">39,587</td><td class="mono small">11 Apr 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=-Fb1SBC_nmg">-Fb1SBC_nmg</a></td><td>Graphify vs GitNexus vs CodeGraph — Which Code Knowledge Graph Should You Use?</td><td class="mono small">34,580</td><td class="mono small">6 Jul 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=qeru0ZdudD4">qeru0ZdudD4</a></td><td>Unlock Claude's Memory: Knowledge Graph MCP Server Tutorial</td><td class="mono small">20,792</td><td class="mono small">1 Jan 2025</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=FOkLJ1pGPck">FOkLJ1pGPck</a></td><td>Stop Wasting Money On AI Coding Agent Use Graphify (71x Cheap And 10x Smarter)</td><td class="mono small">17,407</td><td class="mono small">8 May 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=zIiiu8hS1To">zIiiu8hS1To</a></td><td>Graphify vs GitNexus vs CodeGraph: Stop Wasting API Tokens</td><td class="mono small">12,383</td><td class="mono small">26 Jul 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=dNLM94o-HTw">dNLM94o-HTw</a></td><td>Graphify Knowledge Graph Tutorial | Ultimate Step-by-Step Guide</td><td class="mono small">11,963</td><td class="mono small">5 Jun 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=AkP7-uBB7hc">AkP7-uBB7hc</a></td><td>Graphify: Turn Your Codebase into a Queryable Knowledge Graph for Claude Code</td><td class="mono small">11,749</td><td class="mono small">8 Jun 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=jPBCHO-4uAE">jPBCHO-4uAE</a></td><td>codebase-memory-mcp Tutorial: Codebase Memory MCP for Claude Code, Cursor &amp; Codex</td><td class="mono small">9,064</td><td class="mono small">27 Jun 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=nvJ1M_GRj8Q">nvJ1M_GRj8Q</a></td><td>Graphify: The Knowledge Graph Layer for Claude Code &amp; AI Coding Agents | YC S26</td><td class="mono small">5,839</td><td class="mono small">15 Aug 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=wBAlh70Quk8">wBAlh70Quk8</a></td><td>CodeGraph: SuperCharge Claude Code with Pre-indexed Semantic Code Intelligence</td><td class="mono small">5,546</td><td class="mono small">21 May 2026</td><td class="small">fetched</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=BpEtWpQw0yw">BpEtWpQw0yw</a></td><td>Graphify Tested: A Knowledge Graph Index for Claude Code</td><td class="mono small">395</td><td class="mono small">19 May 2026</td><td class="small">captions disabled</td></tr><tr><td class="mono"><a href="https://www.youtube.com/watch?v=LVnKcfHHaFM">LVnKcfHHaFM</a></td><td>94% Faster Claude Code: Semantic Graphs! [2026]</td><td class="mono small">90</td><td class="mono small">17 May 2026</td><td class="small">fetched</td></tr></tbody>
+</table></div>
+<p class="small">Weighting rule, so any claim here can be audited: each practice is one atomic imperative, and its weight is the number of distinct transcripts that discuss it — never how often a single source repeats itself. Where automatic transcription mangled a tool name, that is flagged rather than guessed at.</p>
+</main>
+</body>
+</html>

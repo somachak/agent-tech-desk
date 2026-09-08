@@ -20,6 +20,7 @@ const OUT = path.join(ROOT, "public");
 const NAV = [
   ["/", "Desk"],
   ["/bookshelf", "Bookshelf"],
+  ["/archive", "Archive"],
   ["/ide", "Python IDE"],
   ["/tutor", "Tutor"],
   ["/python-constructs", "Python constructs"],
@@ -144,6 +145,7 @@ function homePage(phases) {
 
 <div class="grid">
   <a class="tile" href="/bookshelf"><b>Bookshelf — ${total} book guides</b><span>Build ladder → chapter map → concept cards by level → printable cheat sheet, per book.</span></a>
+  <a class="tile" href="/archive"><b>Archive — everything, dated</b><span>Every guide newest first, with the date it was added and where its material came from.</span></a>
   <a class="tile" href="/ide"><b>Python IDE</b><span>Write and run Python in the browser. Nothing to install; your snippets stay on this device.</span></a>
   <a class="tile" href="/tutor"><b>Tutor</b><span>Ask about anything on the shelf. Answers in plain British English, numbered, with the code.</span></a>
   <a class="tile" href="/python-constructs"><b>Python constructs — 7 chapters</b><span>The Python Tutorial §4.8–§9.10, every example a Formulaite mini-programme, ending in a capstone.</span></a>
@@ -163,6 +165,106 @@ function homePage(phases) {
 .tile b{font-family:var(--font-head);font-size:18px;display:block;margin-bottom:4px}
 .tile span{color:var(--ink-2);font-size:15px}
 ul.plain{padding-left:20px}ul.plain li{margin:6px 0}
+</style>`,
+  });
+}
+
+/**
+ * The dated archive. content/guides.json is the sidecar that carries what the
+ * bookshelf cannot: when each guide was added and where its material came from.
+ * It is kept out of book-guides/index.html on purpose — that file's parser is
+ * whitespace-sensitive regex and should not have to grow new fields.
+ */
+async function parseGuidesIndex() {
+  const raw = await readFile(path.join(CONTENT, "guides.json"), "utf8");
+  const list = JSON.parse(raw);
+  if (!Array.isArray(list) || !list.length) throw new Error("content/guides.json is empty");
+  for (const g of list) {
+    if (!g.slug || !g.title || !g.dateAdded) throw new Error(`content/guides.json entry is missing slug/title/dateAdded: ${JSON.stringify(g)}`);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(g.dateAdded)) throw new Error(`${g.slug}: dateAdded must be YYYY-MM-DD, got ${g.dateAdded}`);
+  }
+  return list;
+}
+
+const DAY = 86400000;
+const longDate = (iso) =>
+  new Date(iso + "T00:00:00Z").toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+const longMonth = (iso) =>
+  new Date(iso + "T00:00:00Z").toLocaleDateString("en-GB", { month: "long", year: "numeric", timeZone: "UTC" });
+
+function archivePage(entries, now = new Date()) {
+  const sorted = [...entries].sort((a, b) => (a.dateAdded < b.dateAdded ? 1 : a.dateAdded > b.dateAdded ? -1 : 0));
+  const cutoff = new Date(now.getTime() - 7 * DAY).toISOString().slice(0, 10);
+  const recent = sorted.filter((g) => g.dateAdded >= cutoff);
+  const older = sorted.filter((g) => g.dateAdded < cutoff);
+
+  const card = (g) => `<article class="entry">
+<div class="when"><time datetime="${g.dateAdded}">${longDate(g.dateAdded)}</time></div>
+<div>
+  <h3><a href="/guides/${g.slug}">${g.title}</a></h3>
+  <p class="small meta">${g.role ? `<span class="role">${g.role}</span>` : ""}<span class="src">Source: ${g.source || "not recorded"}</span></p>
+  <p class="links"><a class="btn go" href="/guides/${g.slug}">Open the guide</a> <a class="btn" href="/guides/${g.slug}-cheatsheet">Cheat sheet</a> <a class="btn" href="/guides/${g.slug}-cheatsheet.md">Raw Markdown</a></p>
+</div>
+</article>`;
+
+  const groupBy = (list, key) => {
+    const out = [];
+    for (const g of list) {
+      const k = key(g.dateAdded);
+      const last = out[out.length - 1];
+      if (last && last.k === k) last.items.push(g);
+      else out.push({ k, items: [g] });
+    }
+    return out;
+  };
+
+  // Inside "this week" each entry already shows its own date in the left rail, so
+  // day subheadings would just repeat it. Older entries get a month heading, where
+  // the grouping earns its place.
+  const flatSection = (id, heading, note, items) =>
+    !items.length ? "" : `<section id="${id}"><h2>${heading}</h2><p class="small">${note}</p>${items.map(card).join("")}</section>`;
+  const groupedSection = (id, heading, note, groups) =>
+    !groups.length
+      ? ""
+      : `<section id="${id}"><h2>${heading}</h2><p class="small">${note}</p>` +
+        groups.map((grp) => `<h3 class="daygroup">${grp.k}</h3>${grp.items.map(card).join("")}`).join("") +
+        `</section>`;
+
+  const olderGroups = groupBy(older, longMonth);
+  const contents = [
+    ...(recent.length ? [["Added this week", recent.length]] : []),
+    ...olderGroups.map((g) => [g.k, g.items.length]),
+  ];
+
+  return page({
+    title: "Archive",
+    current: "/archive",
+    body: `<span class="eyebrow">Archive</span>
+<h1>Everything on the desk, newest first</h1>
+<p>${entries.length} guides. Each one carries the date it was added and where its material came from, so this page is the way back in when you cannot remember what a thing was called.</p>
+
+<nav class="toc"><strong>Contents</strong><ul>${contents.map(([k, n], i) => `<li><a href="#${i === 0 && recent.length ? "recent" : "previous"}">${k}</a> <span class="small">— ${n} guide${n === 1 ? "" : "s"}</span></li>`).join("")}</ul></nav>
+
+${flatSection("recent", "Added this week", "The last seven days.", recent)}
+${groupedSection("previous", "Previous", "Everything before that, newest month first.", olderGroups)}
+${!older.length ? '<p class="small">Nothing older than a week yet — this section fills in as the desk grows.</p>' : ""}
+`,
+    head: `<style>
+.toc{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:16px 20px;margin:22px 0 30px}
+.toc strong{font-family:var(--font-head);display:block;margin-bottom:6px}
+.toc ul{margin:0;padding-left:20px}.toc li{margin:3px 0}
+section{margin-bottom:34px}
+section h2{border-top:1px solid var(--line);padding-top:22px;margin-top:30px}
+.daygroup{font-family:var(--font-mono);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:500;margin:24px 0 10px}
+.entry{display:grid;grid-template-columns:170px 1fr;gap:18px;padding:16px 0;border-top:1px solid var(--line-soft)}
+.entry:first-of-type{border-top:0}
+.entry .when{font-family:var(--font-mono);font-size:13px;color:var(--ink-3);padding-top:3px}
+.entry h3{margin-bottom:4px}
+.entry h3 a{text-decoration-color:var(--accent)}
+.entry .meta{margin-bottom:8px}
+.entry .role{background:var(--surface-3);border-radius:999px;padding:2px 9px;margin-right:9px;font-family:var(--font-mono);font-size:12px}
+.entry .links{margin:0;display:flex;flex-wrap:wrap;gap:8px}
+@media(max-width:700px){.entry{grid-template-columns:1fr;gap:6px}.entry .when{padding-top:0}}
 </style>`,
   });
 }
@@ -663,6 +765,8 @@ async function build() {
 
   await writeFile(path.join(OUT, "index.html"), homePage(phases));
   await writeFile(path.join(OUT, "bookshelf.html"), bookshelfPage(phases));
+  const guideIndex = await parseGuidesIndex();
+  await writeFile(path.join(OUT, "archive.html"), archivePage(guideIndex));
   await writeFile(path.join(OUT, "ide.html"), idePage());
   await writeFile(path.join(OUT, "tutor.html"), tutorPage(phases));
 
@@ -707,7 +811,7 @@ async function build() {
   }
 
   const count = phases.reduce((a, p) => a + p.books.length, 0);
-  console.log(`built public/ — ${count} books, ${files.length - 1} guide files, ${constructs.length} construct chapters, 5 site pages`);
+  console.log(`built public/ — ${count} books, ${files.length - 1} guide files, ${guideIndex.length} archive entries, ${constructs.length} construct chapters, 6 site pages`);
 }
 
 if (!existsSync(path.join(CONTENT, "book-guides", "index.html"))) {

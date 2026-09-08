@@ -172,7 +172,7 @@ Meanwhile the shelf answers most things itself. Open the guide for the book you 
 
 /* ------------------------------------------------------------------ routes */
 
-const PAGES = new Set(["/bookshelf", "/ide", "/tutor", "/agent-walkthrough", "/python-constructs"]);
+const PAGES = new Set(["/bookshelf", "/archive", "/ide", "/tutor", "/agent-walkthrough", "/python-constructs"]);
 
 export default {
   async fetch(request, env) {

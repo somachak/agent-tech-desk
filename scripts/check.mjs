@@ -1,5 +1,5 @@
 /**
- * Gate checks. Usage: node scripts/check.mjs build|order|serve|secrets|all
+ * Gate checks. Usage: node scripts/check.mjs build|order|archive|serve|secrets|ide|constructs|all
  * Each mode prints a success-only token when every assertion passes.
  */
 import { readFile, readdir, stat } from "node:fs/promises";
@@ -20,6 +20,7 @@ async function checkBuild() {
   const need = [
     "index.html",
     "bookshelf.html",
+    "archive.html",
     "ide.html",
     "tutor.html",
     "agent-walkthrough.html",
@@ -34,9 +35,15 @@ async function checkBuild() {
   const html = guides.filter((f) => f.endsWith(".html") && !f.endsWith("-cheatsheet.html"));
   const sheetPages = guides.filter((f) => f.endsWith("-cheatsheet.html"));
   const sheets = guides.filter((f) => f.endsWith("-cheatsheet.md"));
-  if (html.length !== 14) bad(`expected 14 guide pages, found ${html.length}`);
-  if (sheetPages.length !== 14) bad(`expected 14 cheat-sheet pages, found ${sheetPages.length}`);
-  if (sheets.length !== 14) bad(`expected 14 raw cheat sheets, found ${sheets.length}`);
+  // The count comes from the source of truth, not a literal, so the shelf can grow.
+  // Counting <div class="book"> rather than <h3> keeps this correct if the page ever
+  // gains a heading outside a book entry.
+  const srcIndex = await readFile(path.join(ROOT, "content", "book-guides", "index.html"), "utf8");
+  const expected = [...srcIndex.matchAll(/<div class="book">/g)].length;
+  if (!expected) bad("no books found in content/book-guides/index.html");
+  if (html.length !== expected) bad(`expected ${expected} guide pages, found ${html.length}`);
+  if (sheetPages.length !== expected) bad(`expected ${expected} cheat-sheet pages, found ${sheetPages.length}`);
+  if (sheets.length !== expected) bad(`expected ${expected} raw cheat sheets, found ${sheets.length}`);
   if (guides.includes("index.html")) bad("guides/index.html should be replaced by /bookshelf");
 
   // no page may reference the private material
@@ -50,7 +57,7 @@ async function checkBuild() {
   for (const href of ["/bookshelf", "/ide", "/tutor"]) {
     if (!guide.includes(`href="${href}"`)) bad(`guide page does not link ${href}`);
   }
-  console.log(`  ${html.length} guides, ${sheetPages.length} cheat-sheet pages (+${sheets.length} raw), 5 site pages, no private references`);
+  console.log(`  ${html.length} guides, ${sheetPages.length} cheat-sheet pages (+${sheets.length} raw), 6 site pages, no private references`);
 }
 
 async function checkOrder() {
@@ -59,7 +66,7 @@ async function checkOrder() {
   const titles = (h) => [...h.matchAll(/<h3>([^<]+)<\/h3>/g)].map((m) => m[1]);
   const a = titles(src);
   const b = titles(built);
-  if (a.length !== 14) bad(`the attachment lists ${a.length} books, expected 14`);
+  if (!a.length) bad("the attachment lists no books");
   if (JSON.stringify(a) !== JSON.stringify(b)) {
     bad(`built order differs from the attachment:\n    attachment: ${a.join(" | ")}\n    built:      ${b.join(" | ")}`);
   }
@@ -70,7 +77,41 @@ async function checkOrder() {
     const target = m[1].endsWith(".md") ? m[1] : m[1] + ".html";
     if (!existsSync(path.join(OUT, "guides", target))) bad(`bookshelf links a missing file: ${target}`);
   }
-  console.log(`  14 books in the attachment's own order, 3 phases, every link resolves`);
+  const phaseCount = phases(src).length;
+  console.log(`  ${a.length} books in the attachment's own order, ${phaseCount} phases, every link resolves`);
+}
+
+/** The dated archive must agree with the bookshelf, entry for entry. */
+async function checkArchive() {
+  const list = JSON.parse(await readFile(path.join(ROOT, "content", "guides.json"), "utf8"));
+  const src = await readFile(path.join(ROOT, "content", "book-guides", "index.html"), "utf8");
+  const shelfSlugs = [...src.matchAll(/<a class="go" href="([^"]+)\.html"/g)].map((m) => m[1]).sort();
+  const jsonSlugs = list.map((g) => g.slug).sort();
+
+  for (const s of jsonSlugs) if (!shelfSlugs.includes(s)) bad(`guides.json lists ${s}, which is not on the bookshelf`);
+  for (const s of shelfSlugs) if (!jsonSlugs.includes(s)) bad(`${s} is on the bookshelf but missing from guides.json`);
+
+  const seen = new Set();
+  for (const g of list) {
+    if (seen.has(g.slug)) bad(`guides.json lists ${g.slug} twice`);
+    seen.add(g.slug);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(g.dateAdded || "")) bad(`${g.slug} has no valid dateAdded`);
+    if (!g.source) bad(`${g.slug} has no source recorded`);
+    if (!existsSync(path.join(OUT, "guides", `${g.slug}.html`))) bad(`guides.json lists ${g.slug}, which has no built page`);
+  }
+
+  const archive = await readFile(path.join(OUT, "archive.html"), "utf8");
+  if (!archive.includes('class="sitebar"')) bad("archive.html has no site navigation");
+  for (const g of list) {
+    if (!archive.includes(`href="/guides/${g.slug}"`)) bad(`the archive does not link ${g.slug}`);
+  }
+  // newest first
+  const dates = [...archive.matchAll(/datetime="(\d{4}-\d{2}-\d{2})"/g)].map((m) => m[1]);
+  if (dates.length !== list.length) bad(`the archive shows ${dates.length} dated entries, expected ${list.length}`);
+  for (let i = 1; i < dates.length; i++) {
+    if (dates[i] > dates[i - 1]) { bad("the archive is not in newest-first order"); break; }
+  }
+  console.log(`  ${list.length} archive entries, newest first, every slug matched to the bookshelf and a built page`);
 }
 
 function waitFor(url, tries = 60) {
@@ -116,6 +157,8 @@ async function checkServe() {
     }
     const shelf = await get("/bookshelf");
     if (shelf.status !== 200 || !shelf.text.includes("books, one build path")) bad(`/bookshelf returned ${shelf.status}`);
+    const archive = await get("/archive");
+    if (archive.status !== 200 || !archive.text.includes("Everything on the desk, newest first")) bad(`/archive returned ${archive.status}`);
     const ide = await get("/ide");
     if (ide.status !== 200 || !ide.text.includes("pyodide")) bad(`/ide returned ${ide.status} or has no Pyodide`);
     const guide = await get("/guides/python-ai-programming-second-edition");
@@ -140,7 +183,7 @@ async function checkServe() {
     if (!/kwargs/.test(ask.reply || "")) bad("the mock tutor did not answer the kwargs question");
     if (!ask.note) bad("the mock answer is not labelled as a mock");
 
-    console.log(`  served / /bookshelf /ide a guide and a cheat sheet; mock tutor answered ${(ask.reply || "").length} chars`);
+    console.log(`  served / /bookshelf /archive /ide a guide and a cheat sheet; mock tutor answered ${(ask.reply || "").length} chars`);
   } catch (err) {
     bad(`${err.message}\n${log.slice(-600)}`);
   } finally {
@@ -251,10 +294,11 @@ async function checkConstructs() {
   console.log(`  7 chapters + course map + design system served; index links and titles all match`);
 }
 
-const modes = { build: checkBuild, order: checkOrder, serve: checkServe, secrets: checkSecrets, ide: checkIde, constructs: checkConstructs };
+const modes = { build: checkBuild, order: checkOrder, archive: checkArchive, serve: checkServe, secrets: checkSecrets, ide: checkIde, constructs: checkConstructs };
 const tokens = {
   build: "build verification passed",
   order: "order verification passed",
+  archive: "archive verification passed",
   serve: "serve verification passed",
   secrets: "secrets verification passed",
   ide: "ide verification passed",

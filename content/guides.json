@@ -1,0 +1,152 @@
+[
+  {
+    "slug": "python-ai-programming-second-edition",
+    "title": "Python AI Programming, Second Edition",
+    "role": "Python first",
+    "source": "Patrick J",
+    "dateAdded": "2026-09-07",
+    "tags": [
+      "foundations"
+    ]
+  },
+  {
+    "slug": "ai-agents-with-python-mcp-multi-agent",
+    "title": "AI Agents with Python",
+    "role": "The agent loop",
+    "source": "Williams Moses",
+    "dateAdded": "2026-09-07",
+    "tags": [
+      "foundations"
+    ]
+  },
+  {
+    "slug": "learn-ai-agents-by-building-real-applications",
+    "title": "Learn AI Agents by Building Real Applications",
+    "role": "Build by doing",
+    "source": "Kitchen to Code",
+    "dateAdded": "2026-09-07",
+    "tags": [
+      "foundations"
+    ]
+  },
+  {
+    "slug": "ai-programming-with-python-for-developers",
+    "title": "AI Programming with Python for Developers",
+    "role": "Real-world apps",
+    "source": "Henry Bill",
+    "dateAdded": "2026-09-07",
+    "tags": [
+      "building"
+    ]
+  },
+  {
+    "slug": "building-autonomous-ai-agents-with-claude",
+    "title": "Building Autonomous AI Agents with Claude AI",
+    "role": "Claude-shaped design",
+    "source": "Nolan Stark",
+    "dateAdded": "2026-09-07",
+    "tags": [
+      "building"
+    ]
+  },
+  {
+    "slug": "claude-certified-architect-foundations-playbook",
+    "title": "Claude Certified Architect Foundations Playbook",
+    "role": "Claude exam prep",
+    "source": "J Cook",
+    "dateAdded": "2026-09-07",
+    "tags": [
+      "building"
+    ]
+  },
+  {
+    "slug": "agentic-design-patterns",
+    "title": "Agentic Design Patterns",
+    "role": "Pattern catalogue",
+    "source": "Antonio Gulli",
+    "dateAdded": "2026-09-07",
+    "tags": [
+      "building"
+    ]
+  },
+  {
+    "slug": "ai-agents-in-practice-task-decomposition",
+    "title": "AI Agents in Practice: Task Decomposition, Delegation, and Human-in-the-Loop Control",
+    "role": "Decompose and delegate",
+    "source": "Sophie Langford",
+    "dateAdded": "2026-09-07",
+    "tags": [
+      "building"
+    ]
+  },
+  {
+    "slug": "30-agents-every-developer-should-build",
+    "title": "30 Agents Every Developer Should Build: A Practical Field Guide",
+    "role": "Thirty builds",
+    "source": "Gordon A. Crawford",
+    "dateAdded": "2026-09-07",
+    "tags": [
+      "building"
+    ]
+  },
+  {
+    "slug": "modern-loop-engineering-for-agentic-ai",
+    "title": "Modern Loop Engineering for Agentic AI",
+    "role": "Feedback loops",
+    "source": "Dominic F. Hargrave",
+    "dateAdded": "2026-09-07",
+    "tags": [
+      "building"
+    ]
+  },
+  {
+    "slug": "the-7-genai-architectures",
+    "title": "The 7 GenAI Architectures: A Field Guide to Choosing the Right AI System",
+    "role": "Choosing the architecture",
+    "source": "Ranjan Kumar",
+    "dateAdded": "2026-09-07",
+    "tags": [
+      "scaling"
+    ]
+  },
+  {
+    "slug": "ai-agents-playbook-stop-burning-tokens",
+    "title": "AI Agents Playbook: Stop Burning Tokens and Work Smarter",
+    "role": "Token economy",
+    "source": "Peter J. Kober",
+    "dateAdded": "2026-09-07",
+    "tags": [
+      "scaling"
+    ]
+  },
+  {
+    "slug": "production-ai-engineering",
+    "title": "Production AI Engineering: From AI Prototypes to Reliable, Secure, Scalable Systems",
+    "role": "Production",
+    "source": "Sterling Norwood",
+    "dateAdded": "2026-09-07",
+    "tags": [
+      "scaling"
+    ]
+  },
+  {
+    "slug": "designing-data-intensive-applications",
+    "title": "Designing Data-Intensive Applications",
+    "role": "Data foundations",
+    "source": "Martin Kleppmann and Chris Riccomini (Second Edition, 2026)",
+    "dateAdded": "2026-09-07",
+    "tags": [
+      "scaling"
+    ]
+  },
+  {
+    "slug": "the-graph-engineering-atlas",
+    "title": "The Graph Engineering Atlas",
+    "role": "Codebase context",
+    "source": "22 YouTube transcripts",
+    "dateAdded": "2026-09-08",
+    "tags": [
+      "scaling"
+    ]
+  }
+]
