@@ -1,6 +1,10 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "agent-tech-desk",
+  // Pinned so a deploy can never land on the wrong Cloudflare account.
+  // This is pixelartinc@gmail.com. Deploying while logged in as any other
+  // account now fails loudly instead of creating a duplicate worker.
+  "account_id": "84109e1abca4de1a49667be4443d08e7",
   "main": "worker/index.js",
   "compatibility_date": "2026-09-07",
   "observability": { "enabled": true },
